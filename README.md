@@ -17,6 +17,12 @@ part of the call above, thus running
 ./slurm.sh json/dice/2d_unet.json 2d_unet 200
 ```
 
+Manually build
+```
+singularity build --fakeroot Singularity deoxys.sif
+```
+
+Remember to login to a gpu session to use the gpu
 ```
 qlogin --partition=gpu --gres=gpu:1
 ```

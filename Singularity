@@ -3,6 +3,7 @@ From: tensorflow/tensorflow:2.0.0-gpu-py3
 Stage: build
 
 %post
+    apt-mark hold tensorflow
     apt update -y
     apt upgrade -y
     pip install ipython

@@ -111,3 +111,5 @@ notebooks/*
 !notebooks/*.ipynb
 !notebooks/*.txt
 *.h5
+*.sif
+*.out
