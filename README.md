@@ -16,3 +16,7 @@ part of the call above, thus running
 ```bash
 ./slurm.sh json/dice/2d_unet.json 2d_unet 200
 ```
+
+```
+qlogin --partition=gpu --gres=gpu:1
+```
