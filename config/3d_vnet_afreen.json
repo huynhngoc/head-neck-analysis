@@ -3,7 +3,7 @@
         "class_name": "HDF5Reader",
         "config": {
             "filename": "/work/users/hn_delin/headneck_3d.h5",
-            "batch_size": 3,
+            "batch_size": 2,
             "x_name": "input",
             "y_name": "target",
             "batch_cache": 1,

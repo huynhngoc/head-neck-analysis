@@ -53,7 +53,7 @@
             "class_name": "BinaryFbetaLoss"
         },
         "optimizer": {
-            "class_name": "adam",
+            "class_name": "SGD",
             "config": {
                 "learning_rate": 0.00005
             }
