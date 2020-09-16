@@ -38,7 +38,16 @@
         }
     },
     "train_params": {
-        "epochs": 40
+        "epochs": 40,
+        "callbacks": [
+            {
+                "class_name": "EarlyStopping",
+                "config": {
+                    "monitor": "val_loss",
+                    "patience": 10
+                }
+            }
+        ]
     },
     "input_params": {
         "shape": [
@@ -104,7 +113,7 @@
                 "class_name": "Conv3D",
                 "config": {
                     "filters": 32,
-                    "kernel_size": 3,
+                    "kernel_size": 1,
                     "strides": 2,
                     "kernel_initializer": "he_normal",
                     "padding": "same"
@@ -141,7 +150,7 @@
                 "class_name": "Conv3D",
                 "config": {
                     "filters": 64,
-                    "kernel_size": 3,
+                    "kernel_size": 1,
                     "strides": 2,
                     "kernel_initializer": "he_normal",
                     "padding": "same"
@@ -178,7 +187,7 @@
                 "class_name": "Conv3D",
                 "config": {
                     "filters": 128,
-                    "kernel_size": 3,
+                    "kernel_size": 1,
                     "strides": 2,
                     "kernel_initializer": "he_normal",
                     "padding": "same"
@@ -215,7 +224,7 @@
                 "class_name": "Conv3D",
                 "config": {
                     "filters": 256,
-                    "kernel_size": 3,
+                    "kernel_size": 1,
                     "strides": 2,
                     "kernel_initializer": "he_normal",
                     "padding": "same"

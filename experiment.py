@@ -36,6 +36,12 @@ if __name__ == '__main__':
             model_checkpoint_period=args.model_checkpoint_period,
             prediction_checkpoint_period=args.prediction_checkpoint_period,
             epochs=args.epochs,
+        ).run_experiment(
+            train_history_log=True,
+            model_checkpoint_period=1,
+            prediction_checkpoint_period=1,
+            epochs=args.epochs + 1,
+            initial_epoch=args.epochs
         )
         .plot_performance()
         .plot_prediction(masked_images=[i for i in range(42)])
