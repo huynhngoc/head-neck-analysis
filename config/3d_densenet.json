@@ -1,0 +1,1037 @@
+{
+    "dataset_params": {
+        "class_name": "HDF5Reader",
+        "config": {
+            "filename": "/work/users/hn_delin/headneck_3d.h5",
+            "batch_size": 2,
+            "x_name": "input",
+            "y_name": "target",
+            "batch_cache": 1,
+            "train_folds": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+            ],
+            "val_folds": [
+                10
+            ],
+            "test_folds": [
+                11,
+                12,
+                13
+            ],
+            "preprocessors": {
+                "class_name": "WindowingPreprocessor",
+                "config": {
+                    "window_center": 1094,
+                    "window_width": 200,
+                    "channel": 0
+                }
+            }
+        }
+    },
+    "train_params": {
+        "epochs": 40
+    },
+    "input_params": {
+        "shape": [
+            173,
+            191,
+            265,
+            2
+        ]
+    },
+    "model_params": {
+        "loss": {
+            "class_name": "BinaryFbetaLoss"
+        },
+        "optimizer": {
+            "class_name": "adam",
+            "config": {
+                "learning_rate": 0.0001
+            }
+        },
+        "metrics": [
+            {
+                "class_name": "BinaryFbeta"
+            },
+            {
+                "class_name": "Fbeta"
+            }
+        ]
+    },
+    "architecture": {
+        "type": "Vnet",
+        "layers": [
+            {
+                "name": "down_conv_1",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 48,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                }
+            },
+            {
+                "name": "block1_conv1",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 48,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                }
+            },
+            {
+                "name": "block1_conv2",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 48,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_1",
+                    "block1_conv1"
+                ]
+            },
+            {
+                "name": "block1_conv3",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 48,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_1",
+                    "block1_conv1",
+                    "block1_conv2"
+                ]
+            },
+            {
+                "name": "down_conv_2",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 1,
+                    "strides": 2,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_1",
+                    "block1_conv1",
+                    "block1_conv2",
+                    "block1_conv3"
+                ]
+            },
+            {
+                "name": "block2_conv1",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                }
+            },
+            {
+                "name": "block2_conv2",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_2",
+                    "block2_conv1"
+                ]
+            },
+            {
+                "name": "block2_conv3",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_2",
+                    "block2_conv1",
+                    "block2_conv2"
+                ]
+            },
+            {
+                "name": "block2_conv4",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_2",
+                    "block2_conv1",
+                    "block2_conv2",
+                    "block2_conv3"
+                ]
+            },
+            {
+                "name": "down_conv_3",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 80,
+                    "kernel_size": 1,
+                    "strides": 2,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_2",
+                    "block2_conv1",
+                    "block2_conv2",
+                    "block2_conv3",
+                    "block2_conv4"
+                ]
+            },
+            {
+                "name": "block3_conv1",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 80,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                }
+            },
+            {
+                "name": "block3_conv2",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 80,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_3",
+                    "block3_conv1"
+                ]
+            },
+            {
+                "name": "block3_conv3",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 80,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_3",
+                    "block3_conv1",
+                    "block3_conv2"
+                ]
+            },
+            {
+                "name": "block3_conv4",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 80,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_3",
+                    "block3_conv1",
+                    "block3_conv2",
+                    "block3_conv3"
+                ]
+            },
+            {
+                "name": "block3_conv5",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 80,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_3",
+                    "block3_conv1",
+                    "block3_conv2",
+                    "block3_conv3",
+                    "block3_conv4"
+                ]
+            },
+            {
+                "name": "down_conv_4",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 1,
+                    "strides": 2,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_3",
+                    "block3_conv1",
+                    "block3_conv2",
+                    "block3_conv3",
+                    "block3_conv4",
+                    "block3_conv5"
+                ]
+            },
+            {
+                "name": "block4_conv1",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                }
+            },
+            {
+                "name": "block4_conv2",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_4",
+                    "block4_conv1"
+                ]
+            },
+            {
+                "name": "block4_conv3",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_4",
+                    "block4_conv1",
+                    "block4_conv2"
+                ]
+            },
+            {
+                "name": "block4_conv4",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_4",
+                    "block4_conv1",
+                    "block4_conv2",
+                    "block4_conv3"
+                ]
+            },
+            {
+                "name": "block4_conv5",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_4",
+                    "block4_conv1",
+                    "block4_conv2",
+                    "block4_conv3",
+                    "block4_conv4"
+                ]
+            },
+            {
+                "name": "block4_conv6",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_4",
+                    "block4_conv1",
+                    "block4_conv2",
+                    "block4_conv3",
+                    "block4_conv4",
+                    "block4_conv5"
+                ]
+            },
+            {
+                "name": "down_conv_5",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 112,
+                    "kernel_size": 1,
+                    "strides": 2,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_4",
+                    "block4_conv1",
+                    "block4_conv2",
+                    "block4_conv3",
+                    "block4_conv4",
+                    "block4_conv5",
+                    "block4_conv6"
+                ]
+            },
+            {
+                "name": "block5_conv1",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 112,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                }
+            },
+            {
+                "name": "block5_conv2",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 112,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_5",
+                    "block5_conv1"
+                ]
+            },
+            {
+                "name": "block5_conv3",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 112,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_5",
+                    "block5_conv1",
+                    "block5_conv2"
+                ]
+            },
+            {
+                "name": "block5_conv4",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 112,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_5",
+                    "block5_conv1",
+                    "block5_conv2",
+                    "block5_conv3"
+                ]
+            },
+            {
+                "name": "block5_conv5",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 112,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_5",
+                    "block5_conv1",
+                    "block5_conv2",
+                    "block5_conv3",
+                    "block5_conv4"
+                ]
+            },
+            {
+                "name": "block5_conv6",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 112,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_5",
+                    "block5_conv1",
+                    "block5_conv2",
+                    "block5_conv3",
+                    "block5_conv4",
+                    "block5_conv5"
+                ]
+            },
+            {
+                "name": "block5_conv7",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 112,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_5",
+                    "block5_conv1",
+                    "block5_conv2",
+                    "block5_conv3",
+                    "block5_conv4",
+                    "block5_conv5",
+                    "block5_conv6"
+                ]
+            },
+            {
+                "name": "up_conv_5",
+                "class_name": "Conv3DTranspose",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 1,
+                    "strides": 2,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "block5_conv1",
+                    "block5_conv2",
+                    "block5_conv3",
+                    "block5_conv4",
+                    "block5_conv5",
+                    "block5_conv6",
+                    "block5_conv7"
+                ]
+            },
+            {
+                "name": "block6_conv1",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_4",
+                    "block4_conv1",
+                    "block4_conv2",
+                    "block4_conv3",
+                    "block4_conv4",
+                    "block4_conv5",
+                    "block4_conv6",
+                    "up_conv_5"
+                ]
+            },
+            {
+                "name": "block6_conv2",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_4",
+                    "block4_conv1",
+                    "block4_conv2",
+                    "block4_conv3",
+                    "block4_conv4",
+                    "block4_conv5",
+                    "block4_conv6",
+                    "up_conv_5",
+                    "block6_conv1"
+                ]
+            },
+            {
+                "name": "block6_conv3",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_4",
+                    "block4_conv1",
+                    "block4_conv2",
+                    "block4_conv3",
+                    "block4_conv4",
+                    "block4_conv5",
+                    "block4_conv6",
+                    "up_conv_5",
+                    "block6_conv1",
+                    "block6_conv2"
+                ]
+            },
+            {
+                "name": "block6_conv4",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_4",
+                    "block4_conv1",
+                    "block4_conv2",
+                    "block4_conv3",
+                    "block4_conv4",
+                    "block4_conv5",
+                    "block4_conv6",
+                    "up_conv_5",
+                    "block6_conv1",
+                    "block6_conv2",
+                    "block6_conv3"
+                ]
+            },
+            {
+                "name": "block6_conv5",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_4",
+                    "block4_conv1",
+                    "block4_conv2",
+                    "block4_conv3",
+                    "block4_conv4",
+                    "block4_conv5",
+                    "block4_conv6",
+                    "up_conv_5",
+                    "block6_conv1",
+                    "block6_conv2",
+                    "block6_conv3",
+                    "block6_conv4"
+                ]
+            },
+            {
+                "name": "block6_conv6",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_4",
+                    "block4_conv1",
+                    "block4_conv2",
+                    "block4_conv3",
+                    "block4_conv4",
+                    "block4_conv5",
+                    "block4_conv6",
+                    "up_conv_5",
+                    "block6_conv1",
+                    "block6_conv2",
+                    "block6_conv3",
+                    "block6_conv4",
+                    "block6_conv5"
+                ]
+            },
+            {
+                "name": "up_conv_4",
+                "class_name": "Conv3DTranspose",
+                "config": {
+                    "filters": 80,
+                    "kernel_size": 1,
+                    "strides": 2,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "block6_conv1",
+                    "block6_conv2",
+                    "block6_conv3",
+                    "block6_conv4",
+                    "block6_conv5",
+                    "block6_conv6"
+                ]
+            },
+            {
+                "name": "block7_conv1",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 80,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_3",
+                    "block3_conv1",
+                    "block3_conv2",
+                    "block3_conv3",
+                    "block3_conv4",
+                    "block3_conv5",
+                    "up_conv_4"
+                ]
+            },
+            {
+                "name": "block7_conv2",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 80,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_3",
+                    "block3_conv1",
+                    "block3_conv2",
+                    "block3_conv3",
+                    "block3_conv4",
+                    "block3_conv5",
+                    "up_conv_4",
+                    "block7_conv1"
+                ]
+            },
+            {
+                "name": "block7_conv3",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 80,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_3",
+                    "block3_conv1",
+                    "block3_conv2",
+                    "block3_conv3",
+                    "block3_conv4",
+                    "block3_conv5",
+                    "up_conv_4",
+                    "block7_conv1",
+                    "block7_conv2"
+                ]
+            },
+            {
+                "name": "block7_conv4",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 80,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_3",
+                    "block3_conv1",
+                    "block3_conv2",
+                    "block3_conv3",
+                    "block3_conv4",
+                    "block3_conv5",
+                    "up_conv_4",
+                    "block7_conv1",
+                    "block7_conv2",
+                    "block7_conv3"
+                ]
+            },
+            {
+                "name": "block7_conv5",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 80,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_3",
+                    "block3_conv1",
+                    "block3_conv2",
+                    "block3_conv3",
+                    "block3_conv4",
+                    "block3_conv5",
+                    "up_conv_4",
+                    "block7_conv1",
+                    "block7_conv2",
+                    "block7_conv3",
+                    "block7_conv4"
+                ]
+            },
+            {
+                "name": "up_conv_3",
+                "class_name": "Conv3DTranspose",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 1,
+                    "strides": 2,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "block7_conv1",
+                    "block7_conv2",
+                    "block7_conv3",
+                    "block7_conv4",
+                    "block7_conv5"
+                ]
+            },
+            {
+                "name": "block8_conv1",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_2",
+                    "block2_conv1",
+                    "block2_conv2",
+                    "block2_conv3",
+                    "block2_conv4",
+                    "up_conv_3"
+                ]
+            },
+            {
+                "name": "block8_conv2",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_2",
+                    "block2_conv1",
+                    "block2_conv2",
+                    "block2_conv3",
+                    "block2_conv4",
+                    "up_conv_3",
+                    "block8_conv1"
+                ]
+            },
+            {
+                "name": "block8_conv3",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_2",
+                    "block2_conv1",
+                    "block2_conv2",
+                    "block2_conv3",
+                    "block2_conv4",
+                    "up_conv_3",
+                    "block8_conv1",
+                    "block8_conv2"
+                ]
+            },
+            {
+                "name": "block8_conv4",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_2",
+                    "block2_conv1",
+                    "block2_conv2",
+                    "block2_conv3",
+                    "block2_conv4",
+                    "up_conv_3",
+                    "block8_conv1",
+                    "block8_conv2",
+                    "block8_conv3"
+                ]
+            },
+            {
+                "name": "up_conv_2",
+                "class_name": "Conv3DTranspose",
+                "config": {
+                    "filters": 48,
+                    "kernel_size": 1,
+                    "strides": 2,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "block8_conv1",
+                    "block8_conv2",
+                    "block8_conv3",
+                    "block8_conv4"
+                ]
+            },
+            {
+                "name": "block9_conv1",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 48,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_1",
+                    "block1_conv1",
+                    "block1_conv2",
+                    "block1_conv3",
+                    "up_conv_2"
+                ]
+            },
+            {
+                "name": "block9_conv2",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 48,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_1",
+                    "block1_conv1",
+                    "block1_conv2",
+                    "block1_conv3",
+                    "up_conv_2",
+                    "block9_conv1"
+                ]
+            },
+            {
+                "name": "block9_conv3",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 48,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "down_conv_1",
+                    "block1_conv1",
+                    "block1_conv2",
+                    "block1_conv3",
+                    "up_conv_2",
+                    "block9_conv1",
+                    "block9_conv2"
+                ]
+            },
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 1,
+                    "kernel_size": 3,
+                    "activation": "sigmoid",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "inputs": [
+                    "block9_conv1",
+                    "block9_conv2",
+                    "block9_conv3"
+                ]
+            }
+        ]
+    }
+}
