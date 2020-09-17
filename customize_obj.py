@@ -44,17 +44,23 @@ class Padding(BasePreprocessor):
 
             if height % divide_factor != 0:
                 new_height = (height // divide_factor + 1) * divide_factor
+            else:
+                new_height = height
 
             if width % divide_factor != 0:
                 new_width = (width // divide_factor + 1) * divide_factor
+            else:
+                new_width = WindowsError
 
             if z % divide_factor != 0:
                 new_z = (z // divide_factor + 1) * divide_factor
+            else:
+                new_z = z
 
             new_images = np.zeros(
-                (image_shape[0], height, width, z, image_shape[-1]))
+                (image_shape[0], new_height, new_width, new_z, image_shape[-1]))
             new_targets = np.zeros(
-                (target_shape[0], height, width, z, target_shape[-1]))
+                (target_shape[0], new_height, new_width, new_z, target_shape[-1]))
 
             min_h = (new_height - height) // 2
             min_w = (new_width - width) // 2

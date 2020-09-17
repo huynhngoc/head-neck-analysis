@@ -46,7 +46,16 @@
         }
     },
     "train_params": {
-        "epochs": 40
+        "epochs": 40,
+        "callbacks": [
+            {
+                "class_name": "EarlyStopping",
+                "config": {
+                    "monitor": "val_loss",
+                    "patience": 10
+                }
+            }
+        ]
     },
     "input_params": {
         "shape": [
