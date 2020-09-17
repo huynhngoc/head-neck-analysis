@@ -3,10 +3,10 @@
         "class_name": "HDF5Reader",
         "config": {
             "filename": "/work/users/hn_delin/full_dataset_single.h5",
-            "batch_size": 2,
+            "batch_size": 16,
             "x_name": "input",
             "y_name": "target",
-            "batch_cache": 1,
+            "batch_cache": 4,
             "train_folds": [
                 0,
                 1,
