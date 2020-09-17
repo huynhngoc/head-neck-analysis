@@ -8,8 +8,9 @@ In addition, we can peek the result of 42 first images from prediction set.
 """
 
 from deoxys.experiment import Experiment
-from deoxys.utils import read_file
+# from deoxys.utils import read_file
 import argparse
+import os
 # from pathlib import Path
 # from comet_ml import Experiment as CometEx
 import tensorflow as tf
@@ -28,15 +29,20 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    config = read_file(args.config_file)
+    # config = read_file(args.config_file)
+    if os.path.isfile(args.config_file) and args.config_file.endswith('h5'):
+        initial_epoch = int(args.config_file[-6:-6])
+    else:
+        raise RuntimeError('Not a model file')
     (
         Experiment(log_base_path=args.log_folder)
-        .from_full_config(config)
+        .from_file(args.config_file)
         .run_experiment(
             train_history_log=True,
             model_checkpoint_period=args.model_checkpoint_period,
             prediction_checkpoint_period=args.prediction_checkpoint_period,
-            epochs=args.epochs,
+            epochs=args.epochs + initial_epoch,
+            initial_epoch=initial_epoch
         ).run_experiment(
             train_history_log=True,
             model_checkpoint_period=1,
