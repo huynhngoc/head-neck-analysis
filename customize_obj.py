@@ -1,5 +1,6 @@
-from deoxys.customize import custom_architecture
+from deoxys.customize import custom_architecture, custom_preprocessor
 from deoxys.loaders.architecture import BaseModelLoader, Vnet
+from deoxys.data.preprocessor import BasePreprocessor
 
 from deoxys.keras.models import Model as KerasModel
 from deoxys.keras.layers import Input, concatenate, Lambda, Concatenate
@@ -9,6 +10,65 @@ import tensorflow as tf
 
 from deoxys.model.layers import layer_from_config
 from deoxys.utils import deep_copy
+
+import numpy as np
+
+
+@custom_preprocessor
+class Padding(BasePreprocessor):
+    def __init__(self, depth=4):
+        self.depth = depth
+
+    def transform(self, images, targets):
+        image_shape = images.shape
+        target_shape = targets.shape
+
+        shape = image_shape[1:-1]
+
+        divide_factor = 2 ** self.depth
+
+        if len(shape) == 2:
+            height, width = shape
+            if height % divide_factor != 0:
+                height = (height // divide_factor + 1) * divide_factor
+
+            if width % divide_factor != 0:
+                width = (width // divide_factor + 1) * divide_factor
+
+            images = image.resize_with_pad(images, height, width)
+            targets = image.resize_with_pad(targets, height, width)
+            return images, targets
+
+        if len(shape) == 3:
+            height, width, z = shape
+
+            if height % divide_factor != 0:
+                new_height = (height // divide_factor + 1) * divide_factor
+
+            if width % divide_factor != 0:
+                new_width = (width // divide_factor + 1) * divide_factor
+
+            if z % divide_factor != 0:
+                new_z = (z // divide_factor + 1) * divide_factor
+
+            new_images = np.zeros(
+                (image_shape[0], height, width, z, image_shape[-1]))
+            new_targets = np.zeros(
+                (target_shape[0], height, width, z, target_shape[-1]))
+
+            min_h = (new_height - height) // 2
+            min_w = (new_width - width) // 2
+            min_z = (new_z - z) // 2
+
+            new_images[:, min_h: min_h+height,
+                       min_w: min_w+width, min_z:min_z+z, :] = images
+
+            new_targets[:, min_h: min_h+height,
+                        min_w: min_w+width, min_z:min_z+z, :] = targets
+
+            return new_images, new_targets
+
+        raise RuntimeError('Does not support 4D tensors')
 
 
 @custom_architecture

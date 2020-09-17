@@ -27,14 +27,22 @@
                 12,
                 13
             ],
-            "preprocessors": {
-                "class_name": "WindowingPreprocessor",
-                "config": {
-                    "window_center": 1094,
-                    "window_width": 200,
-                    "channel": 0
+            "preprocessors": [
+                {
+                    "class_name": "WindowingPreprocessor",
+                    "config": {
+                        "window_center": 1094,
+                        "window_width": 200,
+                        "channel": 0
+                    }
+                },
+                {
+                    "class_name": "Padding",
+                    "config": {
+                        "depth": 4
+                    }
                 }
-            }
+            ]
         }
     },
     "train_params": {
@@ -42,9 +50,9 @@
     },
     "input_params": {
         "shape": [
-            173,
-            191,
-            265,
+            176,
+            192,
+            272,
             2
         ]
     },
