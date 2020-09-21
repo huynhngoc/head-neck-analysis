@@ -28,17 +28,17 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    strategy = tf.distribute.MirroredStrategy()
-    print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+    # strategy = tf.distribute.MirroredStrategy()
+    # print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
-    with strategy.scope():
-        config = read_file(args.config_file)
+    # with strategy.scope():
+    config = read_file(args.config_file)
 
-        exp = Experiment(
-            log_base_path=args.log_folder
-        ).from_full_config(config)
-
-    exp.run_experiment(
+    exp = Experiment(
+        log_base_path=args.log_folder
+    ).from_full_config(
+        config
+    ).run_experiment(
         train_history_log=True,
         model_checkpoint_period=args.model_checkpoint_period,
         prediction_checkpoint_period=args.prediction_checkpoint_period,
@@ -49,6 +49,4 @@ if __name__ == '__main__':
         prediction_checkpoint_period=1,
         epochs=args.epochs + 1,
         initial_epoch=args.epochs
-    )
-    .plot_performance()
-    .plot_prediction(masked_images=[i for i in range(42)])
+    ).plot_performance().plot_prediction(masked_images=[i for i in range(42)])
