@@ -156,7 +156,7 @@ class DenseNetV2(Vnet):
                 connected_input = layers[i]
 
             if 'dense_block' in layer:
-                with tf.device('GPU:1'):
+                with tf.device('cpu:0'):
                     next_layer = self._create_dense_block(
                         layer, connected_input)
             else:
