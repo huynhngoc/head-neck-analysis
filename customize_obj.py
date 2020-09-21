@@ -150,14 +150,15 @@ class DenseNetV2(Vnet):
                         inputs.append(saved_input[input_name])
                         size_factors = saved_input[
                             input_name].get_shape().as_list()[1:-1]
-                with tf.device('cpu:0'):
-                    connected_input = concatenate(inputs)
+
+                connected_input = concatenate(inputs)
             else:
                 connected_input = layers[i]
 
             if 'dense_block' in layer:
-                next_layer = self._create_dense_block(
-                    layer, connected_input)
+                with tf.device('GPU:1'):
+                    next_layer = self._create_dense_block(
+                        layer, connected_input)
             else:
                 next_tensor = layer_from_config(layer)
 
@@ -188,8 +189,7 @@ class DenseNetV2(Vnet):
             if len(dense_layers) == 1:
                 next_layer = next_tensor(connected_input)
             else:
-                with tf.device('cpu:0'):
-                    inp = concatenate(dense_layers[-2:])
+                inp = concatenate(dense_layers[-2:])
                 next_layer = next_tensor(inp)
                 dense_layers.append(inp)
 
@@ -198,8 +198,8 @@ class DenseNetV2(Vnet):
                     layer['normalizer'])(next_layer)
             dense_layers.append(next_layer)
             final_concat.append(next_layer)
-        with tf.device('cpu:0'):
-            return concatenate(final_concat)
+
+        return concatenate(final_concat)
 
     def _create_dense_blockv1(self, layer, connected_input, input):
         dense = layer['dense_block']
