@@ -1,6 +1,8 @@
-from deoxys.customize import custom_architecture, custom_preprocessor
+from deoxys.customize import custom_architecture, custom_preprocessor, \
+    custom_datareader
 from deoxys.loaders.architecture import BaseModelLoader, Vnet
 from deoxys.data.preprocessor import BasePreprocessor
+from deoxys.data.data_reader import HDF5Reader, HDF5DataGenerator
 
 from deoxys.keras.models import Model as KerasModel
 from deoxys.keras.layers import Input, concatenate, Lambda, Concatenate
@@ -156,9 +158,8 @@ class DenseNetV2(Vnet):
                 connected_input = layers[i]
 
             if 'dense_block' in layer:
-                with tf.device('cpu:0'):
-                    next_layer = self._create_dense_block(
-                        layer, connected_input)
+                next_layer = self._create_dense_block(
+                    layer, connected_input)
             else:
                 next_tensor = layer_from_config(layer)
 
@@ -226,3 +227,214 @@ class DenseNetV2(Vnet):
             dense_layers.append(next_layer)
 
         return concatenate(dense_layers[1:])
+
+
+@custom_datareader
+class HDF5ReaderV2(HDF5Reader):
+    @property
+    def train_generator(self):
+        """
+
+        Returns
+        -------
+        deoxys.data.DataGenerator
+            A DataGenerator for generating batches of data for training
+        """
+        return HDF5DataGeneratorV2(
+            self.hf, batch_size=self.batch_size, batch_cache=self.batch_cache,
+            preprocessors=self.preprocessors,
+            x_name=self.x_name, y_name=self.y_name,
+            folds=self.train_folds, is_training=True)
+
+    @property
+    def test_generator(self):
+        """
+
+        Returns
+        -------
+        deoxys.data.DataGenerator
+            A DataGenerator for generating batches of data for testing
+        """
+        return HDF5DataGeneratorV2(
+            self.hf, batch_size=self.batch_size, batch_cache=self.batch_cache,
+            preprocessors=self.preprocessors,
+            x_name=self.x_name, y_name=self.y_name,
+            folds=self.test_folds)
+
+    @property
+    def val_generator(self):
+        """
+
+        Returns
+        -------
+        deoxys.data.DataGenerator
+            A DataGenerator for generating batches of data for validation
+        """
+        return HDF5DataGeneratorV2(
+            self.hf, batch_size=self.batch_size, batch_cache=self.batch_cache,
+            preprocessors=self.preprocessors,
+            x_name=self.x_name, y_name=self.y_name,
+            folds=self.val_folds)
+
+
+class HDF5DataGeneratorV2(HDF5DataGenerator):
+    def __init__(self, h5file, batch_size=32, batch_cache=10,
+                 preprocessors=None,
+                 x_name='x', y_name='y', folds=None, is_training=False):
+        super().__init__(h5file, batch_size, batch_cache,
+                         preprocessors,
+                         x_name, y_name, folds)
+        self.is_training = is_training
+
+    def generate(self):
+        """Create a generator that generate a batch of data
+
+        Yields
+        -------
+        tuple of 2 arrays
+            batch of (input, target)
+        """
+        while True:
+            # When all batches of data are yielded, move to next seg
+            if self.index >= self.seg_size or \
+                    self.seg_index + self.index >= self.fold_len:
+                self.next_seg()
+
+            # Index may has been reset. Thus, call after next_seg
+            index = self.index
+
+            # The last batch of data may not have less than batch_size items
+            if index + self.batch_size >= self.seg_size or \
+                    self.seg_index + index + self.batch_size >= self.fold_len:
+                batch_x = self.x_cur[index:]
+                batch_y = self.y_cur[index:]
+            else:
+                # Take the next batch
+                batch_x = self.x_cur[index:(index + self.batch_size)]
+                batch_y = self.y_cur[index:(index + self.batch_size)]
+
+            self.index += self.batch_size
+
+            if self.batch_size == 1 and self.is_training:
+                for i in range(11):
+                    im = batch_x[0][i*16: i*16 + 16]
+                    label = batch_y[0][i*16: i*16 + 16]
+                    print(np.array([im]).shape)
+                    yield np.array([im]), np.array([label])
+
+                for i in range(10):
+                    im = [batch_x[0][8 + i*16: i*16 + 24]]
+                    label = [batch_y[0][8 + i*16: i*16 + 24]]
+                    yield im, label
+
+            else:
+                yield batch_x, batch_y
+
+    @property
+    def total_batch(self):
+        if self.is_training:
+            return super().total_batch * 21
+        else:
+            return super().total_batch
+
+
+@custom_architecture
+class DenseNetV2(Vnet):
+    def load(self):
+        """
+        Load the unet neural network. Use Conv3d
+
+        Returns
+        -------
+        tensorflow.keras.models.Model
+            A neural network with unet structure
+
+        Raises
+        ------
+        NotImplementedError
+            Does not support video and time-series image inputs
+        """
+        layers = [Input(**self._input_params)]
+        saved_input = {}
+
+        for i, layer in enumerate(self._layers):
+            if 'inputs' in layer:
+                inputs = []
+                size_factors = None
+                for input_name in layer['inputs']:
+                    if size_factors:
+                        if size_factors == saved_input[
+                                input_name].get_shape().as_list()[1:-1]:
+                            next_input = saved_input[input_name]
+                        else:
+                            if len(size_factors) == 2:
+                                next_input = image.resize(
+                                    saved_input[input_name],
+                                    size_factors,
+                                    # preserve_aspect_ratio=True,
+                                    method='bilinear')
+                            elif len(size_factors) == 3:
+
+                                next_input = self.resize_along_dim(
+                                    saved_input[input_name],
+                                    size_factors
+                                )
+
+                            else:
+                                raise NotImplementedError(
+                                    "Image shape is not supported ")
+                        inputs.append(next_input)
+
+                    else:
+                        inputs.append(saved_input[input_name])
+                        size_factors = saved_input[
+                            input_name].get_shape().as_list()[1:-1]
+
+                connected_input = concatenate(inputs)
+            else:
+                connected_input = layers[i]
+
+            if 'dense_block' in layer:
+                next_layer = self._create_dense_block(
+                    layer, connected_input)
+            else:
+                next_tensor = layer_from_config(layer)
+
+                next_layer = next_tensor(connected_input)
+
+                if 'normalizer' in layer:
+                    next_layer = layer_from_config(
+                        layer['normalizer'])(next_layer)
+
+            if 'name' in layer:
+                saved_input[layer['name']] = next_layer
+
+            layers.append(next_layer)
+
+        return KerasModel(inputs=layers[0], outputs=layers[-1])
+
+    def _create_dense_block(self, layer, connected_input):
+        dense = layer['dense_block']
+        if type(dense) == dict:
+            layer_num = dense['layer_num']
+        else:
+            layer_num = dense
+
+        dense_layers = [connected_input]
+        final_concat = []
+        for i in range(layer_num):
+            next_tensor = layer_from_config(layer)
+            if len(dense_layers) == 1:
+                next_layer = next_tensor(connected_input)
+            else:
+                inp = concatenate(dense_layers[-2:])
+                next_layer = next_tensor(inp)
+                dense_layers.append(inp)
+
+            if 'normalizer' in layer:
+                next_layer = layer_from_config(
+                    layer['normalizer'])(next_layer)
+            dense_layers.append(next_layer)
+            final_concat.append(next_layer)
+
+        return concatenate(final_concat)
