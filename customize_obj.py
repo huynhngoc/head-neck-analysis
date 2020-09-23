@@ -5,7 +5,8 @@ from deoxys.data.preprocessor import BasePreprocessor
 from deoxys.data.data_reader import HDF5Reader, HDF5DataGenerator
 
 from deoxys.keras.models import Model as KerasModel
-from deoxys.keras.layers import Input, concatenate, Lambda, Concatenate
+from deoxys.keras.layers import Input, concatenate, Lambda, Concatenate, \
+    Add, Activation
 from deoxys.utils import is_keras_standalone
 from tensorflow import image
 import tensorflow as tf
@@ -14,6 +15,8 @@ from deoxys.model.layers import layer_from_config
 from deoxys.utils import deep_copy
 
 import numpy as np
+
+multi_input_layers = ['Add', 'Concatenate']
 
 
 @custom_preprocessor
@@ -316,16 +319,23 @@ class HDF5DataGeneratorV2(HDF5DataGenerator):
             self.index += self.batch_size
 
             if self.batch_size == 1 and self.is_training:
+                im, label = [], []
                 for i in range(11):
-                    im = batch_x[0][i*16: i*16 + 16]
-                    label = batch_y[0][i*16: i*16 + 16]
-                    print(np.array([im]).shape)
-                    yield np.array([im]), np.array([label])
+                    im.append(batch_x[0][i*16: i*16 + 16])
+                    label.append(batch_y[0][i*16: i*16 + 16])
 
+                    if i % 4 == 3:
+                        yield np.array(im), np.array(label)
+                        im, label = [], []
+
+                im, label = [], []
                 for i in range(10):
-                    im = [batch_x[0][8 + i*16: i*16 + 24]]
-                    label = [batch_y[0][8 + i*16: i*16 + 24]]
-                    yield im, label
+                    im.append(batch_x[0][8 + i*16: i*16 + 24])
+                    label.append(batch_y[0][8 + i*16: i*16 + 24])
+
+                    if i % 4 == 3:
+                        yield np.array(im), np.array(label)
+                        im, label = [], []
 
             else:
                 yield batch_x, batch_y
@@ -333,13 +343,13 @@ class HDF5DataGeneratorV2(HDF5DataGenerator):
     @property
     def total_batch(self):
         if self.is_training:
-            return super().total_batch * 21
+            return super().total_batch * 6
         else:
             return super().total_batch
 
 
 @custom_architecture
-class DenseNetV2(Vnet):
+class VoxResNet(Vnet):
     def load(self):
         """
         Load the unet neural network. Use Conv3d
@@ -359,43 +369,49 @@ class DenseNetV2(Vnet):
 
         for i, layer in enumerate(self._layers):
             if 'inputs' in layer:
-                inputs = []
-                size_factors = None
-                for input_name in layer['inputs']:
-                    if size_factors:
-                        if size_factors == saved_input[
-                                input_name].get_shape().as_list()[1:-1]:
-                            next_input = saved_input[input_name]
-                        else:
-                            if len(size_factors) == 2:
-                                next_input = image.resize(
-                                    saved_input[input_name],
-                                    size_factors,
-                                    # preserve_aspect_ratio=True,
-                                    method='bilinear')
-                            elif len(size_factors) == 3:
-
-                                next_input = self.resize_along_dim(
-                                    saved_input[input_name],
-                                    size_factors
-                                )
-
+                if len(layer['inputs']) > 1:
+                    inputs = []
+                    size_factors = None
+                    for input_name in layer['inputs']:
+                        if size_factors:
+                            if size_factors == saved_input[
+                                    input_name].get_shape().as_list()[1:-1]:
+                                next_input = saved_input[input_name]
                             else:
-                                raise NotImplementedError(
-                                    "Image shape is not supported ")
-                        inputs.append(next_input)
+                                if len(size_factors) == 2:
+                                    next_input = image.resize(
+                                        saved_input[input_name],
+                                        size_factors,
+                                        # preserve_aspect_ratio=True,
+                                        method='bilinear')
+                                elif len(size_factors) == 3:
 
+                                    next_input = self.resize_along_dim(
+                                        saved_input[input_name],
+                                        size_factors
+                                    )
+
+                                else:
+                                    raise NotImplementedError(
+                                        "Image shape is not supported ")
+                            inputs.append(next_input)
+
+                        else:
+                            inputs.append(saved_input[input_name])
+                            size_factors = saved_input[
+                                input_name].get_shape().as_list()[1:-1]
+
+                    if layer['class_name'] in multi_input_layers:
+                        connected_input = inputs
                     else:
-                        inputs.append(saved_input[input_name])
-                        size_factors = saved_input[
-                            input_name].get_shape().as_list()[1:-1]
-
-                connected_input = concatenate(inputs)
+                        connected_input = concatenate(inputs)
+                else:
+                    connected_input = saved_input[layer['inputs'][0]]
             else:
                 connected_input = layers[i]
 
-            if 'dense_block' in layer:
-                next_layer = self._create_dense_block(
+            if 'res_block' in layer:
+                next_layer = self._create_res_block(
                     layer, connected_input)
             else:
                 next_tensor = layer_from_config(layer)
@@ -413,28 +429,23 @@ class DenseNetV2(Vnet):
 
         return KerasModel(inputs=layers[0], outputs=layers[-1])
 
-    def _create_dense_block(self, layer, connected_input):
-        dense = layer['dense_block']
-        if type(dense) == dict:
-            layer_num = dense['layer_num']
+    def _create_res_block(self, layer, connected_input):
+        res = layer['res_block']
+        if type(res) == dict:
+            layer_num = res['layer_num']
         else:
-            layer_num = dense
-
-        dense_layers = [connected_input]
-        final_concat = []
+            layer_num = res
+        next_layer = connected_input
         for i in range(layer_num):
-            next_tensor = layer_from_config(layer)
-            if len(dense_layers) == 1:
-                next_layer = next_tensor(connected_input)
-            else:
-                inp = concatenate(dense_layers[-2:])
-                next_layer = next_tensor(inp)
-                dense_layers.append(inp)
-
             if 'normalizer' in layer:
                 next_layer = layer_from_config(
                     layer['normalizer'])(next_layer)
-            dense_layers.append(next_layer)
-            final_concat.append(next_layer)
+            if 'activation' in layer['config']:
+                activation = layer['config']['activation']
+                del layer['config']['activation']
 
-        return concatenate(final_concat)
+                next_layer = Activation(activation)(next_layer)
+
+            next_layer = layer_from_config(layer)(next_layer)
+
+        return Add()([connected_input, next_layer])
