@@ -234,6 +234,18 @@ class DenseNetV2(Vnet):
 
 @custom_datareader
 class HDF5ReaderV2(HDF5Reader):
+    def __init__(self, filename, batch_size=32, preprocessors=None,
+                 x_name='x', y_name='y', batch_cache=10,
+                 train_folds=None, test_folds=None, val_folds=None,
+                 fold_prefix='fold', patch_size=48, overlap=8):
+        super().__init__(filename, batch_size, preprocessors,
+                         x_name, y_name, batch_cache,
+                         train_folds, test_folds, val_folds,
+                         fold_prefix)
+
+        self.patch_size = patch_size
+        self.overlap = overlap
+
     @property
     def train_generator(self):
         """
@@ -247,7 +259,8 @@ class HDF5ReaderV2(HDF5Reader):
             self.hf, batch_size=self.batch_size, batch_cache=self.batch_cache,
             preprocessors=self.preprocessors,
             x_name=self.x_name, y_name=self.y_name,
-            folds=self.train_folds, is_training=True)
+            folds=self.train_folds, is_training=True,
+            patch_size=self.patch_size, overlap=self.overlap)
 
     @property
     def test_generator(self):
@@ -259,7 +272,8 @@ class HDF5ReaderV2(HDF5Reader):
             A DataGenerator for generating batches of data for testing
         """
         return HDF5DataGeneratorV2(
-            self.hf, batch_size=self.batch_size, batch_cache=self.batch_cache,
+            self.hf, batch_size=1 if self.patch_size else self.batch_size,
+            batch_cache=self.batch_cache,
             preprocessors=self.preprocessors,
             x_name=self.x_name, y_name=self.y_name,
             folds=self.test_folds)
@@ -274,7 +288,8 @@ class HDF5ReaderV2(HDF5Reader):
             A DataGenerator for generating batches of data for validation
         """
         return HDF5DataGeneratorV2(
-            self.hf, batch_size=self.batch_size, batch_cache=self.batch_cache,
+            self.hf, batch_size=1 if self.patch_size else self.batch_size,
+            batch_cache=self.batch_cache,
             preprocessors=self.preprocessors,
             x_name=self.x_name, y_name=self.y_name,
             folds=self.val_folds)
@@ -283,11 +298,21 @@ class HDF5ReaderV2(HDF5Reader):
 class HDF5DataGeneratorV2(HDF5DataGenerator):
     def __init__(self, h5file, batch_size=32, batch_cache=10,
                  preprocessors=None,
-                 x_name='x', y_name='y', folds=None, is_training=False):
+                 x_name='x', y_name='y', folds=None, is_training=False,
+                 patch_size=None, overlap=8):
+        if is_training and patch_size:
+            self.batch_size_patch = batch_size
+            batch_size = 1
+            batch_cache = 1
+
+        self._z_axis = None
+
         super().__init__(h5file, batch_size, batch_cache,
                          preprocessors,
                          x_name, y_name, folds)
         self.is_training = is_training
+        self.patch_size = patch_size
+        self.overlap = overlap
 
     def generate(self):
         """Create a generator that generate a batch of data
@@ -318,34 +343,51 @@ class HDF5DataGeneratorV2(HDF5DataGenerator):
 
             self.index += self.batch_size
 
-            if self.batch_size == 1 and self.is_training:
+            if self.is_training and self.patch_size:
                 im, label = [], []
-                for i in range(11):
-                    im.append(batch_x[0][i*16: i*16 + 16])
-                    label.append(batch_y[0][i*16: i*16 + 16])
+                for i in range(0, self.z_axis - self.patch_size,
+                               self.overlap):
+                    im.append(batch_x[0][i: i + self.patch_size])
+                    label.append(batch_y[0][i: i + self.patch_size])
 
-                    if i % 4 == 3:
+                    if len(im) == self.batch_size_patch:
                         yield np.array(im), np.array(label)
                         im, label = [], []
 
-                im, label = [], []
-                for i in range(10):
-                    im.append(batch_x[0][8 + i*16: i*16 + 24])
-                    label.append(batch_y[0][8 + i*16: i*16 + 24])
-
-                    if i % 4 == 3:
-                        yield np.array(im), np.array(label)
-                        im, label = [], []
+                if len(im) > 0:
+                    yield np.array(im), np.array(label)
 
             else:
                 yield batch_x, batch_y
 
     @property
     def total_batch(self):
-        if self.is_training:
-            return super().total_batch * 6
+        if self.is_training and self.patch_size:
+            total_items = super().total_batch
+
+            return total_items * np.ceil(
+                (self.z_axis - self.patch_size) / self.overlap)
+
         else:
             return super().total_batch
+
+    @property
+    def z_axis(self):
+        if self._z_axis is None:
+            x = self.hf[self.folds[0]][self.x_name][:1]
+            y = self.hf[self.folds[0]][self.y_name][:1]
+
+            if self.preprocessors:
+                if type(self.preprocessors) == list:
+                    for preprocessor in self.preprocessors:
+                        x, y = preprocessor.transform(
+                            x, y)
+                else:
+                    x, y = self.preprocessors.transform(x, y)
+
+            self._z_axis = x.shape[1]
+
+        return self._z_axis
 
 
 @custom_architecture
