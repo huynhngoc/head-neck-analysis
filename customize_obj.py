@@ -21,8 +21,9 @@ multi_input_layers = ['Add', 'Concatenate']
 
 @custom_preprocessor
 class Padding(BasePreprocessor):
-    def __init__(self, depth=4):
+    def __init__(self, depth=4, mode='auto'):
         self.depth = depth
+        self.mode = mode
 
     def transform(self, images, targets):
         image_shape = images.shape
@@ -62,10 +63,17 @@ class Padding(BasePreprocessor):
             else:
                 new_z = z
 
-            new_images = np.zeros(
-                (image_shape[0], new_height, new_width, new_z, image_shape[-1]))
-            new_targets = np.zeros(
-                (target_shape[0], new_height, new_width, new_z, target_shape[-1]))
+            if self.mode == 'edge':
+                pass
+            else:  # default - pad with zeros
+                new_images = np.zeros(
+                    (image_shape[0],
+                     new_height, new_width, new_z,
+                     image_shape[-1]))
+                new_targets = np.zeros(
+                    (target_shape[0],
+                     new_height, new_width, new_z,
+                     target_shape[-1]))
 
             min_h = (new_height - height) // 2
             min_w = (new_width - width) // 2
@@ -80,6 +88,27 @@ class Padding(BasePreprocessor):
             return new_images, new_targets
 
         raise RuntimeError('Does not support 4D tensors')
+
+
+@custom_preprocessor
+class ImageNormalizer(BasePreprocessor):
+    def __init__(self, vmin=0, vmax=255):
+        """
+        Normalize all channels to the range 0-1
+
+        Args:
+            vmin (int, or list,  optional): [description]. Defaults to 0.
+            vmax (int, or list optional): [description]. Defaults to 255.
+        """
+        self.vmin = vmin
+        self.vmax = vmax
+
+    def transform(self, images, targets):
+        transformed_images = (np.array(images) - self.vmin) / \
+            (self.vmax - self.vmin)
+        transformed_images = transformed_images.clip(0, 1)
+
+        return transformed_images, targets
 
 
 @custom_architecture

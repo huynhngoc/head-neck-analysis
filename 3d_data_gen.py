@@ -41,21 +41,21 @@ if __name__ == '__main__':
     # fold_idx = 0
 
     # for i in range(0, len(train_index), 15):
-    #     with h5py.File('../../headneck_3d.h5', 'a') as hf:
+    #     with h5py.File('../../headneck_3d_fixed.h5', 'a') as hf:
     #         group = hf.create_group('fold_{}'.format(fold_idx))
     #         group.create_dataset('patient_idx', data=train_index[i:i+15])
 
     #     fold_idx += 1
 
     # for i in range(0, len(val_index), 15):
-    #     with h5py.File('../../headneck_3d.h5', 'a') as hf:
+    #     with h5py.File('../../headneck_3d_fixed.h5', 'a') as hf:
     #         group = hf.create_group('fold_{}'.format(fold_idx))
     #         group.create_dataset('patient_idx', data=val_index[i:i+15])
 
     #     fold_idx += 1
 
     # for i in range(0, len(test_index), 15):
-    #     with h5py.File('../../headneck_3d.h5', 'a') as hf:
+    #     with h5py.File('../../headneck_3d_fixed.h5', 'a') as hf:
     #         group = hf.create_group('fold_{}'.format(fold_idx))
     #         group.create_dataset('patient_idx', data=test_index[i:i+15])
 
@@ -63,10 +63,10 @@ if __name__ == '__main__':
 
     path_to_patients = '//nmbu.no/largefile/Project/REALTEK-HeadNeck-Project/Head-and-Neck/HNPrepped_Data/Dataset_3D_U_NET/imdata/imdata_P{:03d}.mat'
 
-    for fold_idx in range(4, 14):
+    for fold_idx in range(15):
         gc.collect()
         print('Working on fold', fold_idx)
-        with h5py.File('../../headneck_3d.h5', 'r') as hf:
+        with h5py.File('../../headneck_3d_fixed.h5', 'r') as hf:
             patient_idx = hf[f'fold_{fold_idx}']['patient_idx'][:]
         inputs = np.zeros((len(patient_idx), 173, 191, 265, 2))
         targets = np.zeros((len(patient_idx), 173, 191, 265, 1))
@@ -102,7 +102,7 @@ if __name__ == '__main__':
                     targets[i, start_x: start_x+x, start_y: start_y +
                             y, start_z:start_z+z, :] = mask
 
-        with h5py.File('../../headneck_3d.h5', 'a') as hf:
+        with h5py.File('../../headneck_3d_fixed.h5', 'a') as hf:
             group = hf[f'fold_{fold_idx}']
             group.create_dataset('input', data=inputs,
                                  dtype='f4', chunks=(1, 173, 191, 265, 2),
