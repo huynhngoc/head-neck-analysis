@@ -2,7 +2,8 @@ from deoxys.customize import custom_architecture, custom_preprocessor, \
     custom_datareader
 from deoxys.loaders.architecture import Vnet
 from deoxys.data.preprocessor import BasePreprocessor
-from deoxys.data.data_reader import HDF5Reader, HDF5DataGenerator
+from deoxys.data.data_reader import HDF5Reader, HDF5DataGenerator, \
+    DataReader, DataGenerator
 
 from deoxys.keras.models import Model as KerasModel
 from deoxys.keras.layers import Input, concatenate, \
@@ -14,6 +15,9 @@ import tensorflow as tf
 from deoxys.model.layers import layer_from_config
 
 import numpy as np
+
+import h5py
+from deoxys.utils import file_finder
 
 multi_input_layers = ['Add', 'Concatenate']
 
@@ -99,8 +103,8 @@ class ImageNormalizer(BasePreprocessor):
             vmin (int, or list,  optional): [description]. Defaults to 0.
             vmax (int, or list optional): [description]. Defaults to 255.
         """
-        self.vmin = vmin
-        self.vmax = vmax
+        self.vmin = np.array(vmin) if type(vmin) == list else vmin
+        self.vmax = np.array(vmax) if type(vmax) == list else vmax
 
     def transform(self, images, targets):
         transformed_images = (np.array(images) - self.vmin) / \
@@ -519,3 +523,134 @@ class VoxResNet(Vnet):
             next_layer = layer_from_config(layer)(next_layer)
 
         return Add()([connected_input, next_layer])
+
+
+class H5Reader(DataReader):
+    def __init__(self, filename, batch_size=32, preprocessors=None,
+                 x_name='x', y_name='y', batch_cache=10,
+                 train_folds=None, test_folds=None, val_folds=None,
+                 fold_prefix='fold', patch_size=48, overlap=8):
+        """
+        Initialize a HDF5 Data Reader, which reads data from a HDF5
+        file. This file should be split into groups. Each group contain
+        datasets, each of which is a column in the data.
+        """
+        super().__init__()
+
+        h5_filename = file_finder(filename)
+        if h5_filename is None:
+            # HDF5DataReader is created, but won't be loaded into model
+            self.ready = False
+            return
+
+        self.hf = h5py.File(h5_filename, 'r')
+        self.batch_size = batch_size
+        self.batch_cache = batch_cache
+        self.preprocessors = preprocessors
+        self.x_name = x_name
+        self.y_name = y_name
+        self.fold_prefix = fold_prefix
+
+        train_folds = list(train_folds) if train_folds else [0]
+        test_folds = list(test_folds) if test_folds else [2]
+        val_folds = list(val_folds) if val_folds else [1]
+
+        if fold_prefix:
+            self.train_folds = ['{}_{}'.format(
+                fold_prefix, train_fold) for train_fold in train_folds]
+            self.test_folds = ['{}_{}'.format(
+                fold_prefix, test_fold) for test_fold in test_folds]
+            self.val_folds = ['{}_{}'.format(
+                fold_prefix, val_fold) for val_fold in val_folds]
+        else:
+            self.train_folds = train_folds
+            self.test_folds = test_folds
+            self.val_folds = val_folds
+
+        self._original_test = None
+        self._original_val = None
+
+    @property
+    def train_generator(self):
+        """
+
+        Returns
+        -------
+        deoxys.data.DataGenerator
+            A DataGenerator for generating batches of data for training
+        """
+        return H5DataGenerator(
+            self.hf, batch_size=self.batch_size, batch_cache=self.batch_cache,
+            preprocessors=self.preprocessors,
+            x_name=self.x_name, y_name=self.y_name,
+            folds=self.train_folds)
+
+    @property
+    def test_generator(self):
+        """
+
+        Returns
+        -------
+        deoxys.data.DataGenerator
+            A DataGenerator for generating batches of data for testing
+        """
+        return H5DataGenerator(
+            self.hf, batch_size=self.batch_size, batch_cache=self.batch_cache,
+            preprocessors=self.preprocessors,
+            x_name=self.x_name, y_name=self.y_name,
+            folds=self.test_folds)
+
+    @property
+    def val_generator(self):
+        """
+
+        Returns
+        -------
+        deoxys.data.DataGenerator
+            A DataGenerator for generating batches of data for validation
+        """
+        return H5DataGenerator(
+            self.hf, batch_size=self.batch_size, batch_cache=self.batch_cache,
+            preprocessors=self.preprocessors,
+            x_name=self.x_name, y_name=self.y_name,
+            folds=self.val_folds)
+
+    @property
+    def original_test(self):
+        """
+        Return a dictionary of all data in the test set
+        """
+        if self._original_test is None:
+            self._original_test = {}
+            for key in self.hf[self.test_folds[0]].keys():
+                data = None
+                for fold in self.test_folds:
+                    new_data = self.hf[fold][key][:]
+
+                    if data is None:
+                        data = new_data
+                    else:
+                        data = np.concatenate((data, new_data))
+                self._original_test[key] = data
+
+        return self._original_test
+
+    @property
+    def original_val(self):
+        """
+        Return a dictionary of all data in the val set
+        """
+        if self._original_val is None:
+            self._original_val = {}
+            for key in self.hf[self.val_folds[0]].keys():
+                data = None
+                for fold in self.val_folds:
+                    new_data = self.hf[fold][key][:]
+
+                    if data is None:
+                        data = new_data
+                    else:
+                        data = np.concatenate((data, new_data))
+                self._original_val[key] = data
+
+        return self._original_val
