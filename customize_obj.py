@@ -1,18 +1,17 @@
 from deoxys.customize import custom_architecture, custom_preprocessor, \
     custom_datareader
-from deoxys.loaders.architecture import BaseModelLoader, Vnet
+from deoxys.loaders.architecture import Vnet
 from deoxys.data.preprocessor import BasePreprocessor
 from deoxys.data.data_reader import HDF5Reader, HDF5DataGenerator
 
 from deoxys.keras.models import Model as KerasModel
-from deoxys.keras.layers import Input, concatenate, Lambda, Concatenate, \
+from deoxys.keras.layers import Input, concatenate, \
     Add, Activation
-from deoxys.utils import is_keras_standalone
+
 from tensorflow import image
 import tensorflow as tf
 
 from deoxys.model.layers import layer_from_config
-from deoxys.utils import deep_copy
 
 import numpy as np
 
