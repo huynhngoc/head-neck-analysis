@@ -10,6 +10,13 @@ sbatch slurm.sh config/2d_unet.json 2d_unet 200
 Which will load the setup from the `config/2d_unet.json` file, train for 200 epochs
 and store the results in the folder `$HOME/logs/hn_perf/2d_unet/`.
 
+To customize model and prediction checkpoints
+
+```
+sbatch slurm.sh config/3d_vnet_32_normalize.json 3d_vnet_32_normalize 100 --model_checkpoint_period 5 --prediction_checkpoint_period 5
+
+```
+
 Alternatively, if your cluster does not have slurm installed, simply omit the `sbatch`
 part of the call above, thus running
 

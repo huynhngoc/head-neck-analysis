@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     # config = read_file(args.config_file)
     if os.path.isfile(args.config_file) and args.config_file.endswith('h5'):
-        initial_epoch = int(args.config_file[-6:-6])
+        initial_epoch = int(args.config_file[-6:-3])
     else:
         raise RuntimeError('Not a model file')
     (
@@ -43,12 +43,6 @@ if __name__ == '__main__':
             prediction_checkpoint_period=args.prediction_checkpoint_period,
             epochs=args.epochs + initial_epoch,
             initial_epoch=initial_epoch
-        ).run_experiment(
-            train_history_log=True,
-            model_checkpoint_period=1,
-            prediction_checkpoint_period=1,
-            epochs=args.epochs + 1,
-            initial_epoch=args.epochs
         )
         .plot_performance()
         .plot_prediction(masked_images=[i for i in range(42)])

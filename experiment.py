@@ -13,6 +13,7 @@ import argparse
 # from pathlib import Path
 # from comet_ml import Experiment as CometEx
 import tensorflow as tf
+from tensorflow.keras.callbacks import EarlyStopping
 import customize_obj
 
 if __name__ == '__main__':
@@ -43,10 +44,32 @@ if __name__ == '__main__':
         model_checkpoint_period=args.model_checkpoint_period,
         prediction_checkpoint_period=args.prediction_checkpoint_period,
         epochs=args.epochs,
-    ).run_experiment(
-        train_history_log=True,
-        model_checkpoint_period=1,
-        prediction_checkpoint_period=1,
-        epochs=args.epochs + 1,
-        initial_epoch=args.epochs
-    ).plot_performance().plot_prediction(masked_images=[i for i in range(42)])
+    )
+
+    # Find early stopping epoch, if any
+    train_params = exp.model._get_train_params
+    if 'callbacks' in train_params:
+        stopped_epoch = 0
+        for callback in train_params['callback']:
+            if isinstance(callback, EarlyStopping):
+                stopped_epoch = callback.stopped_epoch
+                break
+
+        if stopped_epoch > 0:
+            exp.run_experiment(
+                train_history_log=True,
+                model_checkpoint_period=1,
+                prediction_checkpoint_period=1,
+                epochs=stopped_epoch + 2,
+                initial_epoch=stopped_epoch + 1
+            )
+
+    # 42 images for 2d, 15 images for 3d
+    img_num = 42
+
+    if '3d' in args.log_folder:
+        img_num = 15
+
+    # Plot performance
+    exp.plot_performance().plot_prediction(
+        masked_images=[i for i in range(img_num)])
