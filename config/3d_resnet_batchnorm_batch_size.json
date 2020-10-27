@@ -2,7 +2,7 @@
     "dataset_params": {
         "class_name": "HDF5ReaderV2",
         "config": {
-            "filename": "/work/users/hn_delin/headneck_3d.h5",
+            "filename": "/work/users/hn_delin/headneck_3d_fixed.h5",
             "batch_size": 4,
             "x_name": "input",
             "y_name": "target",
