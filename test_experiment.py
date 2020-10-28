@@ -29,6 +29,12 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    # 42 images for 2d, 15 images for 3d
+    img_num = 42
+
+    if '3d' in args.log_folder:
+        img_num = 15
+
     # config = read_file(args.config_file)
     if os.path.isfile(args.config_file) and args.config_file.endswith('h5'):
         initial_epoch = int(args.config_file[-6:-3])
@@ -46,5 +52,5 @@ if __name__ == '__main__':
         # )
         # .plot_performance()
         # .plot_prediction(masked_images=[i for i in range(42)])
-        .run_test()
+        .run_test(masked_images=[i for i in range(img_num)])
     )
