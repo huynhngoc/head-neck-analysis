@@ -47,7 +47,7 @@ if __name__ == '__main__':
     )
 
     # Find early stopping epoch, if any
-    train_params = exp.model._get_train_params()
+    train_params = exp.model._get_train_params(['callbacks'])
     if 'callbacks' in train_params:
         stopped_epoch = 0
         for callback in train_params['callbacks']:
