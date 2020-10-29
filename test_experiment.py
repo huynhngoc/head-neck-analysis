@@ -33,7 +33,7 @@ if __name__ == '__main__':
     img_num = 42
 
     if '3d' in args.log_folder:
-        img_num = 15
+        img_num = 40
 
     # config = read_file(args.config_file)
     if os.path.isfile(args.config_file) and args.config_file.endswith('h5'):
