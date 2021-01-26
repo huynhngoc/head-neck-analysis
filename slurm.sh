@@ -28,7 +28,7 @@ if [ $# -lt 3 ];
 if [ ! -d "$TMPDIR/$USER/hn_delin" ]
     then
     echo "Didn't find dataset folder. Copying files..."
-    mkdir $TMPDIR/$USER/hn_delin
+    mkdir --parents $TMPDIR/$USER/hn_delin
     fi
 
 for f in $(ls $HOME/datasets/headneck/*)

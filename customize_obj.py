@@ -39,14 +39,35 @@ class Padding(BasePreprocessor):
         if len(shape) == 2:
             height, width = shape
             if height % divide_factor != 0:
-                height = (height // divide_factor + 1) * divide_factor
+                new_height = (height // divide_factor + 1) * divide_factor
 
             if width % divide_factor != 0:
-                width = (width // divide_factor + 1) * divide_factor
+                new_width = (width // divide_factor + 1) * divide_factor
 
-            images = image.resize_with_pad(images, height, width)
-            targets = image.resize_with_pad(targets, height, width)
-            return images, targets
+            # images = image.resize_with_pad(images, height, width)
+            # targets = image.resize_with_pad(targets, height, width)
+
+            # return images, targets
+
+            new_images = np.zeros(
+                (image_shape[0],
+                 new_height, new_width,
+                 image_shape[-1]))
+            new_targets = np.zeros(
+                (target_shape[0],
+                    new_height, new_width,
+                    target_shape[-1]))
+
+            min_h = (new_height - height) // 2
+            min_w = (new_width - width) // 2
+
+            new_images[:, min_h: min_h+height,
+                       min_w: min_w+width, :] = images
+
+            new_targets[:, min_h: min_h+height,
+                        min_w: min_w+width, :] = targets
+
+            return new_images, new_targets
 
         if len(shape) == 3:
             height, width, z = shape
@@ -59,7 +80,7 @@ class Padding(BasePreprocessor):
             if width % divide_factor != 0:
                 new_width = (width // divide_factor + 1) * divide_factor
             else:
-                new_width = WindowsError
+                new_width = width
 
             if z % divide_factor != 0:
                 new_z = (z // divide_factor + 1) * divide_factor
