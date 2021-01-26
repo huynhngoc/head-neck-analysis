@@ -38,15 +38,15 @@
                     }
                 },
                 {
-                    "class_name": "ImageNormalizer",
+                    "class_name": "ImageNormalizerPreprocessor",
                     "config": {
                         "vmin": [
-                            -200,
+                            -100,
                             0
                         ],
                         "vmax": [
-                            200,
-                            20
+                            100,
+                            10
                         ]
                     }
                 }
