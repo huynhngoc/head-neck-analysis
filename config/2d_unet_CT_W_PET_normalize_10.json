@@ -50,7 +50,8 @@
                 "class_name": "EarlyStopping",
                 "config": {
                     "monitor": "val_dice",
-                    "patience": 30
+                    "patience": 30,
+                    "mode": "max"
                 }
             }
         ]
