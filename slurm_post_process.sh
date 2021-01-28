@@ -45,7 +45,7 @@ for f in $(ls $HOME/datasets/headneck/*)
 echo "Finished seting up files."
 
 # Hack to ensure that the GPUs work
-nvidia-modprobe -u -c=0
+# nvidia-modprobe -u -c=0
 
 # Run experiment
-singularity exec --nv deoxys.sif python post_processing.py $1 /net/fs-1/Ngoc/hnperf/$2
+singularity exec --nv deoxys.sif python post_processing.py $1 /net/fs-1/Ngoc/hnperf/$2 ${@:3}
