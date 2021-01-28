@@ -7,8 +7,8 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mail-user=ngochuyn@nmbu.no # Email me when job is done.
 #SBATCH --mail-type=ALL
-#SBATCH --output=outputs/unet-postprocess-%A.out
-#SBATCH --error=outputs/unet-postprocess-%A.out
+#SBATCH --output=outputs/unet-test-%A.out
+#SBATCH --error=outputs/unet-test-%A.out
 
 # If you would like to use more please adjust this.
 

@@ -6,8 +6,8 @@
 #SBATCH --partition=smallmem # Use the verysmallmem-partition for jobs requiring < 10 GB RAM.
 #SBATCH --mail-user=ngochuyn@nmbu.no # Email me when job is done.
 #SBATCH --mail-type=ALL
-#SBATCH --output=outputs/unet-test-%A.out
-#SBATCH --error=outputs/unet-test-%A.out
+#SBATCH --output=outputs/unet-postprocess-%A.out
+#SBATCH --error=outputs/unet-postprocess-%A.out
 
 # If you would like to use more please adjust this.
 
