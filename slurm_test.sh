@@ -3,7 +3,8 @@
 #SBATCH --nodes=1                # Use 1 node
 #SBATCH --job-name=hn_test   # sensible name for the job
 #SBATCH --mem=16G                 # Default memory per CPU is 3GB.
-#SBATCH --partition=smallmem # Use the verysmallmem-partition for jobs requiring < 10 GB RAM.
+#SBATCH --partition=gpu # Use the verysmallmem-partition for jobs requiring < 10 GB RAM.
+#SBATCH --gres=gpu:1
 #SBATCH --mail-user=ngochuyn@nmbu.no # Email me when job is done.
 #SBATCH --mail-type=ALL
 #SBATCH --output=outputs/unet-postprocess-%A.out
