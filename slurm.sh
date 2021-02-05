@@ -50,3 +50,11 @@ nvidia-modprobe -u -c=0
 
 # Run experiment
 singularity exec --nv deoxys.sif python experiment.py $1 /net/fs-1/Ngoc/hnperf/$2 --temp_folder $SCRATCH/hnperf/$2 --epochs $3 ${@:4}
+
+echo "Finished training. Post-processing results"
+
+singularity exec --nv deoxys.sif python -u post_processing.py /net/fs-1/Ngoc/hnperf/$2 --temp_folder $SCRATCH/hnperf/$2 ${@:4}
+
+echo "Finished post-precessing. Running test on best model"
+
+singularity exec --nv deoxys.sif python -u run_test.py /net/fs-1/Ngoc/hnperf/$2 --temp_folder $SCRATCH/hnperf/$2 ${@:4}
