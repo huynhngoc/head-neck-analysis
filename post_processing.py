@@ -244,6 +244,7 @@ class PostProcessor:
             self.main_meta_data = self.map_meta_data[0]
 
     def map_2d_meta_data(self):
+        print('mapping 2d meta data')
         map_folder = self.log_base_path + self.SINGLE_MAP_PATH
 
         if not os.path.exists(map_folder):
@@ -261,6 +262,7 @@ class PostProcessor:
         return self
 
     def calculate_fscore_single(self):
+        print('calculating dice score per items in val set')
         predicted_path = self.temp_base_path + \
             self.PREDICTION_PATH + self.PREDICTION_NAME
         map_folder = self.log_base_path + self.SINGLE_MAP_PATH
@@ -274,6 +276,7 @@ class PostProcessor:
         return self
 
     def merge_2d_slice(self):
+        print('merge 2d slice to 3d images')
         predicted_path = self.temp_base_path + \
             self.PREDICTION_PATH + self.PREDICTION_NAME
         map_folder = self.log_base_path + self.SINGLE_MAP_PATH
@@ -299,6 +302,7 @@ class PostProcessor:
         return self
 
     def calculate_fscore(self):
+        print('calculating dice score per 3d image')
         merge_path = self.log_base_path + \
             self.PREDICTION_PATH + self.PREDICTION_NAME
 

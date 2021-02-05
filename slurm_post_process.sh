@@ -48,4 +48,4 @@ echo "Finished seting up files."
 # nvidia-modprobe -u -c=0
 
 # Run experiment
-singularity exec --nv deoxys.sif python post_processing.py /net/fs-1/Ngoc/hnperf/$1 ${@:2}
+singularity exec --nv deoxys.sif python post_processing.py /net/fs-1/Ngoc/hnperf/$1 --temp_folder $SCRATCH/hnperf/$1 ${@:2}
