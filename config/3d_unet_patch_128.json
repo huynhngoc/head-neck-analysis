@@ -2,7 +2,7 @@
     "dataset_params": {
         "class_name": "H5PatchReader",
         "config": {
-            "filename": "/home/work/users/hn_delin/headneck_3d_new.h5",
+            "filename": "/home/work/ngochuyn/hn_delin/headneck_3d_new.h5",
             "batch_size": 16,
             "patch_size": 64,
             "batch_cache": 1,
