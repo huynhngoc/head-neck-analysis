@@ -312,7 +312,7 @@ class PostProcessor:
         for epoch in self.epochs:
             H5CalculateFScore(
                 merge_path.format(epoch=epoch),
-                main_log_folder.format(epoch=epoch),
+                main_log_filename.format(epoch=epoch),
                 map_file=main_log_filename.format(epoch=epoch),
                 map_column=self.main_meta_data
             ).post_process()
