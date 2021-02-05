@@ -5,6 +5,9 @@ import numpy as np
 import h5py
 import pandas as pd
 import os
+
+from deoxys.utils import load_json_config
+from deoxys.loaders import load_data
 # from pathlib import Path
 # from comet_ml import Experiment as CometEx
 # import tensorflow as tf
@@ -156,7 +159,7 @@ class H5Merge2dSlice:
         indice = np.where(tmp[1:] != tmp[:-1])[0]
         indice = np.concatenate([[0], indice, [len(map_data)]])
 
-        with h5py.File(self.merge_file, 'a') as mf:
+        with h5py.File(self.merge_file, 'w') as mf:
             mf.create_group(self.inputs)
             mf.create_group(self.target)
             mf.create_group(self.predicted)
@@ -192,44 +195,179 @@ class H5Merge2dSlice:
         df.to_csv(self.save_file, index=False)
 
 
-if __name__ == '__main__':
+class PostProcessor:
+    MODEL_PATH = '/model'
+    MODEL_NAME = '/model.{epoch:03d}.h5'
+    BEST_MODEL_PATH = '/best'
+    PREDICTION_PATH = '/prediction'
+    PREDICTION_NAME = '/prediction.{epoch:03d}.h5'
+    LOG_FILE = '/logs.csv'
+    PERFORMANCE_PATH = '/performance'
+    PREDICTED_IMAGE_PATH = '/images'
+    TEST_OUTPUT_PATH = '/test'
+    PREDICT_TEST_NAME = '/prediction_test.h5'
+    SINGLE_MAP_PATH = '/single_map'
+    SINGLE_MAP_NAME = '/logs.{epoch:03d}.csv'
 
+    MAP_PATH = '/logs'
+    MAP_NAME = '/logs.{epoch:03d}.csv'
+
+    def __init__(self, log_base_path='logs',
+                 temp_base_path='', map_meta_data=None, main_meta_data=''):
+        self.temp_base_path = temp_base_path
+        self.log_base_path = log_base_path
+
+        model_path = log_base_path + self.MODEL_PATH
+
+        sample_model_filename = model_path + '/' + os.listdir(model_path)[0]
+
+        with h5py.File(sample_model_filename, 'r') as f:
+            config = f.attrs['deoxys_config']
+            config = load_json_config(config)
+
+        self.dataset_filename = config['dataset_params']['config']['filename']
+        self.data_reader = load_data(config['dataset_params'])
+
+        self.temp_prediction_path = temp_base_path + self.PREDICTION_PATH
+        predicted_files = os.listdir(self.temp_prediction_path)
+
+        self.epochs = [int(filename[-6:-3]) for filename in predicted_files]
+
+        if map_meta_data:
+            self.map_meta_data = map_meta_data.split(',')
+        else:
+            self.map_meta_data = ['patient_idx', 'slice_idx']
+
+        if main_meta_data:
+            self.main_meta_data = main_meta_data
+        else:
+            self.main_meta_data = self.map_meta_data[0]
+
+    def map_2d_meta_data(self):
+        map_folder = self.log_base_path + self.SINGLE_MAP_PATH
+
+        if not os.path.exists(map_folder):
+            os.makedirs(map_folder)
+        map_filename = map_folder + self.SINGLE_MAP_NAME
+
+        for epoch in self.epochs:
+            H5MetaDataMapping(
+                ref_file=self.dataset_filename,
+                save_file=map_filename.format(epoch=epoch),
+                folds=self.data_reader.val_folds,
+                fold_prefix='',
+                dataset_names=self.map_meta_data).post_process()
+
+        return self
+
+    def calculate_fscore_single(self):
+        predicted_path = self.temp_base_path + \
+            self.PREDICTION_PATH + self.PREDICTION_NAME
+        map_folder = self.log_base_path + self.SINGLE_MAP_PATH
+        map_filename = map_folder + self.SINGLE_MAP_NAME
+        for epoch in self.epochs:
+            H5CalculateFScore(
+                predicted_path.format(epoch=epoch),
+                map_filename.format(epoch=epoch)
+            ).post_process()
+
+        return self
+
+    def merge_2d_slice(self):
+        predicted_path = self.temp_base_path + \
+            self.PREDICTION_PATH + self.PREDICTION_NAME
+        map_folder = self.log_base_path + self.SINGLE_MAP_PATH
+        map_filename = map_folder + self.SINGLE_MAP_NAME
+
+        merge_path = self.log_base_path + \
+            self.PREDICTION_PATH + self.PREDICTION_NAME
+
+        main_log_folder = self.log_base_path + self.MAP_PATH
+
+        if not os.path.exists(main_log_folder):
+            os.makedirs(main_log_folder)
+        main_log_filename = main_log_folder + self.MAP_NAME
+
+        for epoch in self.epochs:
+            H5Merge2dSlice(
+                predicted_path.format(epoch=epoch),
+                map_filename.format(epoch=epoch),
+                self.main_meta_data,
+                merge_path.format(epoch=epoch),
+                main_log_filename.format(epoch=epoch)
+            ).post_process()
+        return self
+
+    def calculate_fscore(self):
+        merge_path = self.log_base_path + \
+            self.PREDICTION_PATH + self.PREDICTION_NAME
+
+        main_log_folder = self.log_base_path + self.MAP_PATH
+
+        for epoch in self.epochs:
+            H5CalculateFScore(
+                merge_path.format(epoch=epoch),
+                main_log_folder.format(epoch=epoch),
+                map_file=main_log_folder.format(epoch=epoch),
+                map_column=self.main_meta_data
+            ).post_process()
+
+        return self
+
+
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("config_file")  # prediction
     parser.add_argument("log_folder")
-    parser.add_argument("--single_map_file",
-                        default='single_map.csv', type=str)
-    parser.add_argument("--map_file", default='map.csv', type=str)
-    parser.add_argument("--map_column", default='patient_idx', type=str)
-    parser.add_argument("--columns", default='patient_idx,slice_idx', type=str)
-    parser.add_argument("--merge_file", default='merge_file.h5', type=str)
-    parser.add_argument("--folds", default='val', type=str)
-    parser.add_argument("--prefix", default='', type=str)
+    parser.add_argument("--temp_folder",
+                        default='', type=str)
+    parser.add_argument("--meta", default='patient_idx,slice_idx', type=str)
 
     args = parser.parse_args()
 
-    print('mapping meta data')
+    PostProcessor(
+        args.log_folder,
+        temp_base_path=args.temp_folder,
+        map_meta_data=args.meta
+    ).map_2d_meta_data().calculate_fscore_single().merge_2d_slice(
+    ).calculate_fscore()
 
-    H5MetaDataMapping('/home/work/ngochuyn/hn_delin/full_dataset_singleclass.h5',
-                      # H5MetaDataMapping('../../full_dataset_singleclass.h5',
-                      f'{args.log_folder}/{args.single_map_file}',
-                      folds=args.folds.split(','), fold_prefix=args.prefix,
-                      dataset_names=args.columns.split(',')).post_process()
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("config_file")  # prediction
+    # parser.add_argument("log_folder")
+    # parser.add_argument("--single_map_file",
+    #                     default='single_map.csv', type=str)
+    # parser.add_argument("--map_file", default='map.csv', type=str)
+    # parser.add_argument("--map_column", default='patient_idx', type=str)
+    # parser.add_argument("--columns", default='patient_idx,slice_idx', type=str)
+    # parser.add_argument("--merge_file", default='merge_file.h5', type=str)
+    # parser.add_argument("--folds", default='val', type=str)
+    # parser.add_argument("--prefix", default='', type=str)
 
-    print('calculate fscore meta data')
+    # args = parser.parse_args()
 
-    H5CalculateFScore(args.config_file,
-                      f'{args.log_folder}/{args.single_map_file}').post_process()
+    # print('mapping meta data')
+    # print(args.folds)
 
-    print('merge data')
+    # # H5MetaDataMapping('/home/work/ngochuyn/hn_delin/full_dataset_singleclass.h5',
+    # H5MetaDataMapping('../../full_dataset_singleclass.h5',
+    #                   f'{args.log_folder}/{args.single_map_file}',
+    #                   folds=args.folds.split(','), fold_prefix=args.prefix,
+    #                   dataset_names=args.columns.split(',')).post_process()
 
-    H5Merge2dSlice(args.config_file, f'{args.log_folder}/{args.single_map_file}',
-                   args.map_column, f'{args.log_folder}/{args.merge_file}',
-                   f'{args.log_folder}/{args.map_file}').post_process()
+    # print('calculate fscore meta data')
 
-    print('calculate dice')
+    # H5CalculateFScore(args.config_file,
+    #                   f'{args.log_folder}/{args.single_map_file}').post_process()
 
-    H5CalculateFScore(f'{args.log_folder}/{args.merge_file}',
-                      f'{args.log_folder}/{args.map_file}',
-                      map_file=f'{args.log_folder}/{args.map_file}',
-                      map_column=args.map_column).post_process()
+    # print('merge data')
+
+    # H5Merge2dSlice(args.config_file, f'{args.log_folder}/{args.single_map_file}',
+    #                args.map_column, f'{args.log_folder}/{args.merge_file}',
+    #                f'{args.log_folder}/{args.map_file}').post_process()
+
+    # print('calculate dice')
+
+    # H5CalculateFScore(f'{args.log_folder}/{args.merge_file}',
+    #                   f'{args.log_folder}/{args.map_file}',
+    #                   map_file=f'{args.log_folder}/{args.map_file}',
+    #                   map_column=args.map_column).post_process()

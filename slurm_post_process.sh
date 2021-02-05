@@ -18,7 +18,7 @@ module load singularity
 ## Code
 # If data files aren't copied, do so
 #!/bin/bash
-if [ $# -lt 2 ];
+if [ $# -lt 1 ];
     then
     printf "Not enough arguments - %d\n" $#
     exit 0
@@ -48,4 +48,4 @@ echo "Finished seting up files."
 # nvidia-modprobe -u -c=0
 
 # Run experiment
-singularity exec --nv deoxys.sif python post_processing.py $1 /net/fs-1/Ngoc/hnperf/$2 ${@:3}
+singularity exec --nv deoxys.sif python post_processing.py /net/fs-1/Ngoc/hnperf/$1 ${@:2}
