@@ -307,12 +307,13 @@ class PostProcessor:
             self.PREDICTION_PATH + self.PREDICTION_NAME
 
         main_log_folder = self.log_base_path + self.MAP_PATH
+        main_log_filename = main_log_folder + self.MAP_NAME
 
         for epoch in self.epochs:
             H5CalculateFScore(
                 merge_path.format(epoch=epoch),
                 main_log_folder.format(epoch=epoch),
-                map_file=main_log_folder.format(epoch=epoch),
+                map_file=main_log_filename.format(epoch=epoch),
                 map_column=self.main_meta_data
             ).post_process()
 
