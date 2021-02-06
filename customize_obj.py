@@ -841,7 +841,7 @@ class PostProcessor:
 
             H5CalculateFScore(
                 merge_path,
-                main_result_file_name.format,
+                main_result_file_name,
                 map_file=main_result_file_name,
                 map_column=self.main_meta_data
             ).post_process()
