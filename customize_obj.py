@@ -865,8 +865,8 @@ class PostProcessor:
 
             results.append(df[monitor].mean())
 
-        best_epoch = epochs[df[monitor].argmax()]
         res_df[monitor] = results
+        best_epoch = epochs[res_df[monitor].argmax()]
 
         res_df.to_csv(self.log_base_path + '/log_new.csv', index=False)
 
