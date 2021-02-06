@@ -684,7 +684,7 @@ class PostProcessor:
     MAP_NAME = '/logs.{epoch:03d}.csv'
 
     TEST_SINGLE_MAP_NAME = '/single_result.csv'
-    TEST_MAP_NAME = 'single_result.csv'
+    TEST_MAP_NAME = '/result.csv'
 
     def __init__(self, log_base_path='logs',
                  temp_base_path='', map_meta_data=None, main_meta_data='', run_test=False):
