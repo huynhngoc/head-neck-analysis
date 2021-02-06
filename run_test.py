@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     best_model = customize_obj.PostProcessor(
         args.log_folder,
-        temp_base_path=args.temp_folder).best_model
+        temp_base_path=args.temp_folder).get_best_model(args.monitor)
 
     (
         customize_obj.AnalysisExperiment(
