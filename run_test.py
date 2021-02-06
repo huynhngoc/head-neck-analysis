@@ -25,6 +25,7 @@ if __name__ == '__main__':
     parser.add_argument("--temp_folder",
                         default='', type=str)
     parser.add_argument("--monitor", default='', type=str)
+    parser.add_argument("--meta", default='patient_idx,slice_idx', type=str)
 
     args, unknown = parser.parse_known_args()
 
