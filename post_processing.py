@@ -18,7 +18,7 @@ if __name__ == '__main__':
                         default='', type=str)
     parser.add_argument("--meta", default='patient_idx,slice_idx', type=str)
 
-    args = parser.parse_args()
+    args, unknown = parser.parse_known_args()
 
     if '2d' in args.log_folder:
         PostProcessor(

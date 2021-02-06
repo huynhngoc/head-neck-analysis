@@ -26,7 +26,7 @@ if __name__ == '__main__':
                         default='', type=str)
     parser.add_argument("--monitor", default='', type=str)
 
-    args = parser.parse_args()
+    args, unknown = parser.parse_known_args()
 
     # 42 images for 2d, 15 images for 3d
     img_num = 42

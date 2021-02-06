@@ -848,7 +848,7 @@ class PostProcessor:
 
         return self
 
-    def get_best_model(self, monitor=''):
+    def get_best_model(self, monitor='', keep_best_only=True):
         print('finding best model')
 
         epochs = self.epochs
@@ -869,6 +869,12 @@ class PostProcessor:
         res_df[monitor] = results
 
         res_df.to_csv(self.log_base_path + '/log_new.csv', index=False)
+
+        if keep_best_only:
+            for epoch in epochs:
+                if epoch != best_epoch:
+                    os.remove(self.log_base_path + self.PREDICTION_PATH +
+                              self.PREDICTION_NAME.format(epoch=epoch))
 
         return self.log_base_path + self.MODEL_PATH + \
             self.MODEL_NAME.format(epoch=best_epoch)

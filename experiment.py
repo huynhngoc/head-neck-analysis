@@ -33,7 +33,7 @@ if __name__ == '__main__':
     parser.add_argument("--model_checkpoint_period", default=25, type=int)
     parser.add_argument("--prediction_checkpoint_period", default=25, type=int)
 
-    args = parser.parse_args()
+    args, unknown = parser.parse_known_args()
 
     # strategy = tf.distribute.MirroredStrategy()
     # print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
