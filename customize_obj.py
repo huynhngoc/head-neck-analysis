@@ -331,8 +331,14 @@ class H5PatchGenerator(DataGenerator):
                     num_cache = shape[0] // self.batch_cache
                     remainder_img = shape[0] % self.batch_cache
 
-                    total_batch += num_cache * patches_per_cache
-                    total_batch += remainder_img * patches_per_img
+                    batch_per_cache = np.ceil(
+                        patches_per_cache / self.batch_size)
+
+                    total_batch += num_cache * batch_per_cache
+
+                    total_batch += np.ceil(
+                        remainder_img * patches_per_img / self.batch_size)
+
             else:
                 # have to apply preprocessor, if any before calculating
                 # number of patches per image
@@ -369,10 +375,11 @@ class H5PatchGenerator(DataGenerator):
                             cache_x, patch_indice, self.patch_size,
                             self.drop_fraction, self.check_drop_channel)
 
-                        total_batch += np.sum(check_drop_list)
+                        total_batch += np.ceil(
+                            np.sum(check_drop_list) / self.batch_size)
 
         self._total_batch = int(total_batch)
-        print('done counting iter_num')
+        print('done counting iter_num', self._total_batch)
         return self._total_batch
 
     def next_fold(self):
@@ -666,6 +673,115 @@ class H5Merge2dSlice:
         df.to_csv(self.save_file, index=False)
 
 
+class H5MergePatches:
+    def __init__(self, ref_file, predicted_file,
+                 map_column, merge_file, save_file,
+                 patch_size, overlap,
+                 folds, fold_prefix='fold',
+                 original_input_dataset='x',
+                 original_target_dataset='y',
+                 predicted_dataset='predicted', target_dataset='y',
+                 input_dataset='x'
+                 ):
+
+        # def __init__(self, ref_file, map_file, map_column, merge_file, save_file,
+        #              predicted_dataset='predicted', target_dataset='y',
+        #              input_dataset='x'):
+        self.ref_file = ref_file
+        self.predicted_file = predicted_file
+        self.map_column = map_column
+        self.merge_file = merge_file
+        self.save_file = save_file
+
+        self.ref_inputs = original_input_dataset
+        self.ref_targets = original_target_dataset
+
+        self.predicted = predicted_dataset
+        self.target = target_dataset
+        self.inputs = input_dataset
+
+        if fold_prefix:
+            self.folds = ['{}_{}'.format(
+                fold_prefix, fold) for fold in folds]
+        else:
+            self.folds = folds
+
+        self.patch_size = patch_size
+        self.overlap = overlap
+
+        print('patch', patch_size)
+
+    def _save_inputs_target_to_merge_file(self, fold, meta, index):
+        with h5py.File(self.ref_file, 'r') as f:
+            inputs = f[fold][self.ref_inputs][index]
+            targets = f[fold][self.ref_targets][index]
+
+        print(inputs.shape, self.inputs, meta)
+
+        with h5py.File(self.merge_file, 'a') as mf:
+            mf[self.inputs].create_dataset(
+                meta, data=inputs, compression="gzip")
+            mf[self.target].create_dataset(
+                meta, data=targets, compression="gzip")
+
+    def _merge_patches_to_merge_file(self, meta, start_cursor):
+        with h5py.File(self.merge_file, 'r') as mf:
+            shape = mf[self.target][meta].shape[:-1]
+
+        # fix patch size
+        if '__iter__' not in dir(self.patch_size):
+            self.patch_size = [self.patch_size] * len(shape)
+
+        indice = get_patch_indice(shape, self.patch_size, self.overlap)
+        next_cursor = start_cursor + len(indice)
+
+        with h5py.File(self.predicted_file, 'r') as f:
+            data = f[self.predicted][start_cursor: next_cursor]
+
+        predicted = np.zeros(shape)
+        weight = np.zeros(shape)
+        print(data.shape, predicted.shape)
+
+        for i in range(len(indice)):
+            x, y, z = indice[i]
+            w, h, d = self.patch_size
+            predicted[x:x+w, y:y+h, z:z+d] = predicted[x:x+w, y:y+h, z:z+d] \
+                + data[i][..., 0]
+            weight[x:x+w, y:y+h, z:z+d] = weight[x:x+w, y:y+h, z:z+d] \
+                + np.ones(self.patch_size)
+
+        predicted = (predicted/weight)[..., np.newaxis]
+
+        with h5py.File(self.merge_file, 'a') as mf:
+            mf[self.predicted].create_dataset(
+                meta, data=predicted, compression="gzip")
+
+        return next_cursor
+
+    def post_process(self):
+        # create merge file
+        with h5py.File(self.merge_file, 'w') as mf:
+            mf.create_group(self.inputs)
+            mf.create_group(self.target)
+            mf.create_group(self.predicted)
+
+        data = []
+        start_cursor = 0
+        for fold in self.folds:
+            with h5py.File(self.ref_file, 'r') as f:
+                meta_data = f[fold][self.map_column][:]
+                data.extend(meta_data)
+                for index, meta in enumerate(meta_data):
+                    self._save_inputs_target_to_merge_file(
+                        fold, str(meta), index)
+                    start_cursor = self._merge_patches_to_merge_file(
+                        str(meta), start_cursor)
+
+        # create map file
+        df = pd.DataFrame(data, columns=[self.map_column])
+        df.to_csv(self.save_file, index=False)
+
+
 class PostProcessor:
     MODEL_PATH = '/model'
     MODEL_NAME = '/model.{epoch:03d}.h5'
@@ -687,9 +803,19 @@ class PostProcessor:
     TEST_MAP_NAME = '/result.csv'
 
     def __init__(self, log_base_path='logs',
-                 temp_base_path='', map_meta_data=None, main_meta_data='', run_test=False):
+                 temp_base_path='',
+                 analysis_base_path='',
+                 map_meta_data=None, main_meta_data='',
+                 run_test=False):
         self.temp_base_path = temp_base_path
         self.log_base_path = log_base_path
+        self.analysis_base_path = analysis_base_path or log_base_path
+
+        if not os.path.exists(self.analysis_base_path):
+            os.mkdir(self.analysis_base_path)
+
+        if not os.path.exists(self.analysis_base_path + self.PREDICTION_PATH):
+            os.mkdir(self.analysis_base_path + self.PREDICTION_PATH)
 
         model_path = log_base_path + self.MODEL_PATH
 
@@ -818,10 +944,67 @@ class PostProcessor:
 
         return self
 
+    def merge_3d_patches(self):
+        print('merge 3d patches to 3d images')
+        if not self.run_test:
+            predicted_path = self.temp_base_path + \
+                self.PREDICTION_PATH + self.PREDICTION_NAME
+            # map_folder = self.log_base_path + self.SINGLE_MAP_PATH
+            # map_filename = map_folder + self.SINGLE_MAP_NAME
+
+            merge_path = self.analysis_base_path + \
+                self.PREDICTION_PATH + self.PREDICTION_NAME
+
+            main_log_folder = self.log_base_path + self.MAP_PATH
+
+            if not os.path.exists(main_log_folder):
+                os.makedirs(main_log_folder)
+            main_log_filename = main_log_folder + self.MAP_NAME
+
+            for epoch in self.epochs:
+                H5MergePatches(
+                    ref_file=self.dataset_filename,
+                    predicted_file=predicted_path.format(epoch=epoch),
+                    map_column=self.main_meta_data,
+                    merge_file=merge_path.format(epoch=epoch),
+                    save_file=main_log_filename.format(epoch=epoch),
+                    patch_size=self.data_reader.patch_size,
+                    overlap=self.data_reader.overlap,
+                    folds=self.data_reader.val_folds,
+                    fold_prefix='',
+                    original_input_dataset=self.data_reader.x_name,
+                    original_target_dataset=self.data_reader.y_name,
+                ).post_process()
+        else:
+            predicted_path = self.temp_base_path + \
+                self.TEST_OUTPUT_PATH + self.PREDICT_TEST_NAME
+            test_folder = self.log_base_path + self.TEST_OUTPUT_PATH
+            merge_path = test_folder + self.PREDICT_TEST_NAME
+            main_result_file_name = test_folder + self.TEST_MAP_NAME
+
+            if not os.path.exists(test_folder):
+                os.makedirs(test_folder)
+
+            H5MergePatches(
+                ref_file=self.dataset_filename,
+                predicted_file=predicted_path,
+                map_column=self.main_meta_data,
+                merge_file=merge_path,
+                save_file=main_result_file_name,
+                patch_size=self.data_reader.patch_size,
+                overlap=self.data_reader.overlap,
+                folds=self.data_reader.val_folds,
+                fold_prefix='',
+                original_input_dataset=self.data_reader.x_name,
+                original_target_dataset=self.data_reader.y_name,
+            ).post_process()
+
+        return self
+
     def calculate_fscore(self):
         print('calculating dice score per 3d image')
         if not self.run_test:
-            merge_path = self.log_base_path + \
+            merge_path = self.analysis_base_path + \
                 self.PREDICTION_PATH + self.PREDICTION_NAME
 
             main_log_folder = self.log_base_path + self.MAP_PATH
@@ -873,7 +1056,13 @@ class PostProcessor:
         if keep_best_only:
             for epoch in epochs:
                 if epoch != best_epoch:
-                    os.remove(self.log_base_path + self.PREDICTION_PATH +
+                    os.remove(self.analysis_base_path + self.PREDICTION_PATH +
+                              self.PREDICTION_NAME.format(epoch=epoch))
+                elif self.log_base_path != self.analysis_base_path:
+                    # move the best prediction to main folder
+                    os.rename(self.analysis_base_path + self.PREDICTION_PATH +
+                              self.PREDICTION_NAME.format(epoch=epoch),
+                              self.log_base_path + self.PREDICTION_PATH +
                               self.PREDICTION_NAME.format(epoch=epoch))
 
         return self.log_base_path + self.MODEL_PATH + \

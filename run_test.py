@@ -24,6 +24,8 @@ if __name__ == '__main__':
     parser.add_argument("log_folder")
     parser.add_argument("--temp_folder",
                         default='', type=str)
+    parser.add_argument("--analysis_folder",
+                        default='', type=str)
     parser.add_argument("--monitor", default='', type=str)
     parser.add_argument("--meta", default='patient_idx,slice_idx', type=str)
 
@@ -55,3 +57,11 @@ if __name__ == '__main__':
             run_test=True
         ).map_2d_meta_data().calculate_fscore_single().merge_2d_slice(
         ).calculate_fscore()
+    else:
+        customize_obj.PostProcessor(
+            args.log_folder,
+            temp_base_path=args.temp_folder,
+            analysis_base_path=args.analysis_folder,
+            map_meta_data=args.meta,
+            run_test=True
+        ).merge_3d_patches().calculate_fscore()
