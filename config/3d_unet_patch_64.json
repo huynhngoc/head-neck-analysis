@@ -4,7 +4,7 @@
         "config": {
             "filename": "/home/work/ngochuyn/hn_delin/headneck_3d_new.h5",
             "batch_size": 16,
-            "patch_size": 128,
+            "patch_size": 64,
             "batch_cache": 5,
             "x_name": "input",
             "y_name": "target",
@@ -71,9 +71,9 @@
     },
     "input_params": {
         "shape": [
-            128,
-            128,
-            128,
+            64,
+            64,
+            64,
             2
         ]
     },
