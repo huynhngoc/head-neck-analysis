@@ -64,7 +64,7 @@
                 "class_name": "EarlyStopping",
                 "config": {
                     "monitor": "val_loss",
-                    "patience": 10
+                    "patience": 30
                 }
             }
         ]
