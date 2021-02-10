@@ -3,7 +3,7 @@
         "class_name": "H5PatchReader",
         "config": {
             "filename": "/home/work/ngochuyn/hn_delin/headneck_3d_new.h5",
-            "batch_size": 16,
+            "batch_size": 4,
             "patch_size": 128,
             "batch_cache": 5,
             "x_name": "input",
