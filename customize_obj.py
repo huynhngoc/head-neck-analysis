@@ -14,6 +14,7 @@ from deoxys_image.patch_sliding import get_patch_indice, get_patches, \
 from itertools import product
 import pandas as pd
 import os
+import shutil
 
 
 @custom_datareader
@@ -1060,9 +1061,12 @@ class PostProcessor:
                               self.PREDICTION_NAME.format(epoch=epoch))
                 elif self.log_base_path != self.analysis_base_path:
                     # move the best prediction to main folder
-                    os.rename(self.analysis_base_path + self.PREDICTION_PATH +
-                              self.PREDICTION_NAME.format(epoch=epoch),
-                              self.log_base_path + self.PREDICTION_PATH +
+                    shutil.copy(self.analysis_base_path + self.PREDICTION_PATH +
+                                self.PREDICTION_NAME.format(epoch=epoch),
+                                self.log_base_path + self.PREDICTION_PATH +
+                                self.PREDICTION_NAME.format(epoch=epoch))
+
+                    os.remove(self.analysis_base_path + self.PREDICTION_PATH +
                               self.PREDICTION_NAME.format(epoch=epoch))
 
         return self.log_base_path + self.MODEL_PATH + \
