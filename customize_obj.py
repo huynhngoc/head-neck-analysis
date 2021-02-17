@@ -15,6 +15,7 @@ from itertools import product
 import pandas as pd
 import os
 import shutil
+import gc
 
 
 @custom_datareader
@@ -393,6 +394,7 @@ class H5PatchGenerator(DataGenerator):
                 np.random.shuffle(self.folds)
 
     def next_seg(self):
+        gc.collect()
         if self.seg_idx == len(self.seg_list):
             # move to next fold
             self.next_fold()
