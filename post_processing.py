@@ -30,7 +30,7 @@ if __name__ == '__main__':
             map_meta_data=args.meta
         ).map_2d_meta_data().calculate_fscore_single().merge_2d_slice(
         ).calculate_fscore().get_best_model(args.monitor)
-    else:
+    elif 'patch' in args.log_folder:
         PostProcessor(
             args.log_folder,
             temp_base_path=args.temp_folder,
@@ -38,3 +38,11 @@ if __name__ == '__main__':
             map_meta_data=args.meta
         ).merge_3d_patches(
         ).calculate_fscore().get_best_model(args.monitor)
+    else:
+        PostProcessor(
+            args.log_folder,
+            temp_base_path=args.temp_folder,
+            analysis_base_path=args.analysis_folder,
+            map_meta_data=args.meta.split(',')[0]
+        ).map_2d_meta_data(
+        ).calculate_fscore_single().get_best_model(args.monitor)
