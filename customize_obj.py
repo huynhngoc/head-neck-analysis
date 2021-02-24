@@ -339,6 +339,8 @@ class H5PatchGenerator(DataGenerator):
                 final_shape = final_shape + \
                     list(obj['shape'][len(final_shape):])
 
+            final_shape = tuple(final_shape)
+
             final_obj = {'shape': final_shape, 'total': 0}
             for obj in description:
                 indice = get_patch_indice(
