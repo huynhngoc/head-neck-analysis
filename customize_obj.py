@@ -16,6 +16,7 @@ import pandas as pd
 import os
 import shutil
 import gc
+import time
 
 
 @custom_datareader
@@ -263,6 +264,7 @@ class H5PatchGenerator(DataGenerator):
         self.folds = str_folds
 
         self._total_batch = None
+        self._description = None
 
         # initialize "index" of current seg and fold
         self.seg_idx = 0
@@ -303,6 +305,49 @@ class H5PatchGenerator(DataGenerator):
                 seg_x, seg_y)
 
         return seg_x, seg_y
+
+    @property
+    def description(self):
+        if self.shuffle:
+            raise Warning('The data is shuffled, the description results '
+                          'may not accurate')
+        if self._description is None:
+            fold_names = self.folds
+            description = []
+            # find the shape of the inputs in the first fold
+            with h5py.File(self.h5_filename, 'r') as hf:
+                shape = hf[fold_names[0]][self.x_name].shape
+            obj = {'shape': shape[1:], 'total': shape[0]}
+
+            for fold_name in fold_names[1:]:  # iterate through each fold
+                with h5py.File(self.h5_filename, 'r') as hf:
+                    shape = hf[fold_name][self.x_name].shape
+
+                # if the shape are the same, increase the total number
+                if np.all(obj['shape'] == shape[1:]):
+                    obj['total'] += shape[0]
+                # else create a new item
+                else:
+                    description.append(obj.copy())
+                    obj = {'shape': shape[1:], 'total': shape[0]}
+
+            # append the last item
+            description.append(obj.copy())
+
+            final_shape = self.patch_size
+            if len(self.patch_size) < len(obj['shape']):
+                final_shape = final_shape + \
+                    list(obj['shape'][len(final_shape):])
+
+            final_obj = {'shape': final_shape, 'total': 0}
+            for obj in description:
+                indice = get_patch_indice(
+                    obj['shape'][:len(self.patch_size)],
+                    self.patch_size, self.overlap)
+                final_obj['total'] += obj['total'] * len(indice)
+
+            self._description = [final_obj]
+        return self._description
 
     @property
     def total_batch(self):
@@ -903,6 +948,21 @@ class PostProcessor:
             ).post_process()
 
         return self
+
+    def calculate_fscore_single_3d(self):
+        self.calculate_fscore_single()
+        if not self.run_test:
+            map_folder = self.log_base_path + self.SINGLE_MAP_PATH
+
+            main_log_folder = self.log_base_path + self.MAP_PATH
+            os.rename(map_folder, main_log_folder)
+        else:
+            test_folder = self.log_base_path + self.TEST_OUTPUT_PATH
+            map_filename = test_folder + self.TEST_SINGLE_MAP_NAME
+
+            main_result_file_name = test_folder + self.TEST_MAP_NAME
+
+            os.rename(map_filename, main_result_file_name)
 
     def merge_2d_slice(self):
         print('merge 2d slice to 3d images')
