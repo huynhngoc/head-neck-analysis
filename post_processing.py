@@ -42,7 +42,6 @@ if __name__ == '__main__':
         PostProcessor(
             args.log_folder,
             temp_base_path=args.temp_folder,
-            analysis_base_path=args.analysis_folder,
             map_meta_data=args.meta.split(',')[0]
         ).map_2d_meta_data(
-        ).calculate_fscore_single().get_best_model(args.monitor)
+        ).calculate_fscore_single_3d().get_best_model(args.monitor)
