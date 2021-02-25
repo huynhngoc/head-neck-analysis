@@ -3,7 +3,7 @@
     "patch_size": 128,
     "batch_cache": 5,
     "overlap": 0.5,
-    "drop_fraction": 0.00001,
+    "drop_fraction": 0.0004,
     "check_drop_channel": 0,
     "bounding_box": true
 }
