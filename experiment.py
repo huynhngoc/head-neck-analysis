@@ -65,6 +65,13 @@ if __name__ == '__main__':
     else:
         meta = args.meta.split(',')[0]
 
+    print('training from configuration', args.config_file,
+          'and saving log files to', args.log_folder)
+    print('Unprocesssed prediciton are saved to', args.temp_folder)
+    if analysis_folder:
+        print('Intermediate processed files for merging patches are saved to',
+              analysis_folder)
+
     exp = ExperimentPipeline(
         log_base_path=args.log_folder,
         temp_base_path=args.temp_folder
