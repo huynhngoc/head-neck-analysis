@@ -65,25 +65,23 @@
         ]
     },
     "model_params": {
-        "model_params": {
-            "loss": {
-                "class_name": "BinaryFbetaLoss"
+        "loss": {
+            "class_name": "BinaryFbetaLoss"
+        },
+        "optimizer": {
+            "class_name": "adam",
+            "config": {
+                "learning_rate": 0.0001
+            }
+        },
+        "metrics": [
+            {
+                "class_name": "BinaryFbeta"
             },
-            "optimizer": {
-                "class_name": "adam",
-                "config": {
-                    "learning_rate": 0.0001
-                }
-            },
-            "metrics": [
-                {
-                    "class_name": "BinaryFbeta"
-                },
-                {
-                    "class_name": "Dice"
-                }
-            ]
-        }
+            {
+                "class_name": "Dice"
+            }
+        ]
     },
     "architecture": {
         "type": "Vnet",
