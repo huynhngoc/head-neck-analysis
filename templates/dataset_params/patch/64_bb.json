@@ -1,0 +1,9 @@
+{
+    "batch_size": 16,
+    "patch_size": 64,
+    "batch_cache": 5,
+    "overlap": 0.5,
+    "drop_fraction": 0.00001,
+    "check_drop_channel": 0,
+    "bounding_box": true
+}

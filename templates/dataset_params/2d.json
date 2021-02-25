@@ -1,0 +1,31 @@
+{
+    "class_name": "H5Reader",
+    "config": {
+        "filename": "/home/work/ngochuyn/hn_delin/full_dataset_single.h5",
+        "batch_size": 16,
+        "x_name": "input",
+        "y_name": "target",
+        "batch_cache": 10,
+        "shuffle": true,
+        "train_folds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+        ],
+        "val_folds": [
+            10
+        ],
+        "test_folds": [
+            11,
+            12,
+            13
+        ]
+    }
+}
