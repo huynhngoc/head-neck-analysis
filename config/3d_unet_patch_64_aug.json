@@ -68,7 +68,7 @@
                         10,
                         10
                     ],
-                    "flip_axis": 0,
+                    "flip_axis": 1,
                     "brightness_range": [
                         0.8,
                         1.2
