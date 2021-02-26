@@ -1,0 +1,17 @@
+{
+    "augmentations": {
+        "class_name": "ImageAugmentation2D",
+        "config": {
+            "rotation_range": 90,
+            "zoom_range": [
+                0.5,
+                1.5
+            ],
+            "shift_range": [
+                10,
+                10
+            ],
+            "flip_axis": 0
+        }
+    }
+}

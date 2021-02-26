@@ -1,0 +1,18 @@
+{
+    "augmentations": {
+        "class_name": "ImageAugmentation3D",
+        "config": {
+            "rotation_range": 90,
+            "zoom_range": [
+                0.8,
+                1.2
+            ],
+            "shift_range": [
+                10,
+                10,
+                10
+            ],
+            "flip_axis": 1
+        }
+    }
+}
