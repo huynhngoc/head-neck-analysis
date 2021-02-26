@@ -40,7 +40,11 @@ def generate_config(data, preprocess='CT_W_PET', aug=False,
     data_reader['config'].update(preprocess)
     if aug:
         data_aug = data if data != 'patch' else '3d'
-        aug = load_json_config(f'{ds_params_path}{data_aug}/aug.json')
+        if type(aug) == str:
+            aug = load_json_config(
+                f'{ds_params_path}{data_aug}/aug_{aug}.json')
+        else:
+            aug = load_json_config(f'{ds_params_path}{data_aug}/aug.json')
         data_reader['config'].update(aug)
     if patch_option and data == 'patch':
         p_options = load_json_config(
@@ -99,6 +103,36 @@ def generate_multi_config(output_path='config/', **kwargs):
 
 
 # generate_config('config.json', 'patch', aug=True, patch_option='80_bb')
+# generate_multi_config(output_path='config/2d/', data=[('2d', '2d')],
+#                       architecture=[('unet', '2d_unet_64_D4'),
+#                                     ('unet_32', '2d_unet_32_D4'),
+#                                     ('unet_48', '2d_unet_48_D4'),
+#                                     ('unet_32_D3', '2d_unet_32_D3'),
+#                                     ('unet_48_D3', '2d_unet_48_D3'),
+#                                     ('unet_64_D3', '2d_unet_64_D3'),
+#                                     ],
+#                       preprocess=[('', 'CT_W_PET'),
+#                                   ('norm', 'CT_W_PET_norm'),
+#                                   ('P10', 'CT_W_PET_C200_P10'),
+#                                   ('P25', 'CT_W_PET_C200_P25'),
+#                                   ],
+#                       aug=[('', False), ('aug', True)],
+#                       )
+
+# generate_multi_config(output_path='config/3d/', data=[('3d', '3d')],
+#                       architecture=[('unet_32', '3d_unet_32_D4'),
+#                                     ('unet_48', '3d_unet_48_D4'),
+#                                     ('unet_32_D3', '3d_unet_32_D3'),
+#                                     ('unet_48_D3', '3d_unet_48_D3'),
+#                                     ],
+#                       preprocess=[('', 'CT_W_PET'),
+#                                   ('norm', 'CT_W_PET_norm'),
+#                                   ('P10', 'CT_W_PET_C200_P10'),
+#                                   ('P25', 'CT_W_PET_C200_P25'),
+#                                   ],
+#                       aug=[('', False), ('aug', True)],
+#                       )
+
 generate_multi_config(output_path='config/2d/', data=[('2d', '2d')],
                       architecture=[('unet', '2d_unet_64_D4'),
                                     ('unet_32', '2d_unet_32_D4'),
@@ -107,12 +141,11 @@ generate_multi_config(output_path='config/2d/', data=[('2d', '2d')],
                                     ('unet_48_D3', '2d_unet_48_D3'),
                                     ('unet_64_D3', '2d_unet_64_D3'),
                                     ],
-                      preprocess=[('', 'CT_W_PET'),
-                                  ('norm', 'CT_W_PET_norm'),
+                      preprocess=[('norm', 'CT_W_PET_norm'),
                                   ('P10', 'CT_W_PET_C200_P10'),
                                   ('P25', 'CT_W_PET_C200_P25'),
                                   ],
-                      aug=[('', False), ('aug', True)],
+                      aug=[('aug_affine', 'affine')],
                       )
 
 generate_multi_config(output_path='config/3d/', data=[('3d', '3d')],
@@ -121,10 +154,9 @@ generate_multi_config(output_path='config/3d/', data=[('3d', '3d')],
                                     ('unet_32_D3', '3d_unet_32_D3'),
                                     ('unet_48_D3', '3d_unet_48_D3'),
                                     ],
-                      preprocess=[('', 'CT_W_PET'),
-                                  ('norm', 'CT_W_PET_norm'),
+                      preprocess=[('norm', 'CT_W_PET_norm'),
                                   ('P10', 'CT_W_PET_C200_P10'),
                                   ('P25', 'CT_W_PET_C200_P25'),
                                   ],
-                      aug=[('', False), ('aug', True)],
+                      aug=[('aug_affine', 'affine')],
                       )
