@@ -23,6 +23,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("log_folder")
+    parser.add_argument("--best_epoch", default=5, type=int)
     parser.add_argument("--temp_folder", default='', type=str)
     parser.add_argument("--analysis_folder",
                         default='', type=str)
@@ -96,15 +97,21 @@ if __name__ == '__main__':
     ex = ExperimentPipeline(
         log_base_path=args.log_folder,
         temp_base_path=args.temp_folder
-    ).apply_post_processors(
-        recipe='auto',
-        analysis_base_path=analysis_folder,
-        map_meta_data=meta
-    ).load_best_model(
-        recipe='auto',
-        analysis_base_path=analysis_folder,
-        map_meta_data=meta,
-    ).run_test(
+    )
+    try:
+        ex = ex.apply_post_processors(
+            recipe='auto',
+            analysis_base_path=analysis_folder,
+            map_meta_data=meta
+        ).load_best_model(
+            recipe='auto',
+            analysis_base_path=analysis_folder,
+            map_meta_data=meta,
+        )
+    except Exception as e:
+        print(e)
+        e.from_file(args.best_epoch)
+    ex.run_test(
     ).apply_post_processors(
         recipe='auto',
         analysis_base_path=analysis_folder,
