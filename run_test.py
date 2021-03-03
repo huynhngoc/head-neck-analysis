@@ -21,7 +21,6 @@ if __name__ == '__main__':
         raise RuntimeError("GPU Unavailable")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("config_file")
     parser.add_argument("log_folder")
     parser.add_argument("--temp_folder", default='', type=str)
     parser.add_argument("--analysis_folder",
