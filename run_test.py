@@ -17,7 +17,8 @@ import tensorflow as tf
 import customize_obj
 
 if __name__ == '__main__':
-    if not tf.test.is_gpu_available():
+    gpus = tf.config.list_physical_devices('GPU')
+    if not gpus:
         raise RuntimeError("GPU Unavailable")
 
     parser = argparse.ArgumentParser()
