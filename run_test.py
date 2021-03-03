@@ -96,6 +96,10 @@ if __name__ == '__main__':
     ex = ExperimentPipeline(
         log_base_path=args.log_folder,
         temp_base_path=args.temp_folder
+    ).apply_post_processors(
+        recipe='auto',
+        analysis_base_path=analysis_folder,
+        map_meta_data=meta
     ).load_best_model(
         recipe='auto',
         analysis_base_path=analysis_folder,
