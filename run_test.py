@@ -110,7 +110,7 @@ if __name__ == '__main__':
         )
     except Exception as e:
         print(e)
-        e.from_file(args.best_epoch)
+        e.from_file(args.log_folder + f'/model/model.{args.best_epoch:03d}.h5')
     ex.run_test(
     ).apply_post_processors(
         recipe='auto',
