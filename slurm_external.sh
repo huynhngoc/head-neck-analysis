@@ -19,7 +19,7 @@ module load singularity
 ## Code
 # If data files aren't copied, do so
 #!/bin/bash
-if [ $# -lt 1 ];
+if [ $# -lt 2 ];
     then
     printf "Not enough arguments - %d\n" $#
     exit 0
@@ -48,6 +48,5 @@ echo "Finished seting up files."
 # Hack to ensure that the GPUs work
 nvidia-modprobe -u -c=0
 
-# Run experiment
-# singularity exec --nv deoxys.sif python test_experiment.py $1 /net/fs-1/Ngoc/hnperf/$2
-singularity exec --nv deoxys-beta.sif python -u run_test.py /net/fs-1/Ngoc/hnperf/$1 --temp_folder $SCRATCH/hnperf/$1 --analysis_folder $SCRATCH/analysis/$1 ${@:2}
+# Run test on external data
+singularity exec --nv deoxys-beta.sif python -u run_external.py $1 /net/fs-1/Ngoc/hnperf/$2 --temp_folder $SCRATCH/hnperf/$2 --analysis_folder $SCRATCH/analysis/$2 ${@:4}
