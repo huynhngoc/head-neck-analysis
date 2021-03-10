@@ -1,6 +1,6 @@
 {
     "config": {
-        "filename": "../../maastro_test_data_2d.h5",
+        "filename": "/home/work/ngochuyn/hn_delin/maastro_test_data_2d.h5",
         "test_folds": [
             0,
             1,
