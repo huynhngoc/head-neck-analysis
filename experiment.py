@@ -89,6 +89,8 @@ if __name__ == '__main__':
     ).plot_performance().plot_prediction(
         masked_images=[i for i in range(10)], best_num=2, worst_num=2
     ).load_best_model(monitor=args.monitor)
+    if analysis_folder:
+        exp.plot_prediction(best_num=2, worst_num=2)
 
     # config = read_file(args.config_file)
 
