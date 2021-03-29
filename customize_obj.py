@@ -511,6 +511,7 @@ class H5PatchGenerator(DataGenerator):
     def _next_seg(self):
         while True:
             if not self.queue.full():
+                print('Putting item into queue')
                 item = self.next_seg()
                 self.queue.put(item)
                 # logging.debug('Putting ' + str(item)
@@ -543,6 +544,7 @@ class H5PatchGenerator(DataGenerator):
         while True:
             if not self.queue.empty():
                 seg_x, seg_y = self.next_seg()
+                seg_x, seg_y = self.queue.get()  # next_seg()
 
                 seg_len = len(seg_y)
 
