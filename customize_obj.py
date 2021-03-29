@@ -20,7 +20,7 @@ import time
 
 # from threading import Thread
 import threading
-from queue import Queue
+from multiprocessing import Queue, Process
 
 
 @custom_datareader
@@ -511,7 +511,7 @@ class H5PatchGenerator(DataGenerator):
     def _next_seg(self):
         while True:
             if not self.queue.full():
-                print('Putting item into queue')
+                print('Putting item into queue', self.queue.qsize())
                 item = self.next_seg()
                 self.queue.put(item)
                 # logging.debug('Putting ' + str(item)
@@ -539,7 +539,9 @@ class H5PatchGenerator(DataGenerator):
             batch of (input, target)
         """
         # thread.start_new_thread(self._next_seg)
-        threading.Thread(target=self._next_seg).start()
+        self.running_process = Process(target=self._next_seg)
+        self.running_process.daemon = True
+        self.running_process.start()
 
         while True:
             if not self.queue.empty():
@@ -551,5 +553,9 @@ class H5PatchGenerator(DataGenerator):
                 for i in range(0, seg_len, self.batch_size):
                     batch_x = seg_x[i:(i + self.batch_size)]
                     batch_y = seg_y[i:(i + self.batch_size)]
-
                     yield batch_x, batch_y
+
+    def __del__(self):
+        self.queue.close()
+        self.running_process.terminate()
+        # self.running_process.close()
