@@ -18,6 +18,10 @@ import shutil
 import gc
 import time
 
+# from threading import Thread
+import thread
+from Queue import Queue
+
 
 @custom_datareader
 class H5PatchReader(DataReader):
@@ -293,6 +297,8 @@ class H5PatchGenerator(DataGenerator):
         if '__iter__' not in dir(self.patch_size):
             self.patch_size = [patch_size] * len(self.fold_shape)
 
+        self.queue = Queue(2)
+
     def _apply_preprocess(self, x, y):
         seg_x, seg_y = x, y
 
@@ -315,7 +321,7 @@ class H5PatchGenerator(DataGenerator):
     def description(self):
         if self.shuffle:
             raise Warning('The data is shuffled, the description results '
-                          'may not accurate')
+                          'may not be accurate')
         if self._description is None:
             fold_names = self.folds
             description = []
@@ -502,6 +508,27 @@ class H5PatchGenerator(DataGenerator):
         self.seg_idx += 1
         return seg_x, seg_y
 
+    def _next_seg(self):
+        while True:
+            if not self.queue.full():
+                item = self.next_seg()
+                self.queue.put(item)
+                # logging.debug('Putting ' + str(item)
+                #               + ' : ' + str(q.qsize()) + ' items in queue')
+                # time.sleep(random.random())
+        # return
+
+    # def consumer(self):
+    #     def get_seg():
+    #         cr = func(*args, **kwargs)
+    #         next(cr)
+    #         return cr
+
+    #     return get_seg()
+
+    # def next_queue_seg(self):
+    #     return next(self.queue_seg)
+
     def generate(self):
         """Create a generator that generate a batch of data
 
@@ -510,13 +537,15 @@ class H5PatchGenerator(DataGenerator):
         tuple of 2 arrays
             batch of (input, target)
         """
+        thread.start_new_thread(self._next_seg)
         while True:
-            seg_x, seg_y = self.next_seg()
+            if not self.queue.empty():
+                seg_x, seg_y = self.next_seg()
 
-            seg_len = len(seg_y)
+                seg_len = len(seg_y)
 
-            for i in range(0, seg_len, self.batch_size):
-                batch_x = seg_x[i:(i + self.batch_size)]
-                batch_y = seg_y[i:(i + self.batch_size)]
+                for i in range(0, seg_len, self.batch_size):
+                    batch_x = seg_x[i:(i + self.batch_size)]
+                    batch_y = seg_y[i:(i + self.batch_size)]
 
-                yield batch_x, batch_y
+                    yield batch_x, batch_y
