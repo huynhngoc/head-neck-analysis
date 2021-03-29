@@ -298,12 +298,13 @@ class H5PatchGenerator(DataGenerator):
             self.patch_size = [patch_size] * len(self.fold_shape)
 
         if self.augmentations:
-            self.queue = Queue(10)
+            # the queue contains all items in one cache
+            self.queue = Queue(self.batch_size*self.batch_cache)
             self.running_process = Process(target=self._next_seg)
             self.running_process.daemon = True
             self.running_process.start()
-            # sleep for 2 mins to buffer queue
-            time.sleep(120)
+            # sleep for 10sec for each item
+            time.sleep(self.batch_size*self.batch_cache*10)
 
     def _apply_preprocess(self, x, y):
         seg_x, seg_y = x, y
