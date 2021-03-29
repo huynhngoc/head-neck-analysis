@@ -19,7 +19,7 @@ import gc
 import time
 
 # from threading import Thread
-import thread
+import threading
 from Queue import Queue
 
 
@@ -537,7 +537,9 @@ class H5PatchGenerator(DataGenerator):
         tuple of 2 arrays
             batch of (input, target)
         """
-        thread.start_new_thread(self._next_seg)
+        # thread.start_new_thread(self._next_seg)
+        threading.Thread(target=self._next_seg).start()
+
         while True:
             if not self.queue.empty():
                 seg_x, seg_y = self.next_seg()
