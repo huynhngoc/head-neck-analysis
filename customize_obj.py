@@ -297,6 +297,14 @@ class H5PatchGenerator(DataGenerator):
         if '__iter__' not in dir(self.patch_size):
             self.patch_size = [patch_size] * len(self.fold_shape)
 
+        if self.augmentations:
+            self.queue = Queue(10)
+            self.running_process = Process(target=self._next_seg)
+            self.running_process.daemon = True
+            self.running_process.start()
+            # sleep for 2 mins to buffer queue
+            time.sleep(120)
+
     def _apply_preprocess(self, x, y):
         seg_x, seg_y = x, y
 
@@ -528,11 +536,6 @@ class H5PatchGenerator(DataGenerator):
             batch of (input, target)
         """
         if self.augmentations:
-            self.queue = Queue(10)
-            self.running_process = Process(target=self._next_seg)
-            self.running_process.daemon = True
-            self.running_process.start()
-
             while True:
                 if not self.queue.empty():
                     batch_x, batch_y = self.queue.get()  # next_seg()
