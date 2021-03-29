@@ -543,7 +543,7 @@ class H5PatchGenerator(DataGenerator):
 
         while True:
             if not self.queue.empty():
-                seg_x, seg_y = self.next_seg()
+                # seg_x, seg_y = self.next_seg()
                 seg_x, seg_y = self.queue.get()  # next_seg()
 
                 seg_len = len(seg_y)
