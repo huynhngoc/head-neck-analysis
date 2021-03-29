@@ -297,14 +297,15 @@ class H5PatchGenerator(DataGenerator):
         if '__iter__' not in dir(self.patch_size):
             self.patch_size = [patch_size] * len(self.fold_shape)
 
-        if self.augmentations:
-            # the queue contains all items in one cache
-            self.queue = Queue(self.batch_size*self.batch_cache)
-            self.running_process = Process(target=self._next_seg)
-            self.running_process.daemon = True
-            self.running_process.start()
-            # sleep for 10sec for each item
-            time.sleep(self.batch_size*self.batch_cache*10)
+        # if self.augmentations:
+        #     print("Running augmentation on another thread")
+        #     # the queue contains all items in one cache
+        #     self.queue = Queue(self.batch_size*self.batch_cache)
+        #     self.running_process = Process(target=self._next_seg)
+        #     self.running_process.daemon = True
+        #     self.running_process.start()
+        #     # sleep for 20sec for each item
+        #     # time.sleep(self.batch_size*self.batch_cache*20)
 
     def _apply_preprocess(self, x, y):
         seg_x, seg_y = x, y
@@ -508,8 +509,8 @@ class H5PatchGenerator(DataGenerator):
             seg_x, seg_y = self._apply_preprocess(seg_x, seg_y)
 
         # finally apply augmentation, if any
-        # if self.augmentations:
-        #     seg_x, seg_y = self._apply_augmentation(seg_x, seg_y)
+        if self.augmentations:
+            seg_x, seg_y = self._apply_augmentation(seg_x, seg_y)
 
         # increase seg index
         self.seg_idx += 1
@@ -524,7 +525,7 @@ class H5PatchGenerator(DataGenerator):
                 print('Putting item into queue', self.queue.qsize())
                 batch_x = seg_x[i:(i + self.batch_size)]
                 batch_y = seg_y[i:(i + self.batch_size)]
-                self._apply_augmentation(batch_x, batch_y)
+                batch_x, batch_y = self._apply_augmentation(batch_x, batch_y)
                 self.queue.put((batch_x, batch_y))
                 i += self.batch_size
 
@@ -536,29 +537,29 @@ class H5PatchGenerator(DataGenerator):
         tuple of 2 arrays
             batch of (input, target)
         """
-        if self.augmentations:
-            while True:
-                if not self.queue.empty():
-                    batch_x, batch_y = self.queue.get()  # next_seg()
-                    yield batch_x, batch_y
+        # if self.augmentations:
+        #     while True:
+        #         if not self.queue.empty():
+        #             batch_x, batch_y = self.queue.get()  # next_seg()
+        #             yield batch_x, batch_y
 
-                    # seg_len = len(seg_y)
+        #             # seg_len = len(seg_y)
 
-                    # for i in range(0, seg_len, self.batch_size):
-                    #     batch_x = seg_x[i:(i + self.batch_size)]
-                    #     batch_y = seg_y[i:(i + self.batch_size)]
-                    #     yield batch_x, batch_y
-        else:
-            while True:
-                seg_x, seg_y = self.next_seg()
-                seg_len = len(seg_y)
+        #             # for i in range(0, seg_len, self.batch_size):
+        #             #     batch_x = seg_x[i:(i + self.batch_size)]
+        #             #     batch_y = seg_y[i:(i + self.batch_size)]
+        #             #     yield batch_x, batch_y
+        # else:
+        while True:
+            seg_x, seg_y = self.next_seg()
+            seg_len = len(seg_y)
 
-                for i in range(0, seg_len, self.batch_size):
-                    batch_x = seg_x[i:(i + self.batch_size)]
-                    batch_y = seg_y[i:(i + self.batch_size)]
-                    yield batch_x, batch_y
+            for i in range(0, seg_len, self.batch_size):
+                batch_x = seg_x[i:(i + self.batch_size)]
+                batch_y = seg_y[i:(i + self.batch_size)]
+                yield batch_x, batch_y
 
-    def __del__(self):
-        if self.augmentations:
-            self.queue.close()
-            self.running_process.terminate()
+    # def __del__(self):
+    #     if self.augmentations:
+    #         self.queue.close()
+    #         self.running_process.terminate()
