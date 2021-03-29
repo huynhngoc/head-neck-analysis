@@ -555,6 +555,6 @@ class H5PatchGenerator(DataGenerator):
                     yield batch_x, batch_y
 
     def __del__(self):
-        self.queue.close()
-        self.running_process.terminate()
-        # self.running_process.close()
+        if self.augmentations:
+            self.queue.close()
+            self.running_process.terminate()
