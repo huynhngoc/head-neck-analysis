@@ -20,7 +20,7 @@ import time
 
 # from threading import Thread
 import threading
-from Queue import Queue
+from queue import Queue
 
 
 @custom_datareader
