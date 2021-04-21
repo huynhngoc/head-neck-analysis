@@ -20,7 +20,13 @@ import time
 
 # from threading import Thread
 import threading
-from multiprocessing import Queue, Process
+from multiprocessing import Queue, Process, Pool
+# from concurrent.futures import ProcessPoolExecutor as Pool
+
+
+# global aug_pool
+# aug_pool = Pool(4)
+aug_pool = None
 
 
 @custom_datareader
@@ -297,16 +303,6 @@ class H5PatchGenerator(DataGenerator):
         if '__iter__' not in dir(self.patch_size):
             self.patch_size = [patch_size] * len(self.fold_shape)
 
-        # if self.augmentations:
-        #     print("Running augmentation on another thread")
-        #     # the queue contains all items in one cache
-        #     self.queue = Queue(self.batch_size*self.batch_cache)
-        #     self.running_process = Process(target=self._next_seg)
-        #     self.running_process.daemon = True
-        #     self.running_process.start()
-        #     # sleep for 20sec for each item
-        #     # time.sleep(self.batch_size*self.batch_cache*20)
-
     def _apply_preprocess(self, x, y):
         seg_x, seg_y = x, y
 
@@ -318,6 +314,17 @@ class H5PatchGenerator(DataGenerator):
 
     def _apply_augmentation(self, x, y):
         seg_x, seg_y = x, y
+        # ### pool
+        # size = len(x)//4
+        # for preprocessor in self.augmentations:
+        #     global aug_pool
+        #     res = aug_pool.starmap(preprocessor.transform,
+        #                            [(seg_x[i: i+size], seg_y[i:i+size])
+        #                             for i in range(0, len(seg_x), size)])
+        #     print('done')
+        #     res = np.vstack(
+        #         [r[0] for r in res]), np.vstack([r[1] for r in res])
+        # return res
 
         for preprocessor in self.augmentations:
             seg_x, seg_y = preprocessor.transform(
