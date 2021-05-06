@@ -1,32 +1,30 @@
-from deoxys.data.data_reader import HDF5Reader, HDF5DataGenerator, \
-    DataReader, DataGenerator
-
-from deoxys.loaders import load_data
-from deoxys.customize import custom_datareader
-from deoxys.utils import file_finder, load_json_config
-from deoxys.experiment import Experiment
-from deoxys.model.callbacks import PredictionCheckpoint
-
-import numpy as np
-import h5py
+import gc
+from itertools import product
 from deoxys_image.patch_sliding import get_patch_indice, get_patches, \
     check_drop
-from itertools import product
-import pandas as pd
-import os
-import shutil
-import gc
-import time
+import h5py
+import numpy as np
+from deoxys.model.callbacks import PredictionCheckpoint
+from deoxys.experiment import Experiment
+from deoxys.utils import file_finder, load_json_config
+from deoxys.customize import custom_datareader, custom_layer
+from deoxys.loaders import load_data
+from deoxys.data.data_reader import HDF5Reader, HDF5DataGenerator, \
+    DataReader, DataGenerator
+import tensorflow_addons as tfa
+from tensorflow.keras.layers import Add
 
-# from threading import Thread
-import threading
-from multiprocessing import Queue, Process, Pool
-# from concurrent.futures import ProcessPoolExecutor as Pool
+RATIO = 4
 
 
-# global aug_pool
-# aug_pool = Pool(4)
-aug_pool = None
+@custom_layer
+class InstanceNormalization(tfa.layers.InstanceNormalization):
+    pass
+
+
+@custom_layer
+class AddResize(Add):
+    pass
 
 
 @custom_datareader
@@ -223,10 +221,13 @@ class H5PatchGenerator(DataGenerator):
                 if dataset_names:
                     if h5file[fold].keys() != dataset_names:
                         raise RuntimeError(
-                            'HDF5 file: All folds should have the same structure')
+                            'HDF5 file'
+                            ': All folds should have the same structure')
                 else:
                     dataset_names = h5file[fold].keys()
-                    if x_name not in dataset_names or y_name not in dataset_names:
+
+                    if x_name not in dataset_names or \
+                            y_name not in dataset_names:
                         raise RuntimeError(
                             'HDF5 file: {0} or {1} is not in the file'
                             .format(x_name, y_name))
@@ -453,6 +454,9 @@ class H5PatchGenerator(DataGenerator):
 
         self._total_batch = int(total_batch)
         print('done counting iter_num', self._total_batch)
+        if self.augmentations:
+            # only train part of the segment
+            self._total_batch = self._total_batch//RATIO
         return self._total_batch
 
     def next_fold(self):
@@ -517,7 +521,9 @@ class H5PatchGenerator(DataGenerator):
 
         # finally apply augmentation, if any
         if self.augmentations:
-            seg_x, seg_y = self._apply_augmentation(seg_x, seg_y)
+            total = len(seg_y)
+            seg_x, seg_y = self._apply_augmentation(
+                seg_x[:total//RATIO], seg_y[:total//RATIO])
 
         # increase seg index
         self.seg_idx += 1

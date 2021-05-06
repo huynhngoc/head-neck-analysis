@@ -113,3 +113,5 @@ notebooks/*
 *.h5
 *.sif
 *.out
+
+csv/
