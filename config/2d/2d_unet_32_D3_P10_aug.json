@@ -14,7 +14,7 @@
     "dataset_params": {
         "class_name": "H5Reader",
         "config": {
-            "filename": "/home/work/ngochuyn/hn_delin/full_dataset_single.h5",
+            "filename": "/home/work/ngochuyn/hn_delin/headneck_2d_new.h5",
             "batch_size": 16,
             "x_name": "input",
             "y_name": "target",
