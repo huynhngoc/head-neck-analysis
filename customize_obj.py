@@ -14,7 +14,8 @@ from deoxys.data.data_reader import HDF5Reader, HDF5DataGenerator, \
 import tensorflow_addons as tfa
 from tensorflow.keras.layers import Add
 from deoxys.model.losses import Loss, loss_from_config
-from deoxys.customize import custom_loss
+from deoxys.customize import custom_loss, custom_preprocessor
+from deoxys.data import ImageAugmentation2D
 
 RATIO = 4
 
@@ -580,7 +581,6 @@ class H5PatchGenerator(DataGenerator):
     #         self.running_process.terminate()
 
 
-
 @custom_loss
 class FusedLoss(Loss):
     """Used to sum two or more loss functions.
@@ -590,7 +590,8 @@ class FusedLoss(Loss):
         self, loss_configs, loss_weights=None, reduction="auto", name="fused_loss"
     ):
         super().__init__(reduction, name)
-        self.losses = [loss_from_config(loss_config) for loss_config in loss_configs]
+        self.losses = [loss_from_config(loss_config)
+                       for loss_config in loss_configs]
 
         if loss_weights is None:
             loss_weights = [1] * len(self.losses)
@@ -605,3 +606,25 @@ class FusedLoss(Loss):
                 loss += loss_weight * loss_class(target, prediction)
 
         return loss
+
+
+@custom_preprocessor
+class ClassImageAugmentation2D(ImageAugmentation2D):
+    def transform(self, images, targets):
+        """
+        Apply augmentation to a batch of images
+
+        Parameters
+        ----------
+        images : np.array
+            the image batch
+        targets : np.array, optional
+            the target batch, by default None
+
+        Returns
+        -------
+        np.array
+            the transformed images batch (and target)
+        """
+        images = self.augmentation_obj.transform(images)
+        return images, targets
