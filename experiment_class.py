@@ -72,9 +72,9 @@ if __name__ == '__main__':
         print('Intermediate processed files for merging patches are saved to',
               analysis_folder)
 
-    exp = ExperimentPipeline(
+    exp = Experiment(
         log_base_path=args.log_folder,
-        temp_base_path=args.temp_folder
+        # temp_base_path=args.temp_folder
     ).from_full_config(
         args.config_file
     ).run_experiment(
@@ -82,12 +82,8 @@ if __name__ == '__main__':
         model_checkpoint_period=args.model_checkpoint_period,
         prediction_checkpoint_period=args.prediction_checkpoint_period,
         epochs=args.epochs,
-    ).apply_post_processors(
-        recipe='auto',
-        analysis_base_path=analysis_folder,
-        map_meta_data=meta,
-    ).plot_performance().plot_prediction(
-        masked_images=[i for i in range(10)], best_num=2, worst_num=2
-    ).load_best_model(monitor=args.monitor)
-    if analysis_folder:
-        exp.plot_prediction(best_num=2, worst_num=2)
+        # ).apply_post_processors(
+        #     recipe='auto',
+        #     analysis_base_path=analysis_folder,
+        #     map_meta_data=meta,
+    ).plot_performance()

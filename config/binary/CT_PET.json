@@ -1,0 +1,125 @@
+{
+    "train_params": {
+        "epochs": 200,
+        "callbacks": [
+            {
+                "class_name": "EarlyStopping",
+                "config": {
+                    "monitor": "val_loss",
+                    "patience": 30
+                }
+            }
+        ]
+    },
+    "dataset_params": {
+        "class_name": "H5Reader",
+        "config": {
+            "filename": "/home/work/ngochuyn/hn_delin/headneck_2d_full.h5",
+            "batch_size": 16,
+            "x_name": "input",
+            "y_name": "class",
+            "batch_cache": 10,
+            "shuffle": true,
+            "train_folds": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+            ],
+            "val_folds": [
+                10
+            ],
+            "test_folds": [
+                11,
+                12,
+                13
+            ],
+            "preprocessors": []
+        }
+    },
+    "input_params": {
+        "shape": [
+            191,
+            265,
+            2
+        ]
+    },
+    "model_params": {
+        "loss": {
+            "class_name": "BinaryCrossentropy"
+        },
+        "optimizer": {
+            "class_name": "adam",
+            "config": {
+                "learning_rate": 0.0001
+            }
+        },
+        "metrics": [
+            {
+                "class_name": "BinaryFbeta"
+            },
+            {
+                "class_name": "BinaryCrossentropy"
+            }
+        ]
+    },
+    "architecture": {
+        "type": "Sequential",
+        "layers": [
+            {
+                "class_name": "Conv2D",
+                "config": {
+                    "filters": 32,
+                    "kernel_size": 3,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Conv2D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "MaxPooling2D"
+            },
+            {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.25
+                }
+            },
+            {
+                "class_name": "Flatten"
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 128,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.5
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 1,
+                    "activation": "sigmoid"
+                }
+            }
+        ]
+    }
+}
