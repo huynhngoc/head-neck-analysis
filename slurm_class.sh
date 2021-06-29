@@ -49,7 +49,7 @@ echo "Finished seting up files."
 nvidia-modprobe -u -c=0
 
 # Run experiment
-singularity exec --nv deoxys-beta.sif python experiment_class.py $1 /net/fs-1/Ngoc/hnperf/$2 --epochs $3 ${@:4}
+singularity exec --nv deoxys-beta.sif python experiment_class.py $1 /net/fs-1/Ngoc/hnperf/$2 --temp_folder $SCRATCH/hnperf/$2 --analysis_folder $SCRATCH/analysis/$2 --epochs $3 ${@:4}
 
 # echo "Finished training. Post-processing results"
 
