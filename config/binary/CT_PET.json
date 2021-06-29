@@ -68,19 +68,19 @@
                 "class_name": "BinaryCrossentropy"
             },
             {
-                "class_name": "TruePositive",
+                "class_name": "TruePositives",
                 "config": {
                     "name": "TP"
                 }
             },
             {
-                "class_name": "FalsePositive",
+                "class_name": "FalsePositives",
                 "config": {
                     "name": "FP"
                 }
             },
             {
-                "class_name": "FalseNegative",
+                "class_name": "FalseNegatives",
                 "config": {
                     "name": "FN"
                 }
