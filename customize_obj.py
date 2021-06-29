@@ -13,6 +13,8 @@ from deoxys.data.data_reader import HDF5Reader, HDF5DataGenerator, \
     DataReader, DataGenerator
 import tensorflow_addons as tfa
 from tensorflow.keras.layers import Add
+from deoxys.model.losses import Loss, loss_from_config
+from deoxys.customize import custom_loss
 
 RATIO = 4
 
@@ -576,3 +578,30 @@ class H5PatchGenerator(DataGenerator):
     #     if self.augmentations:
     #         self.queue.close()
     #         self.running_process.terminate()
+
+
+
+@custom_loss
+class FusedLoss(Loss):
+    """Used to sum two or more loss functions.
+    """
+
+    def __init__(
+        self, loss_configs, loss_weights=None, reduction="auto", name="fused_loss"
+    ):
+        super().__init__(reduction, name)
+        self.losses = [loss_from_config(loss_config) for loss_config in loss_configs]
+
+        if loss_weights is None:
+            loss_weights = [1] * len(self.losses)
+        self.loss_weights = loss_weights
+
+    def call(self, target, prediction):
+        loss = None
+        for loss_class, loss_weight in zip(self.losses, self.loss_weights):
+            if loss is None:
+                loss = loss_weight * loss_class(target, prediction)
+            else:
+                loss += loss_weight * loss_class(target, prediction)
+
+        return loss
