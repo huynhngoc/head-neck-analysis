@@ -40,7 +40,16 @@
                 12,
                 13
             ],
-            "preprocessors": []
+            "preprocessors": [
+                {
+                    "class_name": "HounsfieldWindowingPreprocessor",
+                    "config": {
+                        "window_center": 70,
+                        "window_width": 200,
+                        "channel": 0
+                    }
+                }
+            ]
         }
     },
     "input_params": {
