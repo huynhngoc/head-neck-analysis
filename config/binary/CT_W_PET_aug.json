@@ -48,10 +48,23 @@
                         "window_width": 200,
                         "channel": 0
                     }
+                },
+                {
+                    "class_name": "ImageNormalizerPreprocessor",
+                    "config": {
+                        "vmin": [
+                            -100,
+                            0
+                        ],
+                        "vmax": [
+                            100,
+                            10
+                        ]
+                    }
                 }
             ],
             "augmentations": {
-                "class_name": "ImageAugmentation2D",
+                "class_name": "ClassImageAugmentation2D",
                 "config": {
                     "rotation_range": 90,
                     "zoom_range": [
