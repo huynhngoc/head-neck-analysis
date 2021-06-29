@@ -183,46 +183,19 @@
                 "class_name": "MaxPooling2D"
             },
             {
-                "class_name": "Conv2D",
-                "config": {
-                    "filters": 1024,
-                    "kernel_size": 3,
-                    "activation": "relu"
-                }
-            },
-            {
-                "class_name": "Conv2D",
-                "config": {
-                    "filters": 1024,
-                    "kernel_size": 3,
-                    "activation": "relu"
-                }
-            },
-            {
-                "class_name": "Conv2D",
-                "config": {
-                    "filters": 1024,
-                    "kernel_size": 3,
-                    "activation": "relu"
-                }
-            },
-            {
-                "class_name": "MaxPooling2D"
-            },
-            {
                 "class_name": "Flatten"
             },
             {
                 "class_name": "Dense",
                 "config": {
-                    "units": 4096,
+                    "units": 2048,
                     "activation": "relu"
                 }
             },
             {
                 "class_name": "Dense",
                 "config": {
-                    "units": 4096,
+                    "units": 2048,
                     "activation": "relu"
                 }
             },
