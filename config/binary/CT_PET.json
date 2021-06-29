@@ -93,7 +93,7 @@
             {
                 "class_name": "Conv2D",
                 "config": {
-                    "filters": 32,
+                    "filters": 64,
                     "kernel_size": 3,
                     "activation": "relu"
                 }
@@ -110,10 +110,104 @@
                 "class_name": "MaxPooling2D"
             },
             {
-                "class_name": "Dropout",
+                "class_name": "Conv2D",
                 "config": {
-                    "rate": 0.25
+                    "filters": 128,
+                    "kernel_size": 3,
+                    "activation": "relu"
                 }
+            },
+            {
+                "class_name": "Conv2D",
+                "config": {
+                    "filters": 128,
+                    "kernel_size": 3,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "MaxPooling2D"
+            },
+            {
+                "class_name": "Conv2D",
+                "config": {
+                    "filters": 256,
+                    "kernel_size": 3,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Conv2D",
+                "config": {
+                    "filters": 256,
+                    "kernel_size": 3,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Conv2D",
+                "config": {
+                    "filters": 256,
+                    "kernel_size": 3,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "MaxPooling2D"
+            },
+            {
+                "class_name": "Conv2D",
+                "config": {
+                    "filters": 512,
+                    "kernel_size": 3,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Conv2D",
+                "config": {
+                    "filters": 512,
+                    "kernel_size": 3,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Conv2D",
+                "config": {
+                    "filters": 512,
+                    "kernel_size": 3,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "MaxPooling2D"
+            },
+            {
+                "class_name": "Conv2D",
+                "config": {
+                    "filters": 1024,
+                    "kernel_size": 3,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Conv2D",
+                "config": {
+                    "filters": 1024,
+                    "kernel_size": 3,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Conv2D",
+                "config": {
+                    "filters": 1024,
+                    "kernel_size": 3,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "MaxPooling2D"
             },
             {
                 "class_name": "Flatten"
@@ -121,14 +215,15 @@
             {
                 "class_name": "Dense",
                 "config": {
-                    "units": 128,
+                    "units": 4096,
                     "activation": "relu"
                 }
             },
             {
-                "class_name": "Dropout",
+                "class_name": "Dense",
                 "config": {
-                    "rate": 0.5
+                    "units": 4096,
+                    "activation": "relu"
                 }
             },
             {
