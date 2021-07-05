@@ -16,8 +16,15 @@ from tensorflow.keras.layers import Add
 from deoxys.model.losses import Loss, loss_from_config
 from deoxys.customize import custom_loss, custom_preprocessor
 from deoxys.data import ImageAugmentation2D
+import ray
+ray.init()
 
 RATIO = 4
+
+
+@ray.remote
+def apply_aug(aug, seg_x, seg_y):
+    return aug.transform(seg_x, seg_y)
 
 
 @custom_layer
@@ -331,8 +338,11 @@ class H5PatchGenerator(DataGenerator):
         # return res
 
         for preprocessor in self.augmentations:
-            seg_x, seg_y = preprocessor.transform(
-                seg_x, seg_y)
+            # seg_x, seg_y = preprocessor.transform(
+            #     seg_x, seg_y)
+            for i in range(len(seg_x)):
+                seg_x[i:i+1], seg_y[i:i+1] = apply_aug.remote(
+                    preprocessor, seg_x[i:i+1], seg_y[i:i+1])
 
         return seg_x, seg_y
 
@@ -587,8 +597,8 @@ class FusedLoss(Loss):
     """
 
     def __init__(
-        self, loss_configs, loss_weights=None, reduction="auto", name="fused_loss"
-    ):
+            self, loss_configs, loss_weights=None,
+            reduction="auto", name="fused_loss"):
         super().__init__(reduction, name)
         self.losses = [loss_from_config(loss_config)
                        for loss_config in loss_configs]
