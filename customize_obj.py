@@ -23,7 +23,7 @@ ray.init(_temp_dir=os.environ.get('TMPDIR') + '/ray')
 RATIO = 4
 
 
-@ray.remote
+@ray.remote(num_return_vals=2)
 def apply_aug(aug, seg_x, seg_y):
     return aug.transform(seg_x, seg_y)
 
