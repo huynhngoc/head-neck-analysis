@@ -23,9 +23,14 @@ ray.init(_temp_dir=os.environ.get('TMPDIR') + '/ray')
 RATIO = 4
 
 
-@ray.remote(num_returns=2)
-def apply_aug(aug, seg_x, seg_y):
-    return aug.transform(seg_x, seg_y)
+@ray.remote(num_cpus=16)
+class Aug:
+    def __init__(self, preprocessors):
+        self.preprocessors = preprocessors
+
+    @ray.remote(num_returns=2)
+    def apply_aug(self, seg_x, seg_y):
+        return self.preprocessors.transform(seg_x, seg_y)
 
 
 @custom_layer
@@ -277,7 +282,8 @@ class H5PatchGenerator(DataGenerator):
         self.overlap = overlap
 
         self.preprocessors = preprocessors
-        self.augmentations = augmentations
+        # self.augmentations = augmentations
+        self.augmentations = [Aug.remote(p) for p in augmentations]
 
         self.x_name = x_name
         self.y_name = y_name
@@ -341,9 +347,15 @@ class H5PatchGenerator(DataGenerator):
         for preprocessor in self.augmentations:
             # seg_x, seg_y = preprocessor.transform(
             #     seg_x, seg_y)
+            seg_x_new = []
+            seg_y_new = []
             for i in range(len(seg_x)):
-                seg_x[i:i+1], seg_y[i:i+1] = apply_aug.remote(
+                x_, y_ = preprocessor.apply_aug.remote(
                     preprocessor, seg_x[i:i+1], seg_y[i:i+1])
+                seg_x_new.append(x_)
+                seg_y_new.append(y_)
+            seg_x[:] = ray.get(seg_x_new)
+            seg_y[:] = ray.get(seg_y_new)
 
         return seg_x, seg_y
 
