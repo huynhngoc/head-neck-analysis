@@ -17,7 +17,8 @@ from deoxys.model.losses import Loss, loss_from_config
 from deoxys.customize import custom_loss, custom_preprocessor
 from deoxys.data import ImageAugmentation2D
 import ray
-ray.init()
+import os
+ray.init(_temp_dir=os.environ.get('TMPDIR') + '/ray')
 
 RATIO = 4
 
