@@ -2,7 +2,7 @@
 #SBATCH --ntasks=1               # 1 core(CPU)
 #SBATCH --nodes=1                # Use 1 node
 #SBATCH --job-name=hn_test   # sensible name for the job
-#SBATCH --mem=16G                 # Default memory per CPU is 3GB.
+#SBATCH --mem=32G                 # Default memory per CPU is 3GB.
 #SBATCH --partition=gpu # Use the verysmallmem-partition for jobs requiring < 10 GB RAM.
 #SBATCH --gres=gpu:1
 #SBATCH --mail-user=ngochuyn@nmbu.no # Email me when job is done.
@@ -50,4 +50,4 @@ nvidia-modprobe -u -c=0
 
 # Run experiment
 # singularity exec --nv deoxys.sif python test_experiment.py $1 /net/fs-1/Ngoc/hnperf/$2
-singularity exec --nv deoxys-beta.sif python -u run_test.py /net/fs-1/Ngoc/hnperf/$1 --temp_folder $SCRATCH/hnperf/$1 --analysis_folder $SCRATCH/analysis/$1 ${@:2}
+singularity exec --nv deoxys-ray_2.sif python -u run_test.py /net/fs-1/Ngoc/hnperf/$1 --temp_folder $SCRATCH/hnperf/$1 --analysis_folder $SCRATCH/analysis/$1 ${@:2}

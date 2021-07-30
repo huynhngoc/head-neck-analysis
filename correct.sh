@@ -2,13 +2,13 @@
 #SBATCH --ntasks=1               # 1 core(CPU)
 #SBATCH --nodes=1                # Use 1 node
 #SBATCH --job-name=hn_test   # sensible name for the job
-#SBATCH --mem=16G                 # Default memory per CPU is 3GB.
+#SBATCH --mem=32G                 # Default memory per CPU is 3GB.
 #SBATCH --partition=gpu # Use the verysmallmem-partition for jobs requiring < 10 GB RAM.
-#SBATCH --gres=gpu:1
 #SBATCH --mail-user=ngochuyn@nmbu.no # Email me when job is done.
 #SBATCH --mail-type=ALL
-#SBATCH --output=outputs/unet-test-%A.out
-#SBATCH --error=outputs/unet-test-%A.out
+#SBATCH --output=outputs/unet-correct-%A.out
+#SBATCH --error=outputs/unet-correct-%A.out
+
 
 # If you would like to use more please adjust this.
 
@@ -19,7 +19,7 @@ module load singularity
 ## Code
 # If data files aren't copied, do so
 #!/bin/bash
-if [ $# -lt 2 ];
+if [ $# -lt 1 ];
     then
     printf "Not enough arguments - %d\n" $#
     exit 0
@@ -45,8 +45,6 @@ for f in $(ls $HOME/datasets/headneck/*)
 
 echo "Finished seting up files."
 
-# Hack to ensure that the GPUs work
-nvidia-modprobe -u -c=0
-
-# Run test on external data
-singularity exec --nv deoxys-ray_2.sif python -u run_external.py $1 /net/fs-1/Ngoc/hnperf/$2 --temp_folder $SCRATCH/hnperf/$2 --analysis_folder $SCRATCH/analysis/$2 ${@:3}
+# Run experiment
+# singularity exec --nv deoxys.sif python test_experiment.py $1 /net/fs-1/Ngoc/hnperf/$2
+singularity exec --nv deoxys-ray_2.sif python -u correct_dice.py $1

@@ -2,9 +2,10 @@
 #SBATCH --ntasks=1               # 1 core(CPU)
 #SBATCH --nodes=1                # Use 1 node
 #SBATCH --job-name=hn_cont   # sensible name for the job
-#SBATCH --mem=16G                 # Default memory per CPU is 3GB.
+#SBATCH --mem=64G                 # Default memory per CPU is 3GB.
 #SBATCH --partition=gpu # Use the verysmallmem-partition for jobs requiring < 10 GB RAM.
 #SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=16
 #SBATCH --mail-user=ngochuyn@nmbu.no # Email me when job is done.
 #SBATCH --mail-type=ALL
 #SBATCH --output=outputs/unet-%A.out
@@ -25,20 +26,20 @@ if [ $# -lt 3 ];
     exit 0
     fi
 
-if [ ! -d "$TMPDIR/hn_delin" ]
+if [ ! -d "$TMPDIR/$USER/hn_delin" ]
     then
     echo "Didn't find dataset folder. Copying files..."
-    mkdir $TMPDIR/hn_delin
+    mkdir --parents $TMPDIR/$USER/hn_delin
     fi
 
 for f in $(ls $HOME/datasets/headneck/*)
     do
     FILENAME=`echo $f | awk -F/ '{print $NF}'`
     echo $FILENAME
-    if [ ! -f "$TMPDIR/hn_delin/$FILENAME" ]
+    if [ ! -f "$TMPDIR/$USER/hn_delin/$FILENAME" ]
         then
         echo "copying $f"
-        cp -r $HOME/datasets/headneck/$FILENAME $TMPDIR/hn_delin/
+        cp -r $HOME/datasets/headneck/$FILENAME $TMPDIR/$USER/hn_delin/
         fi
     done
 
@@ -49,4 +50,7 @@ echo "Finished seting up files."
 nvidia-modprobe -u -c=0
 
 # Run experiment
-singularity exec --nv deoxys.sif python continue_experiment.py $1 $HOME/hnperf/$2 --epochs $3 ${@:4}
+export ITER_PER_EPOCH=200
+export NUM_CPUS=4
+export RAY_ROOT=$TMPDIR/ray
+singularity exec --nv deoxys-ray.sif python continue_experiment.py /net/fs-1/Ngoc/hnperf/$2/model/$1 /net/fs-1/Ngoc/hnperf/$2 --temp_folder $SCRATCH/hnperf/$2 --analysis_folder $SCRATCH/analysis/$2 --epochs $3 ${@:4}

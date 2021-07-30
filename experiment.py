@@ -87,7 +87,7 @@ if __name__ == '__main__':
         analysis_base_path=analysis_folder,
         map_meta_data=meta,
     ).plot_performance().plot_prediction(
-        masked_images=[i for i in range(10)], best_num=2, worst_num=2
+        masked_images=[], best_num=2, worst_num=2
     ).load_best_model(monitor=args.monitor)
     if analysis_folder:
         exp.plot_prediction(best_num=2, worst_num=2)

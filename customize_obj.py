@@ -510,10 +510,10 @@ class H5PatchGenerator(DataGenerator):
             seg_x, seg_y = self._apply_preprocess(seg_x, seg_y)
 
         # finally apply augmentation, if any
-        if self.augmentations:
-            total = len(seg_y)
-            seg_x, seg_y = self._apply_augmentation(
-                seg_x[:total], seg_y[:total])
+        # if self.augmentations:
+        #     total = len(seg_y)
+        #     seg_x, seg_y = self._apply_augmentation(
+        #         seg_x[:total], seg_y[:total])
 
         # increase seg index
         self.seg_idx += 1
@@ -560,6 +560,10 @@ class H5PatchGenerator(DataGenerator):
             for i in range(0, seg_len, self.batch_size):
                 batch_x = seg_x[i:(i + self.batch_size)]
                 batch_y = seg_y[i:(i + self.batch_size)]
+
+                if self.augmentations:
+                    batch_x, batch_y = self._apply_augmentation(
+                        batch_x, batch_y)
                 yield batch_x, batch_y
 
     # def __del__(self):
