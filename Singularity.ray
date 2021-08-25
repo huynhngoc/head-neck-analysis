@@ -1,14 +1,14 @@
 Bootstrap: docker
-From: tensorflow/tensorflow:latest-gpu
+From: tensorflow/tensorflow:2.5.0-gpu
 Stage: build
 
 %post
     apt update -y
     apt upgrade -y
     pip install ipython
+    pip install tensorflow-addons
     pip install https://github.com/huynhngoc/deoxys-image/archive/master.zip
     pip install https://github.com/huynhngoc/deoxys/archive/master.zip
-    pip install tensorflow-addons
     pip install comet-ml
     pip install scikit-image
     pip install scikit-learn
