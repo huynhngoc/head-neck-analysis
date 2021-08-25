@@ -55,23 +55,23 @@ class FusedLoss(Loss):
         return loss
 
 
-@custom_preprocessor
-class ClassImageAugmentation2D(ImageAugmentation2D):
-    def transform(self, images, targets):
-        """
-        Apply augmentation to a batch of images
+# @custom_preprocessor
+# class ClassImageAugmentation2D(ImageAugmentation2D):
+#     def transform(self, images, targets):
+#         """
+#         Apply augmentation to a batch of images
 
-        Parameters
-        ----------
-        images : np.array
-            the image batch
-        targets : np.array, optional
-            the target batch, by default None
+#         Parameters
+#         ----------
+#         images : np.array
+#             the image batch
+#         targets : np.array, optional
+#             the target batch, by default None
 
-        Returns
-        -------
-        np.array
-            the transformed images batch (and target)
-        """
-        images = self.augmentation_obj.transform(images)
-        return images, targets
+#         Returns
+#         -------
+#         np.array
+#             the transformed images batch (and target)
+#         """
+#         images = self.augmentation_obj.transform(images)
+#         return images, targets
