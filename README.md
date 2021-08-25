@@ -19,7 +19,7 @@ sbatch slurm.sh config/3d_vnet_32_normalize.json 3d_vnet_32_normalize 100 --mode
 
 To continue an experiment
 ```
-sbatch slurm_cont.sh config/3d_vnet_32_normalize/model/model.030.h5 3d_vnet_32_normalize 100 --model_checkpoint_period 5 --prediction_checkpoint_period 5
+sbatch slurm_cont.sh model.030.h5 3d_vnet_32_normalize 100 --model_checkpoint_period 5 --prediction_checkpoint_period 5
 ```
 
 To plot performance
@@ -29,9 +29,12 @@ sbatch slurm_vis.sh 3d_vnet_32_normalize
 
 To run test
 ```
-sbatch slurm_test.sh 3d_vnet_32/model/model.030.h5 3d_vnet_32
+sbatch slurm_test.sh 3d_vnet_32
 ```
-
+or
+```
+sbatch slurm_test.sh 3d_vnet_32 --best_epoch <BEST_EPOCH_NUMBER>
+```
 
 
 Alternatively, if your cluster does not have slurm installed, simply omit the `sbatch`
