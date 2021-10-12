@@ -38,6 +38,7 @@ class BinaryMacroFbetaLoss(Loss):
 
     def call(self, target, prediction):
         eps = 1e-8
+        target = tf.cast(target, prediction.dtype)
 
         true_positive = tf.math.reduce_sum(prediction * target)
         target_positive = tf.math.reduce_sum(tf.math.square(target))
