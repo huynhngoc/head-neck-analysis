@@ -104,15 +104,7 @@
     },
     "model_params": {
         "loss": {
-            "class_name": "FusedLoss",
-            "loss_configs": [
-                {
-                    "class_name": "BinaryCrossentropy"
-                },
-                {
-                    "class_name": "BinaryMacroFbetaLoss"
-                }
-            ]
+            "class_name": "BinaryMacroFbetaLoss"
         },
         "optimizer": {
             "class_name": "adam",
