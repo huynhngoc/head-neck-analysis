@@ -4,6 +4,7 @@ from deoxys_image.patch_sliding import get_patch_indice, get_patches, \
     check_drop
 import h5py
 import numpy as np
+import tensorflow as tf
 from deoxys.model.callbacks import PredictionCheckpoint
 from deoxys.experiment import Experiment
 from deoxys.utils import file_finder, load_json_config
@@ -26,6 +27,29 @@ class InstanceNormalization(tfa.layers.InstanceNormalization):
 @custom_layer
 class AddResize(Add):
     pass
+
+
+@custom_loss
+class BinaryMacroFbetaLoss(Loss):
+    def __init__(self, reduction='auto', name="binary_macro_fbeta", beta=1):
+        super().__init__(reduction, name)
+
+        self.beta = beta
+
+    def call(self, target, prediction):
+        eps = 1e-8
+
+        true_positive = tf.math.reduce_sum(prediction * target)
+        target_positive = tf.math.reduce_sum(tf.math.square(target))
+        predicted_positive = tf.math.reduce_sum(
+            tf.math.square(prediction))
+
+        fb_numerator = (1 + self.beta ** 2) * true_positive + eps
+        fb_denominator = (
+            (self.beta ** 2) * target_positive + predicted_positive + eps
+        )
+
+        return 1 - fb_numerator / fb_denominator
 
 
 @custom_loss
