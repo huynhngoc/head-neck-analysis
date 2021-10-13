@@ -69,15 +69,19 @@ if __name__ == '__main__':
         temp_base_path=args.temp_folder + '_' +
         args.dataset_file[:-5].split('/')[-1]
     )
-    try:
-        ex = ex.load_best_model(
-            recipe='auto',
-            analysis_base_path=analysis_folder,
-            map_meta_data=meta,
-        )
-    except Exception as e:
-        print("Error while loading best model", e)
-        ex.from_file(log_folder +
+    if args.best_epoch == 0:
+        try:
+            ex = ex.load_best_model(
+                recipe='auto',
+                analysis_base_path=analysis_folder,
+                map_meta_data=meta,
+            )
+        except Exception as e:
+            print("Error while loading best model", e)
+            print(e)
+    else:
+        print(f'Loading model from epoch {args.best_epoch}')
+        ex.from_file(args.log_folder +
                      f'/model/model.{args.best_epoch:03d}.h5')
     ex.run_external(
         args.dataset_file

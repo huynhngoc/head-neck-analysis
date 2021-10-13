@@ -108,6 +108,7 @@ if __name__ == '__main__':
         except Exception as e:
             print(e)
     else:
+        print(f'Loading model from epoch {args.best_epoch}')
         ex.from_file(args.log_folder +
                      f'/model/model.{args.best_epoch:03d}.h5')
     ex.run_test(
