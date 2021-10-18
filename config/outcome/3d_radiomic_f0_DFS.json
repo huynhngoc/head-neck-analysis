@@ -1,0 +1,235 @@
+{
+    "train_params": {
+        "epochs": 200,
+        "callbacks": [
+            {
+                "class_name": "EarlyStopping",
+                "config": {
+                    "monitor": "val_loss",
+                    "patience": 30
+                }
+            }
+        ]
+    },
+    "dataset_params": {
+        "class_name": "H5MultiReader",
+        "config": {
+            "filename": "/mnt/users/ngochuyn/datasets/headneck/outcome.h5",
+            "batch_size": 4,
+            "batch_cache": 7,
+            "x_name": "shape_data",
+            "y_name": "DFS",
+            "other_input_names": [
+                "texture"
+            ],
+            "train_folds": [
+                1,
+                2,
+                3,
+                4
+            ],
+            "val_folds": [
+                0
+            ],
+            "test_folds": [
+                0
+            ],
+            "shuffle": true,
+            "preprocessors": [],
+            "augmentations": []
+        }
+    },
+    "input_params": [
+        {
+            "shape": [
+                63
+            ]
+        },
+        {
+            "shape": [
+                408
+            ]
+        }
+    ],
+    "model_params": {
+        "loss": {
+            "class_name": "BinaryCrossentropy",
+            "config": {}
+        },
+        "optimizer": {
+            "class_name": "adam",
+            "config": {
+                "learning_rate": 0.001
+            }
+        },
+        "metrics": [
+            {
+                "class_name": "BinaryFbeta"
+            },
+            {
+                "class_name": "AUC"
+            },
+            {
+                "class_name": "BinaryCrossentropy"
+            },
+            {
+                "class_name": "TruePositives",
+                "config": {
+                    "name": "TP"
+                }
+            },
+            {
+                "class_name": "FalsePositives",
+                "config": {
+                    "name": "FP"
+                }
+            },
+            {
+                "class_name": "TrueNegatives",
+                "config": {
+                    "name": "TN"
+                }
+            },
+            {
+                "class_name": "FalseNegatives",
+                "config": {
+                    "name": "FN"
+                }
+            }
+        ]
+    },
+    "architecture": {
+        "type": "MultiInputModelLoader",
+        "layers": [
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 128,
+                    "activation": "relu"
+                },
+                "inputs": [
+                    "input_0"
+                ]
+            },
+            {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.5
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 128,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.5
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 96,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.5
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 64,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 32,
+                    "activation": "relu"
+                }
+            },
+            {
+                "name": "shape_path",
+                "class_name": "Dense",
+                "config": {
+                    "units": 16,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 512,
+                    "activation": "relu"
+                },
+                "inputs": [
+                    "input_1"
+                ]
+            },
+            {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.5
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 128,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.5
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 96,
+                    "activation": "relu"
+                }
+            },
+            {
+                "name": "texture_path",
+                "class_name": "Dense",
+                "config": {
+                    "units": 32,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Concatenate",
+                "inputs": [
+                    "shape_path",
+                    "texture_path"
+                ]
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 16,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 1,
+                    "activation": "sigmoid"
+                }
+            }
+        ]
+    }
+}
