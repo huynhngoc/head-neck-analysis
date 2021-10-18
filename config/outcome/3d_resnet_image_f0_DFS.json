@@ -90,9 +90,9 @@
     },
     "input_params": {
         "shape": [
-            null,
-            null,
-            null,
+            173,
+            191,
+            265,
             3
         ]
     },
