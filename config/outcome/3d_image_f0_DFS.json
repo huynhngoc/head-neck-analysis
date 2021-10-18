@@ -1,0 +1,272 @@
+{
+    "train_params": {
+        "epochs": 200,
+        "callbacks": [
+            {
+                "class_name": "EarlyStopping",
+                "config": {
+                    "monitor": "val_loss",
+                    "patience": 30
+                }
+            }
+        ]
+    },
+    "dataset_params": {
+        "class_name": "H5Reader",
+        "config": {
+            "filename": "/mnt/users/ngochuyn/datasets/headneck/outcome.h5",
+            "batch_size": 4,
+            "batch_cache": 7,
+            "x_name": "image",
+            "y_name": "DFS",
+            "train_folds": [
+                1,
+                2,
+                3,
+                4
+            ],
+            "val_folds": [
+                0
+            ],
+            "test_folds": [
+                0
+            ],
+            "shuffle": true,
+            "preprocessors": [
+                {
+                    "class_name": "HounsfieldWindowingPreprocessor",
+                    "config": {
+                        "window_center": 70,
+                        "window_width": 200,
+                        "channel": 0
+                    }
+                },
+                {
+                    "class_name": "ImageNormalizerPreprocessor",
+                    "config": {
+                        "vmin": [
+                            -100,
+                            0
+                        ],
+                        "vmax": [
+                            100,
+                            25
+                        ]
+                    }
+                }
+            ],
+            "augmentations": {
+                "class_name": "ClassImageAugmentation3D",
+                "config": {
+                    "rotation_range": 90,
+                    "zoom_range": [
+                        0.95,
+                        1.05
+                    ],
+                    "shift_range": [
+                        10,
+                        10,
+                        10
+                    ],
+                    "flip_axis": 1,
+                    "brightness_range": [
+                        0.8,
+                        1.2
+                    ],
+                    "contrast_range": [
+                        0.7,
+                        1.3
+                    ],
+                    "noise_variance": 0.05,
+                    "noise_channel": 1,
+                    "blur_range": [
+                        0.5,
+                        1.5
+                    ],
+                    "blur_channel": 1
+                }
+            }
+        }
+    },
+    "input_params": {
+        "shape": [
+            null,
+            null,
+            null,
+            3
+        ]
+    },
+    "model_params": {
+        "loss": {
+            "class_name": "FusedLoss",
+            "config": {
+                "loss_configs": [
+                    {
+                        "class_name": "BinaryCrossentropy"
+                    },
+                    {
+                        "class_name": "BinaryMacroFbetaLoss"
+                    }
+                ]
+            }
+        },
+        "optimizer": {
+            "class_name": "adam",
+            "config": {
+                "learning_rate": 0.0001
+            }
+        },
+        "metrics": [
+            {
+                "class_name": "BinaryFbeta"
+            },
+            {
+                "class_name": "AUC"
+            },
+            {
+                "class_name": "BinaryCrossentropy"
+            },
+            {
+                "class_name": "TruePositives",
+                "config": {
+                    "name": "TP"
+                }
+            },
+            {
+                "class_name": "FalsePositives",
+                "config": {
+                    "name": "FP"
+                }
+            },
+            {
+                "class_name": "TrueNegatives",
+                "config": {
+                    "name": "TN"
+                }
+            },
+            {
+                "class_name": "FalseNegatives",
+                "config": {
+                    "name": "FN"
+                }
+            }
+        ]
+    },
+    "architecture": {
+        "type": "MultiInputModelLoader",
+        "layers": [
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 16,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                },
+                "inputs": [
+                    "input_0"
+                ]
+            },
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 16,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                }
+            },
+            {
+                "class_name": "MaxPooling3D"
+            },
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 32,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                }
+            },
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 32,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                }
+            },
+            {
+                "class_name": "MaxPooling3D"
+            },
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                }
+            },
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                }
+            },
+            {
+                "class_name": "GlobalAveragePooling3D"
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 1024,
+                    "activation": "relu"
+                }
+            },
+            {
+                "name": "image_path",
+                "class_name": "Dense",
+                "config": {
+                    "units": 256,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 1,
+                    "activation": "sigmoid"
+                }
+            }
+        ]
+    }
+}
