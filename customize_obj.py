@@ -297,6 +297,9 @@ class ZScoreDensePreprocessor(BasePreprocessor):
         if mean is None:
             mean = inputs.mean(axis=0)
             std = inputs.std(axis=0)
+        else:
+            mean = np.array(mean)
+            std = np.array(std)
         std[std == 0] = 1
 
         return (inputs - mean)/std, target
