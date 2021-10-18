@@ -90,9 +90,9 @@
     },
     "input_params": {
         "shape": [
-            173,
-            191,
-            265,
+            null,
+            null,
+            null,
             3
         ]
     },
@@ -200,7 +200,6 @@
                 }
             },
             {
-                "res_block": 2,
                 "class_name": "Conv3D",
                 "config": {
                     "filters": 32,
@@ -217,7 +216,47 @@
                 "res_block": 2,
                 "class_name": "Conv3D",
                 "config": {
+                    "filters": 32,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                }
+            },
+            {
+                "class_name": "Conv3D",
+                "config": {
                     "filters": 64,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                }
+            },
+            {
+                "res_block": 2,
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                }
+            },
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 128,
                     "kernel_size": 3,
                     "activation": "relu",
                     "kernel_initializer": "he_normal",
