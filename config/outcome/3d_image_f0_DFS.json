@@ -46,11 +46,13 @@
                     "config": {
                         "vmin": [
                             -100,
+                            0,
                             0
                         ],
                         "vmax": [
                             100,
-                            25
+                            25,
+                            1
                         ]
                     }
                 }
@@ -73,9 +75,17 @@
                         0.8,
                         1.2
                     ],
+                    "brightness_channel": [
+                        0,
+                        1
+                    ],
                     "contrast_range": [
                         0.7,
                         1.3
+                    ],
+                    "contrast_channel": [
+                        0,
+                        1
                     ],
                     "noise_variance": 0.05,
                     "noise_channel": 1,
