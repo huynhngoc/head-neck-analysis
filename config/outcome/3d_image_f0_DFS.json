@@ -243,6 +243,35 @@
                 }
             },
             {
+                "class_name": "MaxPooling3D"
+            },
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 128,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                }
+            },
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 128,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                }
+            },
+            {
                 "class_name": "GlobalAveragePooling3D"
             },
             {
