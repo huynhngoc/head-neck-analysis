@@ -1,0 +1,244 @@
+{
+    "train_params": {
+        "epochs": 200,
+        "callbacks": [
+            {
+                "class_name": "EarlyStopping",
+                "config": {
+                    "monitor": "val_loss",
+                    "patience": 30
+                }
+            }
+        ]
+    },
+    "dataset_params": {
+        "class_name": "H5MultiReader",
+        "config": {
+            "filename": "/home/work/ngochuyn/hn_delin/hecktor_pfs.h5",
+            "batch_size": 8,
+            "batch_cache": 6,
+            "x_name": "input",
+            "y_name": "target_binary",
+            "other_input_names": [
+                "info"
+            ],
+            "train_folds": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "val_folds": [
+                4
+            ],
+            "test_folds": [
+                4
+            ],
+            "shuffle": true,
+            "preprocessors": [
+                {
+                    "class_name": "HounsfieldWindowingPreprocessor",
+                    "config": {
+                        "window_center": 70,
+                        "window_width": 200,
+                        "channel": 0
+                    }
+                },
+                {
+                    "class_name": "ImageNormalizerPreprocessor",
+                    "config": {}
+                }
+            ],
+            "augmentations": {
+                "class_name": "ClassImageAugmentation3D",
+                "config": {
+                    "rotation_range": 90,
+                    "zoom_range": [
+                        0.95,
+                        1.05
+                    ],
+                    "shift_range": [
+                        10,
+                        10,
+                        10
+                    ],
+                    "flip_axis": 1,
+                    "brightness_range": [
+                        0.8,
+                        1.2
+                    ],
+                    "contrast_range": [
+                        0.7,
+                        1.3
+                    ],
+                    "noise_variance": 0.05,
+                    "noise_channel": 1,
+                    "blur_range": [
+                        0.5,
+                        1.5
+                    ],
+                    "blur_channel": 1
+                }
+            },
+            "other_preprocessors": [
+                [
+                    {
+                        "class_name": "ZScoreDensePreprocessor",
+                        "config": {}
+                    }
+                ]
+            ]
+        }
+    },
+    "input_params": [
+        {
+            "shape": [
+                null,
+                null,
+                null,
+                2
+            ]
+        },
+        {
+            "shape": [
+                6
+            ]
+        }
+    ],
+    "model_params": {
+        "loss": {
+            "class_name": "BinaryMacroFbetaLoss"
+        },
+        "optimizer": {
+            "class_name": "adam",
+            "config": {
+                "learning_rate": 0.0001
+            }
+        },
+        "metrics": [
+            {
+                "class_name": "BinaryFbeta"
+            }
+        ]
+    },
+    "architecture": {
+        "type": "MultiInputModelLoader",
+        "layers": [
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 16,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                },
+                "inputs": [
+                    "input_0"
+                ]
+            },
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 16,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                }
+            },
+            {
+                "class_name": "MaxPooling3D"
+            },
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 32,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                }
+            },
+            {
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 32,
+                    "kernel_size": 3,
+                    "activation": "relu",
+                    "kernel_initializer": "he_normal",
+                    "padding": "same"
+                },
+                "normalizer": {
+                    "class_name": "BatchNormalization"
+                }
+            },
+            {
+                "class_name": "GlobalAveragePooling3D"
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 256,
+                    "activation": "relu"
+                }
+            },
+            {
+                "name": "image_path",
+                "class_name": "Dense",
+                "config": {
+                    "units": 256,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 256,
+                    "activation": "relu"
+                },
+                "inputs": [
+                    "input_1"
+                ]
+            },
+            {
+                "name": "data_path",
+                "class_name": "Dense",
+                "config": {
+                    "units": 256,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Concatenate",
+                "inputs": [
+                    "image_path",
+                    "data_path"
+                ]
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 256,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 1,
+                    "activation": "sigmoid"
+                }
+            }
+        ]
+    }
+}
