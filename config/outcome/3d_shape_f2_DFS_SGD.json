@@ -7,21 +7,21 @@
         "class_name": "H5Reader",
         "config": {
             "filename": "/mnt/users/ngochuyn/datasets/headneck/outcome.h5",
-            "batch_size": 28,
+            "batch_size": 4,
             "batch_cache": 7,
             "x_name": "shape_data",
             "y_name": "DFS",
             "train_folds": [
+                0,
                 1,
-                2,
                 3,
                 4
             ],
             "val_folds": [
-                0
+                2
             ],
             "test_folds": [
-                0
+                2
             ],
             "shuffle": true,
             "preprocessors": [
@@ -177,7 +177,7 @@
         "optimizer": {
             "class_name": "SGD",
             "config": {
-                "learning_rate": 0.01
+                "learning_rate": 0.001
             }
         },
         "metrics": [
@@ -222,52 +222,6 @@
             {
                 "class_name": "Dense",
                 "config": {
-                    "units": 128,
-                    "activation": "relu"
-                }
-            },
-            {
-                "class_name": "Dropout",
-                "config": {
-                    "rate": 0.5
-                }
-            },
-            {
-                "class_name": "Dense",
-                "config": {
-                    "units": 128,
-                    "activation": "relu"
-                }
-            },
-            {
-                "class_name": "Dropout",
-                "config": {
-                    "rate": 0.5
-                }
-            },
-            {
-                "class_name": "Dense",
-                "config": {
-                    "units": 96,
-                    "activation": "relu"
-                }
-            },
-            {
-                "class_name": "Dropout",
-                "config": {
-                    "rate": 0.5
-                }
-            },
-            {
-                "class_name": "Dense",
-                "config": {
-                    "units": 64,
-                    "activation": "relu"
-                }
-            },
-            {
-                "class_name": "Dense",
-                "config": {
                     "units": 32,
                     "activation": "relu"
                 }
@@ -277,6 +231,19 @@
                 "config": {
                     "units": 16,
                     "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 8,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.25
                 }
             },
             {
