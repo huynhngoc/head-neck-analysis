@@ -1,21 +1,13 @@
 {
     "train_params": {
         "epochs": 200,
-        "callbacks": [
-            {
-                "class_name": "EarlyStopping",
-                "config": {
-                    "monitor": "val_loss",
-                    "patience": 30
-                }
-            }
-        ]
+        "callbacks": []
     },
     "dataset_params": {
         "class_name": "H5Reader",
         "config": {
             "filename": "/mnt/users/ngochuyn/datasets/headneck/outcome.h5",
-            "batch_size": 4,
+            "batch_size": 28,
             "batch_cache": 7,
             "x_name": "clinical",
             "y_name": "DFS",
@@ -81,7 +73,7 @@
         "optimizer": {
             "class_name": "adam",
             "config": {
-                "learning_rate": 0.001
+                "learning_rate": 0.01
             }
         },
         "metrics": [
