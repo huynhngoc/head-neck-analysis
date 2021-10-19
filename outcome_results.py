@@ -51,4 +51,4 @@ if __name__ == '__main__':
     pd.DataFrame(np.array(results), columns=[
         'name', 'input', 'output', 'optimizer', 'fold', 'runs', 'best_epoch',
         'est_auc', 'auc'
-    ]).to_csv(f'outcome_res/{args.input}_{args.output}.csv')
+    ]).to_csv(f'outcome_res/{args.input}_{args.output}.csv', index=False)
