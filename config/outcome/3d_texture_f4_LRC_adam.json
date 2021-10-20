@@ -10,18 +10,18 @@
             "batch_size": 4,
             "batch_cache": 7,
             "x_name": "texture",
-            "y_name": "DFS",
+            "y_name": "LRC",
             "train_folds": [
+                0,
                 1,
                 2,
-                3,
-                4
+                3
             ],
             "val_folds": [
-                0
+                4
             ],
             "test_folds": [
-                0
+                4
             ],
             "shuffle": true,
             "preprocessors": [
@@ -865,7 +865,7 @@
             "config": {}
         },
         "optimizer": {
-            "class_name": "SGD",
+            "class_name": "adam",
             "config": {
                 "learning_rate": 0.001
             }

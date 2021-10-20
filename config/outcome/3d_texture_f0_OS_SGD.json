@@ -10,7 +10,7 @@
             "batch_size": 4,
             "batch_cache": 7,
             "x_name": "texture",
-            "y_name": "DFS",
+            "y_name": "OS",
             "train_folds": [
                 1,
                 2,

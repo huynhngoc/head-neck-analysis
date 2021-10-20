@@ -10,7 +10,7 @@
             "batch_size": 4,
             "batch_cache": 7,
             "x_name": "texture",
-            "y_name": "DFS",
+            "y_name": "LRC",
             "train_folds": [
                 1,
                 2,
@@ -865,7 +865,7 @@
             "config": {}
         },
         "optimizer": {
-            "class_name": "SGD",
+            "class_name": "adam",
             "config": {
                 "learning_rate": 0.001
             }

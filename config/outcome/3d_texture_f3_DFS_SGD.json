@@ -12,16 +12,16 @@
             "x_name": "texture",
             "y_name": "DFS",
             "train_folds": [
+                0,
                 1,
                 2,
-                3,
                 4
             ],
             "val_folds": [
-                0
+                3
             ],
             "test_folds": [
-                0
+                3
             ],
             "shuffle": true,
             "preprocessors": [
