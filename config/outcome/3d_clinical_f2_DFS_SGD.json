@@ -1,0 +1,161 @@
+{
+    "train_params": {
+        "epochs": 200,
+        "callbacks": []
+    },
+    "dataset_params": {
+        "class_name": "H5Reader",
+        "config": {
+            "filename": "/mnt/users/ngochuyn/datasets/headneck/outcome.h5",
+            "batch_size": 4,
+            "batch_cache": 7,
+            "x_name": "clinical",
+            "y_name": "DFS",
+            "train_folds": [
+                0,
+                1,
+                3,
+                4
+            ],
+            "val_folds": [
+                2
+            ],
+            "test_folds": [
+                2
+            ],
+            "shuffle": true,
+            "preprocessors": [
+                {
+                    "class_name": "ZScoreDensePreprocessor",
+                    "config": {
+                        "mean": [
+                            60,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            22,
+                            0
+                        ],
+                        "std": [
+                            10,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            20,
+                            0
+                        ]
+                    }
+                }
+            ],
+            "augmentations": []
+        }
+    },
+    "input_params": {
+        "shape": [
+            11
+        ]
+    },
+    "model_params": {
+        "loss": {
+            "class_name": "BinaryCrossentropy",
+            "config": {}
+        },
+        "optimizer": {
+            "class_name": "SGD",
+            "config": {
+                "learning_rate": 0.001
+            }
+        },
+        "metrics": [
+            {
+                "class_name": "BinaryFbeta"
+            },
+            {
+                "class_name": "AUC"
+            },
+            {
+                "class_name": "BinaryCrossentropy"
+            },
+            {
+                "class_name": "TruePositives",
+                "config": {
+                    "name": "TP"
+                }
+            },
+            {
+                "class_name": "FalsePositives",
+                "config": {
+                    "name": "FP"
+                }
+            },
+            {
+                "class_name": "TrueNegatives",
+                "config": {
+                    "name": "TN"
+                }
+            },
+            {
+                "class_name": "FalseNegatives",
+                "config": {
+                    "name": "FN"
+                }
+            }
+        ]
+    },
+    "architecture": {
+        "type": "MultiInputModelLoader",
+        "layers": [
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 64,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 32,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 16,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 8,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.25
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 1,
+                    "activation": "sigmoid"
+                }
+            }
+        ]
+    }
+}
