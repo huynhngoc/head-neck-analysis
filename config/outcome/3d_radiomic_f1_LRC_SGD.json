@@ -10,21 +10,21 @@
             "batch_size": 4,
             "batch_cache": 7,
             "x_name": "shape_data",
-            "y_name": "DFS",
+            "y_name": "LRC",
             "other_input_names": [
                 "texture"
             ],
             "train_folds": [
-                1,
+                0,
                 2,
                 3,
                 4
             ],
             "val_folds": [
-                0
+                1
             ],
             "test_folds": [
-                0
+                1
             ],
             "shuffle": true,
             "preprocessors": [

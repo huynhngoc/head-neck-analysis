@@ -10,7 +10,7 @@
             "batch_size": 4,
             "batch_cache": 7,
             "x_name": "shape_data",
-            "y_name": "DFS",
+            "y_name": "OS",
             "other_input_names": [
                 "texture"
             ],
@@ -1014,7 +1014,7 @@
             "config": {}
         },
         "optimizer": {
-            "class_name": "SGD",
+            "class_name": "adam",
             "config": {
                 "learning_rate": 0.001
             }

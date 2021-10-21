@@ -15,16 +15,16 @@
                 "texture"
             ],
             "train_folds": [
+                0,
                 1,
                 2,
-                3,
-                4
+                3
             ],
             "val_folds": [
-                0
+                4
             ],
             "test_folds": [
-                0
+                4
             ],
             "shuffle": true,
             "preprocessors": [
