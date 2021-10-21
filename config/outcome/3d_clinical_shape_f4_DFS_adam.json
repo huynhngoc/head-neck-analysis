@@ -1,0 +1,380 @@
+{
+    "train_params": {
+        "epochs": 200,
+        "callbacks": []
+    },
+    "dataset_params": {
+        "class_name": "H5MultiReader",
+        "config": {
+            "filename": "/mnt/users/ngochuyn/datasets/headneck/outcome.h5",
+            "batch_size": 4,
+            "batch_cache": 7,
+            "x_name": "clinical",
+            "y_name": "DFS",
+            "other_input_names": [
+                "shape_data"
+            ],
+            "train_folds": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "val_folds": [
+                4
+            ],
+            "test_folds": [
+                4
+            ],
+            "shuffle": true,
+            "preprocessors": [
+                {
+                    "class_name": "ZScoreDensePreprocessor",
+                    "config": {
+                        "mean": [
+                            60,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            22,
+                            0
+                        ],
+                        "std": [
+                            10,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            20,
+                            0
+                        ]
+                    }
+                }
+            ],
+            "augmentations": [],
+            "other_preprocessors": [
+                [
+                    {
+                        "class_name": "ZScoreDensePreprocessor",
+                        "config": {
+                            "mean": [
+                                10,
+                                11,
+                                120,
+                                13,
+                                1,
+                                2,
+                                10,
+                                1834540,
+                                4,
+                                5,
+                                6,
+                                4,
+                                2,
+                                2,
+                                5,
+                                12,
+                                1,
+                                6,
+                                0,
+                                1834540,
+                                0,
+                                0,
+                                0,
+                                9,
+                                1021,
+                                1131,
+                                -2147483648,
+                                -2147483648,
+                                -2147483648,
+                                2,
+                                2,
+                                3,
+                                36,
+                                41,
+                                1508,
+                                45,
+                                1096,
+                                249,
+                                1258,
+                                17,
+                                1086,
+                                -3,
+                                -2147483648,
+                                -2147483648,
+                                -2147483648,
+                                0,
+                                0,
+                                0,
+                                9967,
+                                0,
+                                0,
+                                22,
+                                43,
+                                48,
+                                46,
+                                38,
+                                51,
+                                24991,
+                                29,
+                                0,
+                                5591,
+                                0,
+                                25039
+                            ],
+                            "std": [
+                                5,
+                                13,
+                                194,
+                                5,
+                                0,
+                                1,
+                                4,
+                                4125888,
+                                0,
+                                0,
+                                0,
+                                2,
+                                0,
+                                1,
+                                2,
+                                5,
+                                1,
+                                2,
+                                0,
+                                4125888,
+                                0,
+                                0,
+                                0,
+                                10,
+                                100,
+                                36,
+                                -2147483648,
+                                -2147483648,
+                                -2147483648,
+                                0,
+                                0,
+                                0,
+                                19,
+                                27,
+                                366,
+                                34,
+                                14,
+                                220,
+                                449,
+                                13,
+                                25,
+                                2,
+                                -2147483648,
+                                -2147483648,
+                                -2147483648,
+                                0,
+                                0,
+                                0,
+                                14360,
+                                0,
+                                0,
+                                9,
+                                15,
+                                19,
+                                17,
+                                15,
+                                19,
+                                33506,
+                                11,
+                                0,
+                                4589,
+                                0,
+                                33524
+                            ]
+                        }
+                    }
+                ]
+            ]
+        }
+    },
+    "input_params": [
+        {
+            "shape": [
+                11
+            ]
+        },
+        {
+            "shape": [
+                63
+            ]
+        }
+    ],
+    "model_params": {
+        "loss": {
+            "class_name": "BinaryCrossentropy",
+            "config": {}
+        },
+        "optimizer": {
+            "class_name": "adam",
+            "config": {
+                "learning_rate": 0.001
+            }
+        },
+        "metrics": [
+            {
+                "class_name": "BinaryFbeta"
+            },
+            {
+                "class_name": "AUC"
+            },
+            {
+                "class_name": "BinaryCrossentropy"
+            },
+            {
+                "class_name": "TruePositives",
+                "config": {
+                    "name": "TP"
+                }
+            },
+            {
+                "class_name": "FalsePositives",
+                "config": {
+                    "name": "FP"
+                }
+            },
+            {
+                "class_name": "TrueNegatives",
+                "config": {
+                    "name": "TN"
+                }
+            },
+            {
+                "class_name": "FalseNegatives",
+                "config": {
+                    "name": "FN"
+                }
+            }
+        ]
+    },
+    "architecture": {
+        "type": "MultiInputModelLoader",
+        "layers": [
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 64,
+                    "activation": "relu"
+                },
+                "inputs": [
+                    "input_0"
+                ]
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 32,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 16,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 8
+                }
+            },
+            {
+                "class_name": "LeakyReLU"
+            },
+            {
+                "name": "clinical_path",
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.4
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 32,
+                    "activation": "relu"
+                },
+                "inputs": [
+                    "input_1"
+                ]
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 16,
+                    "activation": "relu"
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 8
+                }
+            },
+            {
+                "class_name": "LeakyReLU"
+            },
+            {
+                "name": "shape_path",
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.4
+                }
+            },
+            {
+                "class_name": "Concatenate",
+                "inputs": [
+                    "clinical_path",
+                    "shape_path"
+                ]
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 8
+                }
+            },
+            {
+                "class_name": "LeakyReLU"
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 4
+                }
+            },
+            {
+                "class_name": "LeakyReLU"
+            },
+            {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.25
+                }
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 1,
+                    "activation": "sigmoid"
+                }
+            }
+        ]
+    }
+}
