@@ -12,7 +12,6 @@
             "x_name": "clinical",
             "y_name": "DFS",
             "other_input_names": [
-                "shape_data",
                 "texture"
             ],
             "train_folds": [
