@@ -301,7 +301,7 @@
                 "name": "clinical_path",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.3
+                    "rate": 0.4
                 }
             },
             {
