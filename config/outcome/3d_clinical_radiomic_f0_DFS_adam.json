@@ -1053,7 +1053,7 @@
             "config": {}
         },
         "optimizer": {
-            "class_name": "SGD",
+            "class_name": "adam",
             "config": {
                 "learning_rate": 0.001
             }

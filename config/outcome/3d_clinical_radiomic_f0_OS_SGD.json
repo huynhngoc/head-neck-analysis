@@ -10,7 +10,7 @@
             "batch_size": 4,
             "batch_cache": 7,
             "x_name": "clinical",
-            "y_name": "DFS",
+            "y_name": "OS",
             "other_input_names": [
                 "shape_data",
                 "texture"
