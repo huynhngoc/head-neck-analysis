@@ -58,7 +58,7 @@ if __name__ == '__main__':
             if fold_df is None:
                 fold_df = pd.DataFrame(np.array([y]), columns=['y'])
             fold_df[inp] = best_predicted
-        df.to_csv(f'outcome_res/f{fold}_{args.output}.csv', index=False)
+        fold_df.to_csv(f'outcome_res/f{fold}_{args.output}.csv', index=False)
     pd.DataFrame(np.array(results), columns=[
         'name', 'input', 'output', 'optimizer', 'fold', 'runs', 'best_epoch',
         'est_auc', 'auc'
