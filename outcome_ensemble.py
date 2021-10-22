@@ -26,10 +26,10 @@ if __name__ == '__main__':
     results = []
 
     for fold in range(5):
-        df = None
+        fold_df = None
         for inp in ['clinical', 'shape', 'texture', 'radiomic']:
             best_real_auc = 0
-            best_predicted = []
+            best_predicted = None
             for optimizer in ['SGD', 'adam']:
                 for postfix in ['', '_2', '_3', '_4', '_5']:
                     name = name_template.format(
@@ -55,9 +55,9 @@ if __name__ == '__main__':
                                 best_auc, real_auc]
 
             results.append(info)
-            if df is None:
-                df = pd.DataFrame(np.array([y]), columns=['y'])
-            df[inp] = best_predicted
+            if fold_df is None:
+                fold_df = pd.DataFrame(np.array([y]), columns=['y'])
+            fold_df[inp] = best_predicted
         df.to_csv(f'outcome_res/f{fold}_{args.output}.csv', index=False)
     pd.DataFrame(np.array(results), columns=[
         'name', 'input', 'output', 'optimizer', 'fold', 'runs', 'best_epoch',
