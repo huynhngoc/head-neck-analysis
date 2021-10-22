@@ -26,7 +26,7 @@ if __name__ == '__main__':
     results = []
 
     for fold in range(5):
-        df = pd.DataFrame()
+        df = None
         for inp in ['clinical', 'shape', 'texture', 'radiomic']:
             best_real_auc = 0
             best_predicted = []
@@ -55,8 +55,9 @@ if __name__ == '__main__':
                                 best_auc, real_auc]
 
             results.append(info)
+            if df is None:
+                df = pd.DataFrame(np.array([y]), columns=['y'])
             df[inp] = best_predicted
-        df['y'] = y
         df.to_csv(f'outcome_res/f{fold}_{args.output}.csv', index=False)
     pd.DataFrame(np.array(results), columns=[
         'name', 'input', 'output', 'optimizer', 'fold', 'runs', 'best_epoch',
