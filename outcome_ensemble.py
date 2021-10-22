@@ -33,7 +33,7 @@ if __name__ == '__main__':
             for optimizer in ['SGD', 'adam']:
                 for postfix in ['', '_2', '_3', '_4', '_5']:
                     name = name_template.format(
-                        input=args.input, fold=fold,
+                        input=inp, fold=fold,
                         output=args.output, optimizer=optimizer)
                     df = read_csv(log_path.format(name=name, postfix=postfix))
                     best_auc = df['val_auc'].max()
