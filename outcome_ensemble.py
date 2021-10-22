@@ -49,7 +49,7 @@ if __name__ == '__main__':
                     if real_auc > best_real_auc:
                         best_real_auc = real_auc
                         best_predicted = predicted
-                        info = [name, args.input, args.output,
+                        info = [name, inp, args.output,
                                 optimizer, fold,
                                 from_postfix(postfix), best_epoch,
                                 best_auc, real_auc]
