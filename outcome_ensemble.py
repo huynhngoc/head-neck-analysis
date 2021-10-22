@@ -15,7 +15,6 @@ def from_postfix(postfix):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("input")
     parser.add_argument("output")
 
     args, unknown = parser.parse_known_args()
