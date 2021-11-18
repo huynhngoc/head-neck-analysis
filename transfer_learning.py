@@ -1,4 +1,5 @@
 from deoxys.experiment import ExperimentPipeline
+import numpy as np
 import argparse
 import os
 import shutil
@@ -75,13 +76,14 @@ if __name__ == '__main__':
         print(f'Loading model from epoch {args.best_epoch}')
         ex.from_file(args.log_folder +
                      f'/model/model.{args.best_epoch:03d}.h5')
-    print('Optimizer state:', ex.model._model.optimizer.get_weights())
+    weights = ex.model._model.optimizer.get_weights()
+    weights[0] = np.array(args.initial_epoch *
+                          os.environ.get('ITER_PER_EPOCH', 200))
+
+    print('Optimizer state:', ex.model._model.optimizer.iterations)
     print('original learning_rate:', ex.model._model.optimizer.learning_rate)
-    print('current learning rate:',
-          ex.model._model.optimizer._decayed_lr('float32').numpy())
     ex.load_new_dataset(
         args.dataset_file,
-        recipe='auto',
         analysis_base_path=analysis_folder,
         map_meta_data=meta,
     ).run_experiment(
@@ -91,6 +93,13 @@ if __name__ == '__main__':
         epochs=args.epochs+args.initial_epoch,
         initial_epoch=args.initial_epoch
     ).apply_post_processors(
+        recipe='auto',
+        analysis_base_path=analysis_folder,
+        map_meta_data=meta,
+        run_test=True
+    ).plot_3d_test_images(best_num=2, worst_num=2)
+
+    ex.run_test().apply_post_processors(
         recipe='auto',
         analysis_base_path=analysis_folder,
         map_meta_data=meta,
