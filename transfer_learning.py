@@ -81,6 +81,7 @@ if __name__ == '__main__':
     weights = ex.model._model.optimizer.get_weights()
     weights[0] = np.array(args.initial_epoch *
                           os.environ.get('ITER_PER_EPOCH', 200))
+    ex.model._model.optimizer.get_weights(weights)
 
     print('Optimizer state:', ex.model._model.optimizer.iterations)
     print('original learning_rate:', ex.model._model.optimizer.learning_rate)
