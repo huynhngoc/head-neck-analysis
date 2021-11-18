@@ -22,6 +22,8 @@ if __name__ == '__main__':
     parser.add_argument("--temp_folder", default='', type=str)
     parser.add_argument("--analysis_folder",
                         default='', type=str)
+    parser.add_argument("--model_checkpoint_period", default=1, type=int)
+    parser.add_argument("--prediction_checkpoint_period", default=1, type=int)
     parser.add_argument("--meta", default='patient_idx,slice_idx', type=str)
     parser.add_argument("--monitor", default='', type=str)
     parser.add_argument("--memory_limit", default=0, type=int)
