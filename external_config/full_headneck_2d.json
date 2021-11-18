@@ -1,11 +1,11 @@
 {
     "config": {
-        "filename": "/home/work/ngochuyn/hn_delin/headneck_2d.h5",
+        "filename": "/home/work/ngochuyn/hn_delin/headneck_2d_new.h5",
         "test_folds": [
             11,
             12,
             13
         ],
-        "y_name": "tagret"
+        "y_name": "target"
     }
 }

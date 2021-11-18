@@ -46,7 +46,7 @@ part of the call above, thus running
 
 Manually build
 ```
-singularity build --fakeroot Singularity deoxys.sif
+singularity build --fakeroot deoxys.sif Singularity
 ```
 
 Remember to login to a gpu session to use the gpu
