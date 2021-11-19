@@ -99,10 +99,15 @@ if __name__ == '__main__':
         recipe='auto',
         analysis_base_path=analysis_folder,
         map_meta_data=meta,
-        run_test=True
+        run_test=False
     ).plot_3d_test_images(best_num=2, worst_num=2)
 
-    ex.run_test().apply_post_processors(
+    ex.load_best_model(
+        recipe='auto',
+        analysis_base_path=analysis_folder,
+        map_meta_data=meta,
+        keep_best_only=False
+    ).run_test().apply_post_processors(
         recipe='auto',
         analysis_base_path=analysis_folder,
         map_meta_data=meta,
