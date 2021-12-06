@@ -10,8 +10,8 @@ import customize_obj
 
 if __name__ == '__main__':
     gpus = tf.config.list_physical_devices('GPU')
-    if not gpus:
-        raise RuntimeError("GPU Unavailable")
+    # if not gpus:
+    #    raise RuntimeError("GPU Unavailable")
 
     parser = argparse.ArgumentParser()
     parser.add_argument("dataset_file")
@@ -43,9 +43,12 @@ if __name__ == '__main__':
         except RuntimeError as e:
             # Virtual devices must be set before GPUs have been initialized
             print(e)
+    temp_folder = args.temp_folder + '_' + \
+        args.dataset_file[:-5].split('/')[-1]
 
     if 'patch' in args.log_folder:
-        analysis_folder = args.analysis_folder
+        analysis_folder = args.analysis_folder + \
+            '_' + args.dataset_file[:-5].split('/')[-1]
     else:
         analysis_folder = ''
 
@@ -61,15 +64,15 @@ if __name__ == '__main__':
 
     ex = ExperimentPipeline(
         log_base_path=log_folder,
-        temp_base_path=args.temp_folder + '_' +
-        args.dataset_file[:-5].split('/')[-1]
-    )
+        temp_base_path=temp_folder)
+
     if args.best_epoch == 0:
         try:
             ex = ex.load_best_model(
                 recipe='auto',
                 analysis_base_path=analysis_folder,
                 map_meta_data=meta,
+                keep_best_only=False
             )
         except Exception as e:
             print("Error while loading best model", e)
@@ -78,6 +81,17 @@ if __name__ == '__main__':
         print(f'Loading model from epoch {args.best_epoch}')
         ex.from_file(args.log_folder +
                      f'/model/model.{args.best_epoch:03d}.h5')
+
+    # deleting old predicted files
+    if os.path.exists(log_folder + ex.PREDICTION_PATH):
+        shutil.rmtree(log_folder + ex.PREDICTION_PATH)
+        os.makedirs(log_folder + ex.PREDICTION_PATH)
+
+    # deleting old models
+    if os.path.exists(log_folder + ex.MODEL_PATH):
+        shutil.rmtree(log_folder + ex.MODEL_PATH)
+        os.makedirs(log_folder + ex.MODEL_PATH)
+
     weights = ex.model._model.optimizer.get_weights()
     weights[0] = np.array(args.initial_epoch *
                           os.environ.get('ITER_PER_EPOCH', 200))

@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --ntasks=1               # 1 core(CPU)
 #SBATCH --nodes=1                # Use 1 node
-#SBATCH --job-name=head_neck   # sensible name for the job
-#SBATCH --mem=64G                 # Default memory per CPU is 3GB.
+#SBATCH --job-name=transfer      # sensible name for the job
+#SBATCH --mem=32G                 # Default memory per CPU is 3GB.
 #SBATCH --partition=gpu # Use the verysmallmem-partition for jobs requiring < 10 GB RAM.
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=16
@@ -50,10 +50,10 @@ echo "Finished seting up files."
 nvidia-modprobe -u -c=0
 
 # Run experiment
-export ITER_PER_EPOCH=200
+# export ITER_PER_EPOCH=200
 export NUM_CPUS=4
 export RAY_ROOT=$TMPDIR/ray
-singularity exec --nv deoxys-new.sif python transfer_learning.py $1 /net/fs-1/Ngoc/hnperf/$2 --temp_folder $SCRATCH/hnperf/$2 --analysis_folder $SCRATCH/analysis/$2 --epochs $3 ${@:4}
+singularity exec --nv deoxys-new_dec.sif python transfer_learning.py $1 /net/fs-1/Ngoc/hnperf/$2 --temp_folder $SCRATCH/hnperf/$2 --analysis_folder $SCRATCH/analysis/$2 --epochs $3 ${@:4}
 
 # echo "Finished training. Post-processing results"
 
