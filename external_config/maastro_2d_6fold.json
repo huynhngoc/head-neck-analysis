@@ -1,0 +1,18 @@
+{
+    "config": {
+        "filename": "/home/work/ngochuyn/hn_delin/maastro_3d_6fold.h5",
+        "train_folds": [
+            10,
+            11
+        ],
+        "val_folds": [
+            12
+        ],
+        "test_folds": [
+            2,
+            3,
+            4,
+            5
+        ]
+    }
+}
