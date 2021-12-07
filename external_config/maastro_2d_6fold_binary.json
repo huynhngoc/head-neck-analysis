@@ -1,6 +1,6 @@
 {
     "config": {
-        "filename": "/home/work/ngochuyn/hn_delin/maastro_3d_6fold.h5",
+        "filename": "/home/work/ngochuyn/hn_delin/maastro_2d_6fold.h5",
         "train_folds": [
             0,
             1
