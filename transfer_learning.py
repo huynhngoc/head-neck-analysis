@@ -87,11 +87,6 @@ if __name__ == '__main__':
         shutil.rmtree(log_folder + ex.PREDICTION_PATH)
         os.makedirs(log_folder + ex.PREDICTION_PATH)
 
-    # deleting old models
-    if os.path.exists(log_folder + ex.MODEL_PATH):
-        shutil.rmtree(log_folder + ex.MODEL_PATH)
-        os.makedirs(log_folder + ex.MODEL_PATH)
-
     weights = ex.model._model.optimizer.get_weights()
     weights[0] = np.array(args.initial_epoch *
                           os.environ.get('ITER_PER_EPOCH', 200))
@@ -103,7 +98,20 @@ if __name__ == '__main__':
         args.dataset_file,
         analysis_base_path=analysis_folder,
         map_meta_data=meta,
-    ).run_experiment(
+    )
+
+    # deleting old models
+    if os.path.exists(log_folder + ex.MODEL_PATH):
+        shutil.rmtree(log_folder + ex.MODEL_PATH)
+        os.makedirs(log_folder + ex.MODEL_PATH)
+
+    if os.path.exists(log_folder + '/logs'):
+        shutil.rmtree(log_folder + '/logs')
+        os.makedirs(log_folder + '/logs')
+
+    ex.post_processors = None
+
+    ex.run_experiment(
         train_history_log=True,
         model_checkpoint_period=args.model_checkpoint_period,
         prediction_checkpoint_period=args.prediction_checkpoint_period,
@@ -114,7 +122,7 @@ if __name__ == '__main__':
         analysis_base_path=analysis_folder,
         map_meta_data=meta,
         run_test=False
-    ).plot_3d_test_images(best_num=2, worst_num=2)
+    )
 
     ex.load_best_model(
         recipe='auto',
