@@ -24,7 +24,8 @@ import tensorflow_addons as tfa
 from deoxys.model.losses import Loss, loss_from_config
 from deoxys.customize import custom_loss, custom_preprocessor
 from deoxys.data import ImageAugmentation2D
-
+from elasticdeform import deform_random_grid
+import new_layer
 
 multi_input_layers = ['Add', 'AddResize', 'Concatenate', 'Multiply']
 resize_input_layers = ['Concatenate', 'AddResize']
@@ -766,6 +767,29 @@ class H5MultiDataGenerator(DataGenerator):
                 batch_y = seg_y[i:(i + self.batch_size)]
 
                 yield [batch_x, *batch_others], batch_y
+
+
+@custom_preprocessor
+class ChannelRepeater(BasePreprocessor):
+    def __init__(self, channel=0):
+        if '__iter__' not in dir(channel):
+            self.channel = [channel]
+        else:
+            self.channel = channel
+
+    def transform(self, images, targets):
+        return np.concatenate([images, images[..., self.channel]], axis=-1), targets
+
+
+@custom_preprocessor
+class ElasticDeform(BasePreprocessor):
+    def __init__(self, sigma=4, points=3):
+        self.sigma = sigma
+        self.points = points
+
+    def transform(self, x, y):
+        return deform_random_grid([x, y], axis=[(1, 2, 3), (1, 2, 3)],
+                                  sigma=self.sigma, points=self.points)
 
 
 # @custom_preprocessor
