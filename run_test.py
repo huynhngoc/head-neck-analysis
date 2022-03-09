@@ -7,7 +7,7 @@ as log file and perforamance plot.
 In addition, we can peek the result of 42 first images from prediction set.
 """
 
-from deoxys.experiment import Experiment, ExperimentPipeline
+from deoxys.experiment import Experiment, ExperimentPipeline, SegmentationExperimentPipeline
 # from deoxys.utils import read_file
 import argparse
 import os
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     parser.add_argument("--model_checkpoint_period", default=5, type=int)
     parser.add_argument("--prediction_checkpoint_period", default=5, type=int)
     parser.add_argument("--meta", default='patient_idx,slice_idx', type=str)
-    parser.add_argument("--monitor", default='', type=str)
+    parser.add_argument("--monitor", default='f1_score', type=str)
     parser.add_argument("--memory_limit", default=0, type=int)
 
     args, unknown = parser.parse_known_args()
@@ -94,13 +94,14 @@ if __name__ == '__main__':
     #         run_test=True
     #     ).merge_3d_patches().calculate_fscore()
 
-    ex = ExperimentPipeline(
+    ex = SegmentationExperimentPipeline(
         log_base_path=args.log_folder,
         temp_base_path=args.temp_folder
     )
     if args.best_epoch == 0:
         try:
             ex = ex.load_best_model(
+                monitor=args.monitor,
                 recipe='auto',
                 analysis_base_path=analysis_folder,
                 map_meta_data=meta,
@@ -116,5 +117,6 @@ if __name__ == '__main__':
         recipe='auto',
         analysis_base_path=analysis_folder,
         map_meta_data=meta,
-        run_test=True
+        run_test=True,
+        metrics=['f1_score', 'precision', 'recall']
     ).plot_3d_test_images(best_num=2, worst_num=2)

@@ -11,8 +11,8 @@ import customize_obj
 # import h5py
 # from tensorflow.keras.callbacks import EarlyStopping
 import tensorflow as tf
-from deoxys.experiment import Experiment, ExperimentPipeline
-# from deoxys.model.callbacks import PredictionCheckpoint
+from deoxys.experiment import Experiment, ExperimentPipeline, SegmentationExperimentPipeline
+from deoxys.model.callbacks import PredictionCheckpoint
 # from deoxys.utils import read_file
 import argparse
 # import os
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     parser.add_argument("--model_checkpoint_period", default=5, type=int)
     parser.add_argument("--prediction_checkpoint_period", default=5, type=int)
     parser.add_argument("--meta", default='patient_idx,slice_idx', type=str)
-    parser.add_argument("--monitor", default='', type=str)
+    parser.add_argument("--monitor", default='f1_score', type=str)
     parser.add_argument("--memory_limit", default=0, type=int)
 
     args, unknown = parser.parse_known_args()
@@ -72,7 +72,7 @@ if __name__ == '__main__':
         print('Intermediate processed files for merging patches are saved to',
               analysis_folder)
 
-    exp = ExperimentPipeline(
+    exp = SegmentationExperimentPipeline(
         log_base_path=args.log_folder,
         temp_base_path=args.temp_folder
     ).from_full_config(
@@ -86,8 +86,11 @@ if __name__ == '__main__':
         recipe='auto',
         analysis_base_path=analysis_folder,
         map_meta_data=meta,
+        metrics=['f1_score', 'precision', 'recall']
     ).plot_performance().plot_prediction(
         masked_images=[], best_num=2, worst_num=2
     ).load_best_model(monitor=args.monitor)
     if analysis_folder:
         exp.plot_prediction(best_num=2, worst_num=2)
+
+    PredictionCheckpoint._max_size = 0.5
