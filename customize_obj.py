@@ -1,5 +1,6 @@
 import gc
 from itertools import product
+import shutil
 from deoxys.data.preprocessor import BasePreprocessor
 from deoxys_image.patch_sliding import get_patch_indice, get_patches, \
     check_drop
@@ -13,6 +14,7 @@ import tensorflow as tf
 from deoxys.model.callbacks import PredictionCheckpoint
 from deoxys.loaders.architecture import BaseModelLoader
 from deoxys.experiment import Experiment
+from deoxys.experiment.postprocessor import DefaultPostProcessor
 from deoxys.utils import file_finder, load_json_config
 from deoxys.customize import custom_architecture, custom_datareader, custom_layer
 from deoxys.loaders import load_data
@@ -26,6 +28,7 @@ from deoxys.customize import custom_loss, custom_preprocessor
 from deoxys.data import ImageAugmentation2D
 from elasticdeform import deform_random_grid
 import new_layer
+import os
 
 multi_input_layers = ['Add', 'AddResize', 'Concatenate', 'Multiply']
 resize_input_layers = ['Concatenate', 'AddResize']
@@ -98,8 +101,63 @@ class FusedLoss(Loss):
         return loss
 
 
+class EnsemblePostProcessor(DefaultPostProcessor):
+    def __init__(self, log_base_path='logs',
+                 log_path_list=None,
+                 map_meta_data=None, **kwargs):
+
+        self.log_base_path = log_base_path
+        self.log_path_list = []
+        for path in log_path_list:
+            merge_file = path + self.TEST_OUTPUT_PATH + self.PREDICT_TEST_NAME
+            if os.path.exists(merge_file):
+                self.log_path_list.append(merge_file)
+
+        # check if there are more than 1 to ensemble
+        assert len(self.log_path_list) > 1, 'Cannot ensemble with 0 or 1 item'
+
+        if map_meta_data:
+            if type(map_meta_data) == str:
+                self.map_meta_data = map_meta_data.split(',')
+            else:
+                self.map_meta_data = map_meta_data
+        else:
+            self.map_meta_data = ['patient_idx']
+
+        # always run test
+        self.run_test = True
+
+    def ensemble_results(self):
+        # initialize the folder
+        if not os.path.exists(self.log_base_path):
+            print('Creating output folder')
+            os.makedirs(self.log_base_path)
+
+        output_folder = self.log_base_path + self.TEST_OUTPUT_PATH
+        if not os.path.exists(output_folder):
+            print('Creating ensemble folder')
+            os.makedirs(output_folder)
+
+        output_file = output_folder + self.PREDICT_TEST_NAME
+        if not os.path.exists(output_file):
+            print('Copying template for output file')
+            shutil.copy(self.log_path_list[0], output_folder)
+
+        print('Creating ensemble results...')
+        y_preds = []
+        for file in self.log_path_list:
+            with h5py.File(file, 'r') as hf:
+                y_preds.append(hf['predicted'][:])
+
+        with h5py.File(output_file, 'a') as mf:
+            mf['predicted'][:] = np.mean(y_preds, axis=0)
+        print('Ensembled results saved to file')
+
+        return self
+
+
 @custom_architecture
-class MultiInputModelLoader(BaseModelLoader):
+class MultiInputModelLoaderV2(BaseModelLoader):
     def resize_by_axis(self, img, dim_1, dim_2, ax):
         resized_list = []
         # print(img.shape, ax, dim_1, dim_2)
@@ -307,7 +365,7 @@ class ZScoreDensePreprocessor(BasePreprocessor):
 
 
 @custom_datareader
-class H5MultiReader(DataReader):
+class H5MultiReaderV2(DataReader):
     """DataReader that use data from an hdf5 file.
 
         Initialize a HDF5 Data Reader, which reads data from a HDF5
