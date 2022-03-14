@@ -1,0 +1,3182 @@
+{
+    "train_params": {
+        "epochs": 20
+    },
+    "dataset_params": {
+        "class_name": "H5Reader",
+        "config": {
+            "filename": "/home/work/ngochuyn/hn_delin/outcome.h5",
+            "batch_size": 4,
+            "x_name": "image",
+            "y_name": "DFS",
+            "batch_cache": 4,
+            "shuffle": true,
+            "train_folds": [
+                0,
+                3,
+                4
+            ],
+            "val_folds": [
+                1
+            ],
+            "test_folds": [
+                2
+            ],
+            "preprocessors": [
+                {
+                    "class_name": "HounsfieldWindowingPreprocessor",
+                    "config": {
+                        "window_center": 70,
+                        "window_width": 200,
+                        "channel": 0
+                    }
+                },
+                {
+                    "class_name": "ImageNormalizerPreprocessor",
+                    "config": {
+                        "vmin": [
+                            -100,
+                            0
+                        ],
+                        "vmax": [
+                            100,
+                            25
+                        ]
+                    }
+                }
+            ],
+            "augmentations": {
+                "class_name": "ClassImageAugmentation3D",
+                "config": {
+                    "rotation_range": 15,
+                    "rotation_axis": [
+                        0,
+                        1,
+                        2
+                    ],
+                    "zoom_range": [
+                        0.9,
+                        1.1
+                    ],
+                    "shift_range": [
+                        5,
+                        5,
+                        5
+                    ],
+                    "flip_axis": 1
+                }
+            }
+        }
+    },
+    "input_params": {
+        "shape": [
+            173,
+            191,
+            265,
+            3
+        ]
+    },
+    "model_params": {
+        "loss": {
+            "class_name": "BinaryCrossentropy"
+        },
+        "optimizer": {
+            "class_name": "adam",
+            "config": {
+                "learning_rate": 0.0001
+            }
+        },
+        "metrics": [
+            {
+                "class_name": "BinaryFbeta"
+            },
+            {
+                "class_name": "BinaryCrossentropy"
+            },
+            {
+                "class_name": "AUC"
+            },
+            {
+                "class_name": "TruePositives",
+                "config": {
+                    "name": "TP"
+                }
+            },
+            {
+                "class_name": "FalsePositives",
+                "config": {
+                    "name": "FP"
+                }
+            },
+            {
+                "class_name": "FalseNegatives",
+                "config": {
+                    "name": "FN"
+                }
+            }
+        ]
+    },
+    "architecture": {
+        "type": "ResNet",
+        "layers": [
+            {
+                "name": "stem_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 16,
+                    "kernel_size": 3,
+                    "strides": 2,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "stem_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "stem_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block1a_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 8,
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block1a_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block1a_project_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block2a_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 32,
+                    "kernel_size": 3,
+                    "strides": 2,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block2a_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block2a_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block2a_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 16,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block2a_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block2b_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block2b_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block2b_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block2b_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 16,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block2b_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block2b_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block2b_project_bn",
+                    "block2a_project_bn"
+                ]
+            },
+            {
+                "name": "block3a_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 64,
+                    "kernel_size": 3,
+                    "strides": 2,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block3a_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block3a_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block3a_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 24,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block3a_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block3b_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block3b_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block3b_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block3b_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 24,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block3b_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block3b_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block3b_project_bn",
+                    "block3a_project_bn"
+                ]
+            },
+            {
+                "name": "block4a_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block4a_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block4a_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block4a_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 2,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block4a_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block4a_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block4a_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block4a_activation"
+                ]
+            },
+            {
+                "name": "block4a_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        96
+                    ]
+                }
+            },
+            {
+                "name": "block4a_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 6,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block4a_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block4a_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block4a_activation",
+                    "block4a_se_expand"
+                ]
+            },
+            {
+                "name": "block4a_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 48,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block4a_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block4b_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 192,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block4b_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block4b_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block4b_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block4b_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block4b_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block4b_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block4b_activation"
+                ]
+            },
+            {
+                "name": "block4b_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        192
+                    ]
+                }
+            },
+            {
+                "name": "block4b_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 12,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block4b_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 192,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block4b_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block4b_activation",
+                    "block4b_se_expand"
+                ]
+            },
+            {
+                "name": "block4b_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 48,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block4b_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block4b_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block4b_project_bn",
+                    "block4a_project_bn"
+                ]
+            },
+            {
+                "name": "block4c_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 192,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block4c_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block4c_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block4c_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block4c_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block4c_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block4c_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block4c_activation"
+                ]
+            },
+            {
+                "name": "block4c_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        192
+                    ]
+                }
+            },
+            {
+                "name": "block4c_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 12,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block4c_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 192,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block4c_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block4c_activation",
+                    "block4c_se_expand"
+                ]
+            },
+            {
+                "name": "block4c_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 48,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block4c_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block4c_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block4c_project_bn",
+                    "block4b_add"
+                ]
+            },
+            {
+                "name": "block5a_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 288,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5a_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5a_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block5a_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5a_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5a_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block5a_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block5a_activation"
+                ]
+            },
+            {
+                "name": "block5a_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        288
+                    ]
+                }
+            },
+            {
+                "name": "block5a_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 12,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block5a_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 288,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block5a_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block5a_activation",
+                    "block5a_se_expand"
+                ]
+            },
+            {
+                "name": "block5a_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 56,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5a_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5b_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 336,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5b_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5b_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block5b_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5b_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5b_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block5b_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block5b_activation"
+                ]
+            },
+            {
+                "name": "block5b_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        336
+                    ]
+                }
+            },
+            {
+                "name": "block5b_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 14,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block5b_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 336,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block5b_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block5b_activation",
+                    "block5b_se_expand"
+                ]
+            },
+            {
+                "name": "block5b_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 56,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5b_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5b_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block5b_project_bn",
+                    "block5a_project_bn"
+                ]
+            },
+            {
+                "name": "block5c_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 336,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5c_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5c_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block5c_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5c_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5c_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block5c_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block5c_activation"
+                ]
+            },
+            {
+                "name": "block5c_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        336
+                    ]
+                }
+            },
+            {
+                "name": "block5c_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 14,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block5c_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 336,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block5c_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block5c_activation",
+                    "block5c_se_expand"
+                ]
+            },
+            {
+                "name": "block5c_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 56,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5c_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5c_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block5c_project_bn",
+                    "block5b_add"
+                ]
+            },
+            {
+                "name": "block5d_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 336,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5d_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5d_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block5d_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5d_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5d_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block5d_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block5d_activation"
+                ]
+            },
+            {
+                "name": "block5d_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        336
+                    ]
+                }
+            },
+            {
+                "name": "block5d_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 14,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block5d_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 336,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block5d_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block5d_activation",
+                    "block5d_se_expand"
+                ]
+            },
+            {
+                "name": "block5d_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 56,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5d_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5d_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block5d_project_bn",
+                    "block5c_add"
+                ]
+            },
+            {
+                "name": "block5e_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 336,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5e_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5e_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block5e_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5e_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5e_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block5e_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block5e_activation"
+                ]
+            },
+            {
+                "name": "block5e_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        336
+                    ]
+                }
+            },
+            {
+                "name": "block5e_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 14,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block5e_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 336,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block5e_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block5e_activation",
+                    "block5e_se_expand"
+                ]
+            },
+            {
+                "name": "block5e_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 56,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block5e_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block5e_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block5e_project_bn",
+                    "block5d_add"
+                ]
+            },
+            {
+                "name": "block6a_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 336,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6a_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6a_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6a_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 2,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6a_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6a_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6a_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block6a_activation"
+                ]
+            },
+            {
+                "name": "block6a_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        336
+                    ]
+                }
+            },
+            {
+                "name": "block6a_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 14,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6a_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 336,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6a_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block6a_activation",
+                    "block6a_se_expand"
+                ]
+            },
+            {
+                "name": "block6a_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6a_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6b_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6b_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6b_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6b_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6b_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6b_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6b_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block6b_activation"
+                ]
+            },
+            {
+                "name": "block6b_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        576
+                    ]
+                }
+            },
+            {
+                "name": "block6b_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 24,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6b_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6b_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block6b_activation",
+                    "block6b_se_expand"
+                ]
+            },
+            {
+                "name": "block6b_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6b_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6b_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block6b_project_bn",
+                    "block6a_project_bn"
+                ]
+            },
+            {
+                "name": "block6c_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6c_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6c_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6c_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6c_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6c_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6c_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block6c_activation"
+                ]
+            },
+            {
+                "name": "block6c_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        576
+                    ]
+                }
+            },
+            {
+                "name": "block6c_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 24,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6c_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6c_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block6c_activation",
+                    "block6c_se_expand"
+                ]
+            },
+            {
+                "name": "block6c_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6c_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6c_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block6c_project_bn",
+                    "block6b_add"
+                ]
+            },
+            {
+                "name": "block6d_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6d_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6d_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6d_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6d_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6d_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6d_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block6d_activation"
+                ]
+            },
+            {
+                "name": "block6d_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        576
+                    ]
+                }
+            },
+            {
+                "name": "block6d_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 24,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6d_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6d_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block6d_activation",
+                    "block6d_se_expand"
+                ]
+            },
+            {
+                "name": "block6d_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6d_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6d_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block6d_project_bn",
+                    "block6c_add"
+                ]
+            },
+            {
+                "name": "block6e_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6e_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6e_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6e_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6e_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6e_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6e_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block6e_activation"
+                ]
+            },
+            {
+                "name": "block6e_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        576
+                    ]
+                }
+            },
+            {
+                "name": "block6e_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 24,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6e_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6e_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block6e_activation",
+                    "block6e_se_expand"
+                ]
+            },
+            {
+                "name": "block6e_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6e_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6e_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block6e_project_bn",
+                    "block6d_add"
+                ]
+            },
+            {
+                "name": "block6f_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6f_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6f_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6f_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6f_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6f_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6f_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block6f_activation"
+                ]
+            },
+            {
+                "name": "block6f_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        576
+                    ]
+                }
+            },
+            {
+                "name": "block6f_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 24,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6f_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6f_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block6f_activation",
+                    "block6f_se_expand"
+                ]
+            },
+            {
+                "name": "block6f_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6f_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6f_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block6f_project_bn",
+                    "block6e_add"
+                ]
+            },
+            {
+                "name": "block6g_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6g_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6g_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6g_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6g_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6g_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6g_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block6g_activation"
+                ]
+            },
+            {
+                "name": "block6g_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        576
+                    ]
+                }
+            },
+            {
+                "name": "block6g_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 24,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6g_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6g_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block6g_activation",
+                    "block6g_se_expand"
+                ]
+            },
+            {
+                "name": "block6g_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6g_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6g_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block6g_project_bn",
+                    "block6f_add"
+                ]
+            },
+            {
+                "name": "block6h_expand_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6h_expand_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6h_expand_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6h_dwconv2",
+                "class_name": "DepthwiseConv3D",
+                "config": {
+                    "kernel_size": 3,
+                    "strides": 1,
+                    "depthwise_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6h_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6h_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "block6h_se_squeeze",
+                "class_name": "GlobalAveragePooling3D",
+                "inputs": [
+                    "block6h_activation"
+                ]
+            },
+            {
+                "name": "block6h_se_reshape",
+                "class_name": "Reshape",
+                "config": {
+                    "target_shape": [
+                        1,
+                        1,
+                        1,
+                        576
+                    ]
+                }
+            },
+            {
+                "name": "block6h_se_reduce",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 24,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "swish",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6h_se_expand",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 576,
+                    "kernel_size": 1,
+                    "padding": "same",
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "block6h_se_excite",
+                "class_name": "Multiply",
+                "inputs": [
+                    "block6h_activation",
+                    "block6h_se_expand"
+                ]
+            },
+            {
+                "name": "block6h_project_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 96,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "data_format": "channels_last",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "block6h_project_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "block6h_add",
+                "class_name": "Add",
+                "inputs": [
+                    "block6h_project_bn",
+                    "block6g_add"
+                ]
+            },
+            {
+                "name": "top_conv",
+                "class_name": "Conv3D",
+                "config": {
+                    "filters": 1280,
+                    "kernel_size": 1,
+                    "strides": 1,
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 2.0,
+                            "mode": "fan_out",
+                            "distribution": "truncated_normal"
+                        }
+                    },
+                    "padding": "same",
+                    "use_bias": false
+                }
+            },
+            {
+                "name": "top_bn",
+                "class_name": "BatchNormalization",
+                "config": {
+                    "axis": 4,
+                    "momentum": 0.9
+                }
+            },
+            {
+                "name": "top_activation",
+                "class_name": "Activation",
+                "config": {
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "avg_pool",
+                "class_name": "GlobalAveragePooling3D"
+            },
+            {
+                "name": "top_dropout",
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.2
+                }
+            },
+            {
+                "name": "predictions",
+                "class_name": "Dense",
+                "config": {
+                    "units": 1,
+                    "activation": "sigmoid",
+                    "kernel_initializer": {
+                        "class_name": "VarianceScaling",
+                        "config": {
+                            "scale": 0.3333333333333333,
+                            "mode": "fan_out",
+                            "distribution": "uniform"
+                        }
+                    },
+                    "bias_initializer": "Constant"
+                }
+            }
+        ]
+    }
+}
