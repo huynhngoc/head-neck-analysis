@@ -11,7 +11,7 @@ import customize_obj
 # import h5py
 # from tensorflow.keras.callbacks import EarlyStopping
 import tensorflow as tf
-from deoxys.experiment import Experiment, ExperimentPipeline
+from deoxys.experiment import DefaultExperimentPipeline
 # from deoxys.model.callbacks import PredictionCheckpoint
 # from deoxys.utils import read_file
 import argparse
@@ -30,14 +30,14 @@ if __name__ == '__main__':
     parser.add_argument("config_file")
     parser.add_argument("log_folder")
     parser.add_argument("--temp_folder", default='', type=str)
-    parser.add_argument("--analysis_folder",
-                        default='', type=str)
     parser.add_argument("--epochs", default=20, type=int)
     parser.add_argument("--model_checkpoint_period", default=1, type=int)
     parser.add_argument("--prediction_checkpoint_period", default=1, type=int)
-    parser.add_argument("--meta", default='patient_idx,slice_idx', type=str)
+    parser.add_argument("--meta", default='patient_idx', type=str)
     parser.add_argument(
-        "--monitor", default='val_binary_crossentropy', type=str)
+        "--monitor", default='AUC', type=str)
+    parser.add_argument(
+        "--monitor_mode", default='max', type=str)
     parser.add_argument("--memory_limit", default=0, type=int)
 
     args, unknown = parser.parse_known_args()
@@ -56,11 +56,6 @@ if __name__ == '__main__':
             # Virtual devices must be set before GPUs have been initialized
             print(e)
 
-    if 'patch' in args.log_folder:
-        analysis_folder = args.analysis_folder
-    else:
-        analysis_folder = ''
-
     if '2d' in args.log_folder:
         meta = args.meta
     else:
@@ -68,12 +63,12 @@ if __name__ == '__main__':
 
     print('training from configuration', args.config_file,
           'and saving log files to', args.log_folder)
-    print('Unprocesssed prediciton are saved to', args.temp_folder)
-    if analysis_folder:
-        print('Intermediate processed files for merging patches are saved to',
-              analysis_folder)
+    print('Unprocesssed prediction are saved to', args.temp_folder)
 
-    exp = ExperimentPipeline(
+    def binarize(targets, predictions):
+        return targets, (predictions > 0.5).astype(targets.dtype)
+
+    exp = DefaultExperimentPipeline(
         log_base_path=args.log_folder,
         temp_base_path=args.temp_folder
     ).from_full_config(
@@ -84,16 +79,19 @@ if __name__ == '__main__':
         prediction_checkpoint_period=args.prediction_checkpoint_period,
         epochs=args.epochs,
     ).apply_post_processors(
-        recipe='3d',
-        analysis_base_path=analysis_folder,
         map_meta_data=meta,
+        metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
+                 'BinaryAccuracy', 'BinaryFbeta'],
+        metrics_sources=['tf', 'sklearn', 'sklearn',  'tf', 'tf', 'tf'],
+        process_functions=[None, None, binarize, None, None, None]
     ).plot_performance().load_best_model(
-        recipe='3d',
-        monitor='val_loss',
-        use_raw_log=True,
-        mode='min'
+        monitor=args.monitor,
+        use_raw_log=False,
+        mode=args.monitor_mode
     ).run_test().apply_post_processors(
-        recipe='3d',
-        analysis_base_path=analysis_folder,
-        map_meta_data=meta, run_test=True
+        map_meta_data=meta, run_test=True,
+        metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
+                 'BinaryAccuracy', 'BinaryFbeta'],
+        metrics_sources=['tf', 'sklearn', 'sklearn',  'tf', 'tf', 'tf'],
+        process_functions=[None, None, binarize, None, None, None]
     )
