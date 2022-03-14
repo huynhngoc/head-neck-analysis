@@ -26,7 +26,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("log_base")
     parser.add_argument("name_list")
-    parser.add_argument("--merge_name", defalt='merge', type=str)
+    parser.add_argument("--merge_name", default='merge', type=str)
     parser.add_argument("--meta", default='patient_idx', type=str)
     parser.add_argument(
         "--monitor", default='AUC', type=str)
