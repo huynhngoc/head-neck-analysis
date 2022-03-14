@@ -26,6 +26,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("log_base")
     parser.add_argument("name_list")
+    parser.add_argument("--merge_name", defalt='merge', type=str)
     parser.add_argument("--meta", default='patient_idx', type=str)
     parser.add_argument(
         "--monitor", default='AUC', type=str)
@@ -36,7 +37,7 @@ if __name__ == '__main__':
 
     log_path_list = [args.log_base +
                      name for name in args.name_list.split(',')]
-    log_base_path = args.log_base + 'merge'
+    log_base_path = args.log_base + args.merge_name
 
     print('Ensemble test results from this list', log_path_list)
     print('Merged results are save to', log_base_path)
