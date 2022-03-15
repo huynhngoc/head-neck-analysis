@@ -27,7 +27,7 @@ class Matthews_corrcoef_scorer:
     def __call__(self, *args, **kwargs):
         return matthews_corrcoef(*args, **kwargs)
 
-    def _score_func(*args, **kwargs):
+    def _score_func(self, *args, **kwargs):
         return matthews_corrcoef(*args, **kwargs)
 
 
