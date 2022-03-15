@@ -81,9 +81,11 @@ if __name__ == '__main__':
     ).apply_post_processors(
         map_meta_data=meta,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta'],
-        metrics_sources=['tf', 'sklearn', 'sklearn',  'tf', 'tf', 'tf'],
-        process_functions=[None, None, binarize, None, None, None]
+                 'BinaryAccuracy', 'BinaryFbeta', 'matthews_corrcoef'],
+        metrics_sources=['tf', 'sklearn', 'sklearn',
+                         'tf', 'tf', 'tf', 'sklearn'],
+        process_functions=[None, None, binarize, None, None, None, binarize],
+        metrics_args=[{}, {}, {}, {}, {}, {}, {'metric_name': 'mcc'}]
     ).plot_performance().load_best_model(
         monitor=args.monitor,
         use_raw_log=False,
@@ -91,7 +93,9 @@ if __name__ == '__main__':
     ).run_test().apply_post_processors(
         map_meta_data=meta, run_test=True,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta'],
-        metrics_sources=['tf', 'sklearn', 'sklearn',  'tf', 'tf', 'tf'],
-        process_functions=[None, None, binarize, None, None, None]
+                 'BinaryAccuracy', 'BinaryFbeta', 'matthews_corrcoef'],
+        metrics_sources=['tf', 'sklearn', 'sklearn',
+                         'tf', 'tf', 'tf', 'sklearn'],
+        process_functions=[None, None, binarize, None, None, None, binarize],
+        metrics_args=[{}, {}, {}, {}, {}, {}, {'metric_name': 'mcc'}]
     )
