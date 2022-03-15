@@ -19,6 +19,7 @@ import argparse
 # import numpy as np
 # from pathlib import Path
 # from comet_ml import Experiment as CometEx
+from sklearn import metrics
 from sklearn.metrics import matthews_corrcoef
 
 
@@ -28,6 +29,9 @@ class Matthews_corrcoef_scorer:
 
     def _score_func(*args, **kwargs):
         return matthews_corrcoef(*args, **kwargs)
+
+
+metrics.SCORERS['mcc'] = Matthews_corrcoef_scorer()
 
 
 if __name__ == '__main__':
@@ -90,11 +94,10 @@ if __name__ == '__main__':
     ).apply_post_processors(
         map_meta_data=meta,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta', Matthews_corrcoef_scorer()],
+                 'BinaryAccuracy', 'BinaryFbeta', 'mcc'],
         metrics_sources=['tf', 'sklearn', 'sklearn',
                          'tf', 'tf', 'tf', 'sklearn'],
-        process_functions=[None, None, binarize, None, None, None, binarize],
-        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {'metric_name': 'mcc'}]
+        process_functions=[None, None, binarize, None, None, None, binarize]
     ).plot_performance().load_best_model(
         monitor=args.monitor,
         use_raw_log=False,
@@ -102,9 +105,8 @@ if __name__ == '__main__':
     ).run_test().apply_post_processors(
         map_meta_data=meta, run_test=True,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta', Matthews_corrcoef_scorer()],
+                 'BinaryAccuracy', 'BinaryFbeta', 'mcc'],
         metrics_sources=['tf', 'sklearn', 'sklearn',
                          'tf', 'tf', 'tf', 'sklearn'],
-        process_functions=[None, None, binarize, None, None, None, binarize],
-        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {'metric_name': 'mcc'}]
+        process_functions=[None, None, binarize, None, None, None, binarize]
     )
