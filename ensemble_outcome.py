@@ -31,6 +31,8 @@ class Matthews_corrcoef_scorer:
         return matthews_corrcoef(*args, **kwargs)
 
 
+metrics.SCORERS['mcc'] = Matthews_corrcoef_scorer()
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
