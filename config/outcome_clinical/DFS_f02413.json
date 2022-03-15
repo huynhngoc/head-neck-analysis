@@ -112,7 +112,7 @@
         ]
     },
     "architecture": {
-        "type": "MultiInputModelLoader",
+        "type": "Generic",
         "layers": [
             {
                 "class_name": "Dense",
