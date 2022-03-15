@@ -19,6 +19,16 @@ import argparse
 # import numpy as np
 # from pathlib import Path
 # from comet_ml import Experiment as CometEx
+from sklearn import metrics
+from sklearn.metrics import matthews_corrcoef
+
+
+class Matthews_corrcoef_scorer:
+    def __call__(self, *args, **kwargs):
+        return matthews_corrcoef(*args, **kwargs)
+
+    def _score_func(self, *args, **kwargs):
+        return matthews_corrcoef(*args, **kwargs)
 
 
 if __name__ == '__main__':
@@ -63,7 +73,8 @@ if __name__ == '__main__':
 
     pp.calculate_metrics(
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta'],
-        metrics_sources=['tf', 'sklearn', 'sklearn',  'tf', 'tf', 'tf'],
-        process_functions=[None, None, binarize, None, None, None]
+                 'BinaryAccuracy', 'BinaryFbeta', 'mcc'],
+        metrics_sources=['tf', 'sklearn', 'sklearn',
+                         'tf', 'tf', 'tf', 'sklearn'],
+        process_functions=[None, None, binarize, None, None, None, binarize]
     )
