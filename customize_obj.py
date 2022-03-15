@@ -112,6 +112,8 @@ class EnsemblePostProcessor(DefaultPostProcessor):
             merge_file = path + self.TEST_OUTPUT_PATH + self.PREDICT_TEST_NAME
             if os.path.exists(merge_file):
                 self.log_path_list.append(merge_file)
+            else:
+                print('Missing file from', path)
 
         # check if there are more than 1 to ensemble
         assert len(self.log_path_list) > 1, 'Cannot ensemble with 0 or 1 item'

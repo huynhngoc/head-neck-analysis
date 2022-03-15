@@ -122,6 +122,7 @@
                 }
             },
             {
+                "name": "path_1",
                 "class_name": "Dense",
                 "config": {
                     "units": 32,
@@ -131,9 +132,49 @@
             {
                 "class_name": "Dense",
                 "config": {
-                    "units": 16,
+                    "units": 64,
+                    "activation": "relu"
+                },
+                "inputs": [
+                    "input_0"
+                ]
+            },
+            {
+                "name": "path_2",
+                "class_name": "Dense",
+                "config": {
+                    "units": 32,
                     "activation": "relu"
                 }
+            },
+            {
+                "name": "add_12",
+                "class_name": "Add",
+                "inputs": [
+                    "path_1",
+                    "path_2"
+                ]
+            },
+            {
+                "name": "mul_12",
+                "class_name": "Multiply",
+                "inputs": [
+                    "path_1",
+                    "path_2"
+                ]
+            },
+            {
+                "class_name": "Dense",
+                "config": {
+                    "units": 16,
+                    "activation": "relu"
+                },
+                "inputs": [
+                    "path_1",
+                    "path_2",
+                    "add_12",
+                    "mul_12"
+                ]
             },
             {
                 "class_name": "Dense",
