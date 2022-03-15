@@ -85,7 +85,7 @@ if __name__ == '__main__':
         metrics_sources=['tf', 'sklearn', 'sklearn',
                          'tf', 'tf', 'tf', 'sklearn'],
         process_functions=[None, None, binarize, None, None, None, binarize],
-        metrics_args=[{}, {}, {}, {}, {}, {}, {'metric_name': 'mcc'}]
+        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {'metric_name': 'mcc'}]
     ).plot_performance().load_best_model(
         monitor=args.monitor,
         use_raw_log=False,
@@ -97,5 +97,5 @@ if __name__ == '__main__':
         metrics_sources=['tf', 'sklearn', 'sklearn',
                          'tf', 'tf', 'tf', 'sklearn'],
         process_functions=[None, None, binarize, None, None, None, binarize],
-        metrics_args=[{}, {}, {}, {}, {}, {}, {'metric_name': 'mcc'}]
+        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {'metric_name': 'mcc'}]
     )
