@@ -19,6 +19,15 @@ import argparse
 # import numpy as np
 # from pathlib import Path
 # from comet_ml import Experiment as CometEx
+from sklearn.metrics import matthews_corrcoef
+
+
+class Matthews_corrcoef_scorer:
+    def __call__(self, *args, **kwargs):
+        return matthews_corrcoef(*args, **kwargs)
+
+    def _score_func(*args, **kwargs):
+        return matthews_corrcoef(*args, **kwargs)
 
 
 if __name__ == '__main__':
@@ -81,7 +90,7 @@ if __name__ == '__main__':
     ).apply_post_processors(
         map_meta_data=meta,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta', 'matthews_corrcoef'],
+                 'BinaryAccuracy', 'BinaryFbeta', Matthews_corrcoef_scorer()],
         metrics_sources=['tf', 'sklearn', 'sklearn',
                          'tf', 'tf', 'tf', 'sklearn'],
         process_functions=[None, None, binarize, None, None, None, binarize],
@@ -93,7 +102,7 @@ if __name__ == '__main__':
     ).run_test().apply_post_processors(
         map_meta_data=meta, run_test=True,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta', 'matthews_corrcoef'],
+                 'BinaryAccuracy', 'BinaryFbeta', Matthews_corrcoef_scorer()],
         metrics_sources=['tf', 'sklearn', 'sklearn',
                          'tf', 'tf', 'tf', 'sklearn'],
         process_functions=[None, None, binarize, None, None, None, binarize],
