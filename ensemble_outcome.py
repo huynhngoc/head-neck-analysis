@@ -27,6 +27,7 @@ if __name__ == '__main__':
     parser.add_argument("log_base")
     parser.add_argument("name_list")
     parser.add_argument("--merge_name", default='merge', type=str)
+    parser.add_argument("--mode", default='ensemble', type=str)
     parser.add_argument("--meta", default='patient_idx', type=str)
     parser.add_argument(
         "--monitor", default='AUC', type=str)
@@ -39,17 +40,28 @@ if __name__ == '__main__':
                      name for name in args.name_list.split(',')]
     log_base_path = args.log_base + args.merge_name
 
-    print('Ensemble test results from this list', log_path_list)
+    if args.mode == 'ensemble':
+        print('Ensemble test results from this list', log_path_list)
+    else:
+        print('Concatenate test results from this list', log_path_list)
+
     print('Merged results are save to', log_base_path)
 
     def binarize(targets, predictions):
         return targets, (predictions > 0.5).astype(targets.dtype)
 
-    customize_obj.EnsemblePostProcessor(
+    pp = customize_obj.EnsemblePostProcessor(
         log_base_path=log_base_path,
         log_path_list=log_path_list,
         map_meta_data=args.meta.split(',')
-    ).ensemble_results().calculate_metrics(
+    )
+
+    if args.mode == 'ensemble':
+        pp.ensemble_results()
+    else:
+        pp.concat_results()
+
+    pp.calculate_metrics(
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
                  'BinaryAccuracy', 'BinaryFbeta'],
         metrics_sources=['tf', 'sklearn', 'sklearn',  'tf', 'tf', 'tf'],

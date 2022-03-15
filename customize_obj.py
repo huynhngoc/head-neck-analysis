@@ -155,6 +155,35 @@ class EnsemblePostProcessor(DefaultPostProcessor):
 
         return self
 
+    def concat_results(self):
+        # initialize the folder
+        if not os.path.exists(self.log_base_path):
+            print('Creating output folder')
+            os.makedirs(self.log_base_path)
+
+        output_folder = self.log_base_path + self.TEST_OUTPUT_PATH
+        if not os.path.exists(output_folder):
+            print('Creating ensemble folder')
+            os.makedirs(output_folder)
+
+        # first check the template
+        with h5py.File(self.log_path_list[0], 'r') as f:
+            ds_names = list(f.keys())
+        ds = {name: [] for name in ds_names}
+
+        # get the data
+        for file in self.log_path_list:
+            with h5py.File(file, 'r') as hf:
+                for key in ds:
+                    ds[key].append(hf[key][:])
+
+        # now merge them
+        print('creating merged file')
+        output_file = output_folder + self.PREDICT_TEST_NAME
+        with h5py.File(output_file, 'w') as mf:
+            for key, val in ds.items():
+                mf.create_dataset(key, data=np.concatenate(val, axis=0))
+
 
 @custom_architecture
 class MultiInputModelLoaderV2(BaseModelLoader):
