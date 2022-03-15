@@ -117,7 +117,7 @@
             {
                 "class_name": "Dense",
                 "config": {
-                    "units": 16,
+                    "units": 32,
                     "activation": "swish"
                 }
             },
@@ -125,14 +125,14 @@
                 "name": "path_1",
                 "class_name": "Dense",
                 "config": {
-                    "units": 8,
+                    "units": 16,
                     "activation": "swish"
                 }
             },
             {
                 "class_name": "Dense",
                 "config": {
-                    "units": 16,
+                    "units": 32,
                     "activation": "swish"
                 },
                 "inputs": [
@@ -143,7 +143,7 @@
                 "name": "path_2",
                 "class_name": "Dense",
                 "config": {
-                    "units": 8,
+                    "units": 16,
                     "activation": "swish"
                 }
             },
