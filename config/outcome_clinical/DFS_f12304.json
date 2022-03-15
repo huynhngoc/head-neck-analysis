@@ -166,10 +166,11 @@
             {
                 "class_name": "Dense",
                 "config": {
-                    "units": 16,
+                    "units": 32,
                     "activation": "swish"
                 },
                 "inputs": [
+                    "input_0",
                     "path_1",
                     "path_2",
                     "add_12",
