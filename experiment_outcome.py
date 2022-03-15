@@ -81,6 +81,9 @@ if __name__ == '__main__':
     def binarize(targets, predictions):
         return targets, (predictions > 0.5).astype(targets.dtype)
 
+    def flip(targets, predictions):
+        return 1 - targets, 1 - predictions
+
     exp = DefaultExperimentPipeline(
         log_base_path=args.log_folder,
         temp_base_path=args.temp_folder
@@ -88,25 +91,36 @@ if __name__ == '__main__':
         args.config_file
     ).run_experiment(
         train_history_log=True,
+        model_checkpoint_period=5,
+        prediction_checkpoint_period=5,
+        epochs=5,
+    ).run_experiment(
+        train_history_log=True,
         model_checkpoint_period=args.model_checkpoint_period,
         prediction_checkpoint_period=args.prediction_checkpoint_period,
         epochs=args.epochs,
+        initial_epoch=5,
     ).apply_post_processors(
         map_meta_data=meta,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta', 'mcc'],
+                 'BinaryAccuracy', 'BinaryFbeta', 'mcc', 'roc_auc'],
         metrics_sources=['tf', 'sklearn', 'sklearn',
-                         'tf', 'tf', 'tf', 'sklearn'],
-        process_functions=[None, None, binarize, None, None, None, binarize]
+                         'tf', 'tf', 'tf', 'sklearn', 'sklearn'],
+        process_functions=[None, None, binarize, None, None, None, binarize,
+                           flip],
+        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {}, {'metric_name': 'auc_0'}]
     ).plot_performance().load_best_model(
         monitor=args.monitor,
         use_raw_log=False,
         mode=args.monitor_mode
-    ).run_test().apply_post_processors(
+    ).run_test(
+    ).apply_post_processors(
         map_meta_data=meta, run_test=True,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta', 'mcc'],
+                 'BinaryAccuracy', 'BinaryFbeta', 'mcc', 'roc_auc'],
         metrics_sources=['tf', 'sklearn', 'sklearn',
-                         'tf', 'tf', 'tf', 'sklearn'],
-        process_functions=[None, None, binarize, None, None, None, binarize]
+                         'tf', 'tf', 'tf', 'sklearn', 'sklearn'],
+        process_functions=[None, None, binarize, None, None, None, binarize,
+                           flip],
+        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {}, {'metric_name': 'auc_0'}]
     )
