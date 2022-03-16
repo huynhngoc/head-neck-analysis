@@ -82,7 +82,7 @@ if __name__ == '__main__':
         return targets, (predictions > 0.5).astype(targets.dtype)
 
     def flip(targets, predictions):
-        return 1 - targets, 1 - predictions
+        return 1 - targets, 1 - (predictions > 0.5).astype(targets.dtype)
 
     exp = DefaultExperimentPipeline(
         log_base_path=args.log_folder,
@@ -103,12 +103,12 @@ if __name__ == '__main__':
     ).apply_post_processors(
         map_meta_data=meta,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta', 'mcc', 'roc_auc'],
+                 'BinaryAccuracy', 'BinaryFbeta', 'mcc', 'f1'],
         metrics_sources=['tf', 'sklearn', 'sklearn',
                          'tf', 'tf', 'tf', 'sklearn', 'sklearn'],
         process_functions=[None, None, binarize, None, None, None, binarize,
                            flip],
-        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {}, {'metric_name': 'auc_0'}]
+        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {}, {'metric_name': 'f1_0'}]
     ).plot_performance().load_best_model(
         monitor=args.monitor,
         use_raw_log=False,
@@ -117,10 +117,10 @@ if __name__ == '__main__':
     ).apply_post_processors(
         map_meta_data=meta, run_test=True,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta', 'mcc', 'roc_auc'],
+                 'BinaryAccuracy', 'BinaryFbeta', 'mcc', 'f1'],
         metrics_sources=['tf', 'sklearn', 'sklearn',
                          'tf', 'tf', 'tf', 'sklearn', 'sklearn'],
         process_functions=[None, None, binarize, None, None, None, binarize,
                            flip],
-        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {}, {'metric_name': 'auc_0'}]
+        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {}, {'metric_name': 'f1_0'}]
     )

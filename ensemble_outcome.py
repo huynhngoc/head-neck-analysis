@@ -63,7 +63,7 @@ if __name__ == '__main__':
         return targets, (predictions > 0.5).astype(targets.dtype)
 
     def flip(targets, predictions):
-        return 1 - targets, 1 - predictions
+        return 1 - targets, 1 - (predictions > 0.5).astype(targets.dtype)
 
     pp = customize_obj.EnsemblePostProcessor(
         log_base_path=log_base_path,
@@ -78,10 +78,10 @@ if __name__ == '__main__':
 
     pp.calculate_metrics(
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta', 'mcc', 'roc_auc'],
+                 'BinaryAccuracy', 'BinaryFbeta', 'mcc', 'f1'],
         metrics_sources=['tf', 'sklearn', 'sklearn',
                          'tf', 'tf', 'tf', 'sklearn', 'sklearn'],
         process_functions=[None, None, binarize, None, None, None, binarize,
                            flip],
-        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {}, {'metric_name': 'auc_0'}]
+        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {}, {'metric_name': 'f1_0'}]
     )
