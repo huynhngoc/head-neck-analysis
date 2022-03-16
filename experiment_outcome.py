@@ -103,12 +103,10 @@ if __name__ == '__main__':
     ).apply_post_processors(
         map_meta_data=meta,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta', 'mcc', 'f1'],
+                 'BinaryAccuracy', 'BinaryFbeta', 'mcc'],
         metrics_sources=['tf', 'sklearn', 'sklearn',
-                         'tf', 'tf', 'tf', 'sklearn', 'sklearn'],
-        process_functions=[None, None, binarize, None, None, None, binarize,
-                           flip],
-        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {}, {'metric_name': 'f1_0'}]
+                         'tf', 'tf', 'tf', 'sklearn'],
+        process_functions=[None, None, binarize, None, None, None, binarize],
     ).plot_performance().load_best_model(
         monitor=args.monitor,
         use_raw_log=False,
