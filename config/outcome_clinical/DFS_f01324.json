@@ -72,7 +72,8 @@
         "optimizer": {
             "class_name": "adam",
             "config": {
-                "learning_rate": 0.001
+                "learning_rate": 0.001,
+                "epsilon": 0.001
             }
         },
         "metrics": [
@@ -115,24 +116,18 @@
         "type": "Generic",
         "layers": [
             {
-                "class_name": "Dense",
-                "config": {
-                    "units": 32,
-                    "activation": "swish"
-                }
-            },
-            {
                 "name": "path_1",
                 "class_name": "Dense",
                 "config": {
-                    "units": 16,
+                    "units": 4,
                     "activation": "swish"
                 }
             },
             {
+                "name": "path_2",
                 "class_name": "Dense",
                 "config": {
-                    "units": 32,
+                    "units": 4,
                     "activation": "swish"
                 },
                 "inputs": [
@@ -140,12 +135,15 @@
                 ]
             },
             {
-                "name": "path_2",
+                "name": "path_3",
                 "class_name": "Dense",
                 "config": {
-                    "units": 16,
+                    "units": 4,
                     "activation": "swish"
-                }
+                },
+                "inputs": [
+                    "input_0"
+                ]
             },
             {
                 "name": "add_12",
@@ -153,6 +151,31 @@
                 "inputs": [
                     "path_1",
                     "path_2"
+                ]
+            },
+            {
+                "name": "add_13",
+                "class_name": "Add",
+                "inputs": [
+                    "path_1",
+                    "path_3"
+                ]
+            },
+            {
+                "name": "add_23",
+                "class_name": "Add",
+                "inputs": [
+                    "path_2",
+                    "path_3"
+                ]
+            },
+            {
+                "name": "add_123",
+                "class_name": "Add",
+                "inputs": [
+                    "path_1",
+                    "path_2",
+                    "path_3"
                 ]
             },
             {
@@ -164,23 +187,51 @@
                 ]
             },
             {
-                "class_name": "Dense",
-                "config": {
-                    "units": 32,
-                    "activation": "swish"
-                },
+                "name": "mul_13",
+                "class_name": "Multiply",
+                "inputs": [
+                    "path_1",
+                    "path_3"
+                ]
+            },
+            {
+                "name": "mul_23",
+                "class_name": "Multiply",
+                "inputs": [
+                    "path_2",
+                    "path_3"
+                ]
+            },
+            {
+                "name": "mul_123",
+                "class_name": "Multiply",
+                "inputs": [
+                    "path_1",
+                    "path_2",
+                    "path_3"
+                ]
+            },
+            {
+                "class_name": "Concatenate",
                 "inputs": [
                     "input_0",
                     "path_1",
                     "path_2",
+                    "path_3",
                     "add_12",
-                    "mul_12"
+                    "add_13",
+                    "add_23",
+                    "add_123",
+                    "mul_12",
+                    "mul_13",
+                    "mul_23",
+                    "mul_123"
                 ]
             },
             {
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.25
+                    "rate": 0.5
                 }
             },
             {
@@ -188,12 +239,6 @@
                 "config": {
                     "units": 8,
                     "activation": "swish"
-                }
-            },
-            {
-                "class_name": "Dropout",
-                "config": {
-                    "rate": 0.25
                 }
             },
             {
