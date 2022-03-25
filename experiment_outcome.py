@@ -34,6 +34,17 @@ class Matthews_corrcoef_scorer:
 metrics.SCORERS['mcc'] = Matthews_corrcoef_scorer()
 
 
+def metric_avg_score(res_df, postprocessor):
+    auc = res_df['AUC']
+    mcc = res_df['mcc'] / 2 + 0.5
+    f1 = res_df['f1']
+    f0 = res_df['f1_0']
+
+    res_df['avg_score'] = (auc + mcc + f1 + f0) / 4
+
+    return res_df
+
+
 if __name__ == '__main__':
     gpus = tf.config.list_physical_devices('GPU')
     if not gpus:
@@ -48,7 +59,7 @@ if __name__ == '__main__':
     parser.add_argument("--prediction_checkpoint_period", default=1, type=int)
     parser.add_argument("--meta", default='patient_idx', type=str)
     parser.add_argument(
-        "--monitor", default='AUC', type=str)
+        "--monitor", default='avg_score', type=str)
     parser.add_argument(
         "--monitor_mode", default='max', type=str)
     parser.add_argument("--memory_limit", default=0, type=int)
@@ -93,24 +104,27 @@ if __name__ == '__main__':
         train_history_log=True,
         model_checkpoint_period=5,
         prediction_checkpoint_period=5,
-        epochs=5,
+        epochs=20,
     ).run_experiment(
         train_history_log=True,
         model_checkpoint_period=args.model_checkpoint_period,
         prediction_checkpoint_period=args.prediction_checkpoint_period,
         epochs=args.epochs,
-        initial_epoch=5,
+        initial_epoch=20,
     ).apply_post_processors(
         map_meta_data=meta,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
-                 'BinaryAccuracy', 'BinaryFbeta', 'mcc'],
+                 'BinaryAccuracy', 'BinaryFbeta', 'mcc', 'f1'],
         metrics_sources=['tf', 'sklearn', 'sklearn',
-                         'tf', 'tf', 'tf', 'sklearn'],
-        process_functions=[None, None, binarize, None, None, None, binarize],
+                         'tf', 'tf', 'tf', 'sklearn', 'sklearn'],
+        process_functions=[None, None, binarize, None, None, None, binarize,
+                           flip],
+        metrics_kwargs=[{}, {}, {}, {}, {}, {}, {}, {'metric_name': 'f1_0'}]
     ).plot_performance().load_best_model(
         monitor=args.monitor,
         use_raw_log=False,
-        mode=args.monitor_mode
+        mode=args.monitor_mode,
+        custom_modifier_fn=metric_avg_score
     ).run_test(
     ).apply_post_processors(
         map_meta_data=meta, run_test=True,
