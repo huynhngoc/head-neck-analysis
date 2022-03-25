@@ -233,7 +233,7 @@
                 "name": "block1b_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.01904761904761905,
+                    "rate": 0.009523809523809525,
                     "noise_shape": [
                         null,
                         1,
@@ -379,7 +379,7 @@
                 "name": "block2b_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.05714285714285715,
+                    "rate": 0.028571428571428574,
                     "noise_shape": [
                         null,
                         1,
@@ -463,7 +463,7 @@
                 "name": "block2c_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.0761904761904762,
+                    "rate": 0.0380952380952381,
                     "noise_shape": [
                         null,
                         1,
@@ -609,7 +609,7 @@
                 "name": "block3b_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.1142857142857143,
+                    "rate": 0.05714285714285715,
                     "noise_shape": [
                         null,
                         1,
@@ -693,7 +693,7 @@
                 "name": "block3c_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.13333333333333336,
+                    "rate": 0.06666666666666668,
                     "noise_shape": [
                         null,
                         1,
@@ -1035,7 +1035,7 @@
                 "name": "block4b_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.17142857142857143,
+                    "rate": 0.08571428571428572,
                     "noise_shape": [
                         null,
                         1,
@@ -1217,7 +1217,7 @@
                 "name": "block4c_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.19047619047619047,
+                    "rate": 0.09523809523809523,
                     "noise_shape": [
                         null,
                         1,
@@ -1399,7 +1399,7 @@
                 "name": "block4d_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.20952380952380953,
+                    "rate": 0.10476190476190476,
                     "noise_shape": [
                         null,
                         1,
@@ -1741,7 +1741,7 @@
                 "name": "block5b_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.24761904761904763,
+                    "rate": 0.12380952380952381,
                     "noise_shape": [
                         null,
                         1,
@@ -1923,7 +1923,7 @@
                 "name": "block5c_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.2666666666666667,
+                    "rate": 0.13333333333333336,
                     "noise_shape": [
                         null,
                         1,
@@ -2105,7 +2105,7 @@
                 "name": "block5d_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.2857142857142857,
+                    "rate": 0.14285714285714285,
                     "noise_shape": [
                         null,
                         1,
@@ -2287,7 +2287,7 @@
                 "name": "block5e_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.3047619047619048,
+                    "rate": 0.1523809523809524,
                     "noise_shape": [
                         null,
                         1,
@@ -2469,7 +2469,7 @@
                 "name": "block5f_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.3238095238095238,
+                    "rate": 0.1619047619047619,
                     "noise_shape": [
                         null,
                         1,
@@ -2811,7 +2811,7 @@
                 "name": "block6b_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.36190476190476195,
+                    "rate": 0.18095238095238098,
                     "noise_shape": [
                         null,
                         1,
@@ -2993,7 +2993,7 @@
                 "name": "block6c_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.38095238095238093,
+                    "rate": 0.19047619047619047,
                     "noise_shape": [
                         null,
                         1,
@@ -3175,7 +3175,7 @@
                 "name": "block6d_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.4,
+                    "rate": 0.2,
                     "noise_shape": [
                         null,
                         1,
@@ -3357,7 +3357,7 @@
                 "name": "block6e_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.41904761904761906,
+                    "rate": 0.20952380952380953,
                     "noise_shape": [
                         null,
                         1,
@@ -3539,7 +3539,7 @@
                 "name": "block6f_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.43809523809523815,
+                    "rate": 0.21904761904761907,
                     "noise_shape": [
                         null,
                         1,
@@ -3721,7 +3721,7 @@
                 "name": "block6g_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.4571428571428572,
+                    "rate": 0.2285714285714286,
                     "noise_shape": [
                         null,
                         1,
@@ -3903,7 +3903,7 @@
                 "name": "block6h_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.47619047619047616,
+                    "rate": 0.23809523809523808,
                     "noise_shape": [
                         null,
                         1,
@@ -4085,7 +4085,7 @@
                 "name": "block6i_drop",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.49523809523809526,
+                    "rate": 0.24761904761904763,
                     "noise_shape": [
                         null,
                         1,
@@ -4145,7 +4145,7 @@
                 "name": "top_dropout",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.3
+                    "rate": 0.2
                 }
             },
             {
