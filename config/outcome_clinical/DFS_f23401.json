@@ -116,7 +116,7 @@
         "type": "Generic",
         "layers": [
             {
-                "name": "path_1",
+                "name": "path_1_dense_1",
                 "class_name": "Dense",
                 "config": {
                     "units": 4,
@@ -124,7 +124,23 @@
                 }
             },
             {
-                "name": "path_2",
+                "name": "path_1_dense_2",
+                "class_name": "Dense",
+                "config": {
+                    "units": 4,
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "path_1_out",
+                "class_name": "Add",
+                "inputs": [
+                    "path_1_dense_1",
+                    "path_1_dense_2"
+                ]
+            },
+            {
+                "name": "path_2_dense_1",
                 "class_name": "Dense",
                 "config": {
                     "units": 4,
@@ -135,7 +151,23 @@
                 ]
             },
             {
-                "name": "path_3",
+                "name": "path_2_dense_2",
+                "class_name": "Dense",
+                "config": {
+                    "units": 4,
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "path_2_out",
+                "class_name": "Add",
+                "inputs": [
+                    "path_2_dense_1",
+                    "path_2_dense_2"
+                ]
+            },
+            {
+                "name": "path_3_dense_1",
                 "class_name": "Dense",
                 "config": {
                     "units": 4,
@@ -143,81 +175,97 @@
                 },
                 "inputs": [
                     "input_0"
+                ]
+            },
+            {
+                "name": "path_3_dense_2",
+                "class_name": "Dense",
+                "config": {
+                    "units": 4,
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "path_3_out",
+                "class_name": "Add",
+                "inputs": [
+                    "path_3_dense_1",
+                    "path_3_dense_2"
                 ]
             },
             {
                 "name": "add_12",
                 "class_name": "Add",
                 "inputs": [
-                    "path_1",
-                    "path_2"
+                    "path_1_out",
+                    "path_2_out"
                 ]
             },
             {
                 "name": "add_13",
                 "class_name": "Add",
                 "inputs": [
-                    "path_1",
-                    "path_3"
+                    "path_1_out",
+                    "path_3_out"
                 ]
             },
             {
                 "name": "add_23",
                 "class_name": "Add",
                 "inputs": [
-                    "path_2",
-                    "path_3"
+                    "path_2_out",
+                    "path_3_out"
                 ]
             },
             {
                 "name": "add_123",
                 "class_name": "Add",
                 "inputs": [
-                    "path_1",
-                    "path_2",
-                    "path_3"
+                    "path_1_out",
+                    "path_2_out",
+                    "path_3_out"
                 ]
             },
             {
                 "name": "mul_12",
                 "class_name": "Multiply",
                 "inputs": [
-                    "path_1",
-                    "path_2"
+                    "path_1_out",
+                    "path_2_out"
                 ]
             },
             {
                 "name": "mul_13",
                 "class_name": "Multiply",
                 "inputs": [
-                    "path_1",
-                    "path_3"
+                    "path_1_out",
+                    "path_3_out"
                 ]
             },
             {
                 "name": "mul_23",
                 "class_name": "Multiply",
                 "inputs": [
-                    "path_2",
-                    "path_3"
+                    "path_2_out",
+                    "path_3_out"
                 ]
             },
             {
                 "name": "mul_123",
                 "class_name": "Multiply",
                 "inputs": [
-                    "path_1",
-                    "path_2",
-                    "path_3"
+                    "path_1_out",
+                    "path_2_out",
+                    "path_3_out"
                 ]
             },
             {
                 "class_name": "Concatenate",
                 "inputs": [
                     "input_0",
-                    "path_1",
-                    "path_2",
-                    "path_3",
+                    "path_1_out",
+                    "path_2_out",
+                    "path_3_out",
                     "add_12",
                     "add_13",
                     "add_23",
