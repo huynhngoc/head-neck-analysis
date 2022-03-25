@@ -132,12 +132,18 @@
                 }
             },
             {
-                "name": "path_1_out",
                 "class_name": "Add",
                 "inputs": [
                     "path_1_dense_1",
                     "path_1_dense_2"
                 ]
+            },
+            {
+                "name": "path_1_out",
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.1
+                }
             },
             {
                 "name": "path_2_dense_1",
@@ -159,12 +165,18 @@
                 }
             },
             {
-                "name": "path_2_out",
                 "class_name": "Add",
                 "inputs": [
                     "path_2_dense_1",
                     "path_2_dense_2"
                 ]
+            },
+            {
+                "name": "path_2_out",
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.1
+                }
             },
             {
                 "name": "path_3_dense_1",
@@ -186,12 +198,18 @@
                 }
             },
             {
-                "name": "path_3_out",
                 "class_name": "Add",
                 "inputs": [
                     "path_3_dense_1",
                     "path_3_dense_2"
                 ]
+            },
+            {
+                "name": "path_3_out",
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.1
+                }
             },
             {
                 "name": "add_12",
