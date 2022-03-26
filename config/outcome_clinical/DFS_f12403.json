@@ -142,7 +142,7 @@
                 "name": "path_1_out",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.1
+                    "rate": 0.2
                 }
             },
             {
@@ -175,7 +175,7 @@
                 "name": "path_2_out",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.1
+                    "rate": 0.2
                 }
             },
             {
@@ -208,7 +208,7 @@
                 "name": "path_3_out",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.1
+                    "rate": 0.2
                 }
             },
             {
