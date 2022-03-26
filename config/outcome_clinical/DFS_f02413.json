@@ -116,6 +116,13 @@
         "type": "Generic",
         "layers": [
             {
+                "name": "stem",
+                "class_name": "GaussianNoise",
+                "config": {
+                    "stddev": 0.05
+                }
+            },
+            {
                 "name": "path_1_dense_1",
                 "class_name": "Dense",
                 "config": {
@@ -153,7 +160,7 @@
                     "activation": "swish"
                 },
                 "inputs": [
-                    "input_0"
+                    "stem"
                 ]
             },
             {
@@ -186,7 +193,7 @@
                     "activation": "swish"
                 },
                 "inputs": [
-                    "input_0"
+                    "stem"
                 ]
             },
             {
@@ -280,7 +287,7 @@
             {
                 "class_name": "Concatenate",
                 "inputs": [
-                    "input_0",
+                    "stem",
                     "path_1_out",
                     "path_2_out",
                     "path_3_out",
@@ -297,7 +304,7 @@
             {
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.3
+                    "rate": 0.5
                 }
             },
             {
