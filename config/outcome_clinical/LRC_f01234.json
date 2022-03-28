@@ -126,7 +126,7 @@
                 "name": "path_1_dense_1",
                 "class_name": "Dense",
                 "config": {
-                    "units": 6,
+                    "units": 4,
                     "activation": "swish"
                 }
             },
@@ -134,7 +134,7 @@
                 "name": "path_1_dense_2",
                 "class_name": "Dense",
                 "config": {
-                    "units": 6,
+                    "units": 4,
                     "activation": "swish"
                 }
             },
@@ -156,7 +156,7 @@
                 "name": "path_2_dense_1",
                 "class_name": "Dense",
                 "config": {
-                    "units": 6,
+                    "units": 4,
                     "activation": "swish"
                 },
                 "inputs": [
@@ -167,7 +167,7 @@
                 "name": "path_2_dense_2",
                 "class_name": "Dense",
                 "config": {
-                    "units": 6,
+                    "units": 4,
                     "activation": "swish"
                 }
             },
@@ -189,7 +189,7 @@
                 "name": "path_3_dense_1",
                 "class_name": "Dense",
                 "config": {
-                    "units": 6,
+                    "units": 4,
                     "activation": "swish"
                 },
                 "inputs": [
@@ -200,7 +200,7 @@
                 "name": "path_3_dense_2",
                 "class_name": "Dense",
                 "config": {
-                    "units": 6,
+                    "units": 4,
                     "activation": "swish"
                 }
             },
@@ -213,6 +213,39 @@
             },
             {
                 "name": "path_3_out",
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.1
+                }
+            },
+            {
+                "name": "path_4_dense_1",
+                "class_name": "Dense",
+                "config": {
+                    "units": 4,
+                    "activation": "swish"
+                },
+                "inputs": [
+                    "stem"
+                ]
+            },
+            {
+                "name": "path_4_dense_2",
+                "class_name": "Dense",
+                "config": {
+                    "units": 4,
+                    "activation": "swish"
+                }
+            },
+            {
+                "class_name": "Add",
+                "inputs": [
+                    "path_4_dense_1",
+                    "path_4_dense_2"
+                ]
+            },
+            {
+                "name": "path_4_out",
                 "class_name": "Dropout",
                 "config": {
                     "rate": 0.1
@@ -240,6 +273,14 @@
                 "inputs": [
                     "path_2_out",
                     "path_3_out"
+                ]
+            },
+            {
+                "name": "add_14",
+                "class_name": "Add",
+                "inputs": [
+                    "path_1_out",
+                    "path_4_out"
                 ]
             },
             {
@@ -276,6 +317,14 @@
                 ]
             },
             {
+                "name": "mul_14",
+                "class_name": "Multiply",
+                "inputs": [
+                    "path_1_out",
+                    "path_4_out"
+                ]
+            },
+            {
                 "name": "mul_123",
                 "class_name": "Multiply",
                 "inputs": [
@@ -291,20 +340,23 @@
                     "path_1_out",
                     "path_2_out",
                     "path_3_out",
+                    "path_4_out",
                     "add_12",
                     "add_13",
                     "add_23",
+                    "add_14",
                     "add_123",
                     "mul_12",
                     "mul_13",
                     "mul_23",
+                    "mul_14",
                     "mul_123"
                 ]
             },
             {
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.5
+                    "rate": 0.65
                 }
             },
             {
