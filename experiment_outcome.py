@@ -16,6 +16,7 @@ from deoxys.experiment import DefaultExperimentPipeline
 # from deoxys.utils import read_file
 import argparse
 # import os
+from deoxys.utils import read_csv
 # import numpy as np
 # from pathlib import Path
 # from comet_ml import Experiment as CometEx
@@ -40,7 +41,14 @@ def metric_avg_score(res_df, postprocessor):
     f1 = res_df['f1']
     f0 = res_df['f1_0']
 
-    res_df['avg_score'] = (auc + mcc + f1 + f0) / 4
+    # get f1 score in train data
+    epochs = res_df['epochs']
+    train_df = read_csv(
+        postprocessor.log_base_path + 'log.csv')
+    train_df['real_epoch'] = train_df['epoch'] + 1
+    train_f1 = train_df[train_df.real_epoch.isin(epochs)]['BinaryFbeta']
+
+    res_df['avg_score'] = (auc + mcc + f1 + 0.75*f0 + 0.5*train_f1) / 4.25
 
     return res_df
 
