@@ -117,8 +117,31 @@
         ]
     },
     "architecture": {
-        "type": "ResNet",
+        "type": "Generic",
         "layers": [
+            {
+                "name": "CT_masked",
+                "class_name": "DepthwiseMultiply",
+                "config": {
+                    "channels": [
+                        0,
+                        2
+                    ]
+                }
+            },
+            {
+                "name": "PET_masked",
+                "class_name": "DepthwiseMultiply",
+                "config": {
+                    "channels": [
+                        1,
+                        2
+                    ]
+                },
+                "inputs": [
+                    "input_0"
+                ]
+            },
             {
                 "name": "stem_conv",
                 "class_name": "Conv3D",
@@ -136,7 +159,12 @@
                     },
                     "padding": "same",
                     "use_bias": false
-                }
+                },
+                "inputs": [
+                    "input_0",
+                    "CT_masked",
+                    "PET_masked"
+                ]
             },
             {
                 "name": "stem_bn",
