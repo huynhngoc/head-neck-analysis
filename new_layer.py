@@ -8,8 +8,11 @@ to perform just the Depthwise Convolution (1st step) of the
 Depthwise Separable Convolution layer.
 '''
 from __future__ import absolute_import
+import customize_obj
+from deoxys.model import model_from_full_config
+import new_layer
 
-from tensorflow.keras import backend as K
+# from tensorflow.keras import backend as K
 from tensorflow.keras import initializers
 from tensorflow.keras import regularizers
 from tensorflow.keras import constraints
@@ -17,7 +20,7 @@ from tensorflow.keras import constraints
 # from keras.engine import InputSpec
 from tensorflow.keras import utils
 # from keras.legacy.interfaces import conv3d_args_preprocessor, generate_legacy_interface
-from tensorflow.keras.layers import Conv3D, InputSpec
+from tensorflow.keras.layers import Conv3D, InputSpec, Layer
 # _preprocess_padding, _preprocess_conv3d_input
 from tensorflow.python.keras import backend as K
 
@@ -300,3 +303,37 @@ class DepthwiseConv3D(Conv3D):
 
 
 DepthwiseConvolution3D = DepthwiseConv3D
+
+
+@custom_layer
+class DepthwiseMultiply(Layer):
+    def __init__(self,
+                 channels=None,
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.channels = channels
+        self.data_format = "NDHWC"
+
+    def call(self, inputs, training=None):
+        if isinstance(inputs, (list, tuple)):
+            raise ValueError('Invalid input')
+
+        inputs = K._preprocess_conv3d_input(inputs, self.data_format)[0]
+        channels = self.channels
+
+        if not channels:
+            channels = list(range(inputs.get_shape().as_list()[-1]))
+        outputs = inputs[..., channels[0]]
+
+        for channel in channels[1:]:
+            outputs = outputs * inputs[..., channel]
+
+        return tf.expand_dims(outputs, -1)
+
+    def compute_output_shape(self, input_shape):
+        return (*input_shape[:-1], 1)
+
+    def get_config(self):
+        config = {'channels': self.channels}
+        base_config = super().get_config()
+        return dict(list(base_config.items()) + list(config.items()))
