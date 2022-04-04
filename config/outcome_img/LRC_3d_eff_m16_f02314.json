@@ -24,6 +24,9 @@
             ],
             "preprocessors": [
                 {
+                    "class_name": "CroppedMask3D"
+                },
+                {
                     "class_name": "HounsfieldWindowingPreprocessor",
                     "config": {
                         "window_center": 70,
@@ -70,9 +73,9 @@
     },
     "input_params": {
         "shape": [
-            173,
-            191,
-            265,
+            128,
+            128,
+            128,
             3
         ]
     },

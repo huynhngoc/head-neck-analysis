@@ -34,6 +34,46 @@ multi_input_layers = ['Add', 'AddResize', 'Concatenate', 'Multiply']
 resize_input_layers = ['Concatenate', 'AddResize']
 
 
+@custom_preprocessor
+class CroppedMask3D:
+    def __init__(self, channel=-1, size=128):
+        self.channel = channel
+        self.size = size
+        self.left = size // 2
+        self.right = size - self.left
+
+    def _get_bounding(self, mask, axis, max_size):
+        args = np.argwhere(mask.sum(axis=axis) > 0).flatten()
+        middle = (args.max() - args.min()) // 2
+        left, right = middle - self.left, middle + self.right
+        if left < 0:
+            left = 0
+            right = self.size
+        if right > max_size:
+            right = max_size
+            left = right - self.size
+
+            return left, right
+
+    def transform(self, images, targets):
+        masks = images[..., self.channel]
+        shape = masks.shape[1:]
+        new_images = []
+        for i, mask in enumerate(masks):
+            left_0, right_0 = self._get_bounding(
+                mask, axis=(1, 2), max_size=shape[0])
+            left_1, right_1 = self._get_bounding(
+                mask, axis=(0, 2), max_size=shape[1])
+            left_2, right_2 = self._get_bounding(
+                mask, axis=(0, 1), max_size=shape[2])
+
+            new_images.append(
+                images[i][left_0: right_0, left_1: right_1, left_2: right_2]
+            )
+
+        return np.concatenate(new_images),  targets
+
+
 @custom_layer
 class InstanceNormalization(tfa.layers.InstanceNormalization):
     pass
