@@ -162,7 +162,12 @@
                     },
                     "padding": "same",
                     "use_bias": false
-                }
+                },
+                "inputs": [
+                    "input_0",
+                    "CT_masked",
+                    "PET_masked"
+                ]
             },
             {
                 "name": "stem_bn",
