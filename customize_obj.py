@@ -71,7 +71,7 @@ class CroppedMask3D(BasePreprocessor):
                 images[i][left_0: right_0, left_1: right_1, left_2: right_2]
             )
 
-        return np.concatenate(new_images),  targets
+        return np.array(new_images), targets
 
 
 @custom_layer
