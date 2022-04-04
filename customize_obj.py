@@ -35,7 +35,7 @@ resize_input_layers = ['Concatenate', 'AddResize']
 
 
 @custom_preprocessor
-class CroppedMask3D:
+class CroppedMask3D(BasePreprocessor):
     def __init__(self, channel=-1, size=128):
         self.channel = channel
         self.size = size
