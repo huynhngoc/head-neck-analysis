@@ -53,7 +53,7 @@ class CroppedMask3D(BasePreprocessor):
             right = max_size
             left = right - self.size
 
-            return left, right
+        return left, right
 
     def transform(self, images, targets):
         masks = images[..., self.channel]
