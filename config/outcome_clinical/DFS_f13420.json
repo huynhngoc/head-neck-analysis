@@ -322,6 +322,12 @@
                 }
             },
             {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.15
+                }
+            },
+            {
                 "class_name": "DepthwiseAverage"
             }
         ]
