@@ -53,7 +53,13 @@ nvidia-modprobe -u -c=0
 # export ITER_PER_EPOCH=200
 export NUM_CPUS=4
 export RAY_ROOT=$TMPDIR/ray
-singularity exec --nv deoxys-mar22-polished.sif python experiment_outcome.py $1 /net/fs-1/Ngoc/hnperf/$2 --temp_folder $SCRATCH/hnperf/$2 --analysis_folder $SCRATCH/analysis/$2 --epochs $3 ${@:4}
+singularity exec --nv deoxys-mar22-polished.sif python experiment_outcome.py $1 /net/fs-1/Ngoc/hnperf/$2_run1 --temp_folder $SCRATCH/hnperf/$2_run1 --analysis_folder $SCRATCH/analysis/$2_run1 --epochs $3 ${@:4}
+singularity exec --nv deoxys-mar22-polished.sif python experiment_outcome.py $1 /net/fs-1/Ngoc/hnperf/$2_run2 --temp_folder $SCRATCH/hnperf/$2_run2 --analysis_folder $SCRATCH/analysis/$2_run2 --epochs $3 ${@:4}
+singularity exec --nv deoxys-mar22-polished.sif python experiment_outcome.py $1 /net/fs-1/Ngoc/hnperf/$2_run3 --temp_folder $SCRATCH/hnperf/$2_run3 --analysis_folder $SCRATCH/analysis/$2_run3 --epochs $3 ${@:4}
+singularity exec --nv deoxys-mar22-polished.sif python experiment_outcome.py $1 /net/fs-1/Ngoc/hnperf/$2_run4 --temp_folder $SCRATCH/hnperf/$2_run4 --analysis_folder $SCRATCH/analysis/$2_run4 --epochs $3 ${@:4}
+singularity exec --nv deoxys-mar22-polished.sif python experiment_outcome.py $1 /net/fs-1/Ngoc/hnperf/$2_run5 --temp_folder $SCRATCH/hnperf/$2_run5 --analysis_folder $SCRATCH/analysis/$2_run5 --epochs $3 ${@:4}
+
+singularity exec --nv deoxys-mar22-polished.sif python ensemble_outcome.py /net/fs-1/Ngoc/hnperf/$2_ run1,run2,run3,run4,run5 --merge_name all
 
 # echo "Finished training. Post-processing results"
 
