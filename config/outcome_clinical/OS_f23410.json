@@ -304,7 +304,7 @@
             {
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.1
+                    "rate": 0.5
                 }
             },
             {
