@@ -317,9 +317,12 @@
             {
                 "class_name": "Dense",
                 "config": {
-                    "units": 1,
+                    "units": 5,
                     "activation": "sigmoid"
                 }
+            },
+            {
+                "class_name": "DepthwiseAverage"
             }
         ]
     }
