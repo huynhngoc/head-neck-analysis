@@ -6,7 +6,7 @@
     "dataset_params": {
         "class_name": "H5Reader",
         "config": {
-            "filename": "/mnt/users/ngochuyn/datasets/headneck/outcome.h5",
+            "filename": "/mnt/users/ngochuyn/datasets/headneck/outcome_new.h5",
             "batch_size": 4,
             "batch_cache": 7,
             "x_name": "clinical",
