@@ -337,3 +337,25 @@ class DepthwiseMultiply(Layer):
         config = {'channels': self.channels}
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
+
+
+@custom_layer
+class DepthwiseAverage(Layer):
+    def __init__(self,
+                 **kwargs):
+        super().__init__(**kwargs)
+
+    def call(self, inputs, training=None):
+        if isinstance(inputs, (list, tuple)):
+            raise ValueError('Invalid input')
+
+        outputs = tf.reduce_mean(inputs, axis=-1, keepdims=True)
+
+        return outputs
+
+    def compute_output_shape(self, input_shape):
+        return (*input_shape[:-1], 1)
+
+    def get_config(self):
+        base_config = super().get_config()
+        return dict(list(base_config.items()))
