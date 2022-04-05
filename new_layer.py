@@ -349,7 +349,8 @@ class DepthwiseAverage(Layer):
         if isinstance(inputs, (list, tuple)):
             raise ValueError('Invalid input')
 
-        outputs = tf.reduce_mean(inputs, axis=-1, keepdims=True)
+        outputs = tf.clip_by_value(
+            tf.reduce_mean(inputs, axis=-1, keepdims=True), 0, 1)
 
         return outputs
 
