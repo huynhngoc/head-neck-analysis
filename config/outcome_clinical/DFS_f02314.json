@@ -126,15 +126,21 @@
                 "name": "path_1_dense_1",
                 "class_name": "Dense",
                 "config": {
-                    "units": 4,
+                    "units": 6,
                     "activation": "swish"
+                }
+            },
+            {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.15
                 }
             },
             {
                 "name": "path_1_dense_2",
                 "class_name": "Dense",
                 "config": {
-                    "units": 4,
+                    "units": 6,
                     "activation": "swish"
                 }
             },
@@ -156,7 +162,7 @@
                 "name": "path_2_dense_1",
                 "class_name": "Dense",
                 "config": {
-                    "units": 4,
+                    "units": 6,
                     "activation": "swish"
                 },
                 "inputs": [
@@ -164,10 +170,16 @@
                 ]
             },
             {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.15
+                }
+            },
+            {
                 "name": "path_2_dense_2",
                 "class_name": "Dense",
                 "config": {
-                    "units": 4,
+                    "units": 6,
                     "activation": "swish"
                 }
             },
@@ -189,7 +201,7 @@
                 "name": "path_3_dense_1",
                 "class_name": "Dense",
                 "config": {
-                    "units": 4,
+                    "units": 6,
                     "activation": "swish"
                 },
                 "inputs": [
@@ -197,10 +209,16 @@
                 ]
             },
             {
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.15
+                }
+            },
+            {
                 "name": "path_3_dense_2",
                 "class_name": "Dense",
                 "config": {
-                    "units": 4,
+                    "units": 6,
                     "activation": "swish"
                 }
             },
