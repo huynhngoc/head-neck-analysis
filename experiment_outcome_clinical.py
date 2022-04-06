@@ -104,6 +104,10 @@ if __name__ == '__main__':
     def flip(targets, predictions):
         return 1 - targets, 1 - (predictions > 0.5).astype(targets.dtype)
 
+    class_weight = None
+    if 'LRC' in args.log_folder:
+        class_weight = {0: 0.3, 1: 0.7}
+
     exp = DefaultExperimentPipeline(
         log_base_path=args.log_folder,
         temp_base_path=args.temp_folder
@@ -115,6 +119,7 @@ if __name__ == '__main__':
         prediction_checkpoint_period=20,
         epochs=40,
         save_val_inputs=False,
+        class_weight=class_weight,
     ).run_experiment(
         train_history_log=True,
         model_checkpoint_period=args.model_checkpoint_period,
