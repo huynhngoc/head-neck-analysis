@@ -145,7 +145,7 @@
             {
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.15
+                    "rate": 0.2
                 }
             },
             {
@@ -167,7 +167,7 @@
                 "name": "path_1_out",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.15
+                    "rate": 0.2
                 }
             },
             {
@@ -184,7 +184,7 @@
             {
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.15
+                    "rate": 0.2
                 }
             },
             {
@@ -206,7 +206,7 @@
                 "name": "path_2_out",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.15
+                    "rate": 0.2
                 }
             },
             {
@@ -223,7 +223,7 @@
             {
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.15
+                    "rate": 0.2
                 }
             },
             {
@@ -245,7 +245,7 @@
                 "name": "path_3_out",
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.15
+                    "rate": 0.2
                 }
             },
             {
@@ -340,7 +340,7 @@
             {
                 "class_name": "Dense",
                 "config": {
-                    "units": 8,
+                    "units": 10,
                     "activation": "swish"
                 }
             },
