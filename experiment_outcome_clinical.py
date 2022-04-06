@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
     class_weight = None
     if 'LRC' in args.log_folder:
-        class_weight = {0: 0.25, 1: 0.75}
+        class_weight = {0: 0.3, 1: 0.7}
 
     exp = DefaultExperimentPipeline(
         log_base_path=args.log_folder,
