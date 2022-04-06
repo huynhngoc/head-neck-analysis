@@ -143,9 +143,16 @@
                 }
             },
             {
+                "class_name": "Dense",
+                "config": {
+                    "units": 16,
+                    "activation": "swish"
+                }
+            },
+            {
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.3
+                    "rate": 0.4
                 }
             },
             {
@@ -182,9 +189,16 @@
                 ]
             },
             {
+                "class_name": "Dense",
+                "config": {
+                    "units": 16,
+                    "activation": "swish"
+                }
+            },
+            {
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.3
+                    "rate": 0.4
                 }
             },
             {
@@ -221,9 +235,16 @@
                 ]
             },
             {
+                "class_name": "Dense",
+                "config": {
+                    "units": 16,
+                    "activation": "swish"
+                }
+            },
+            {
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.3
+                    "rate": 0.4
                 }
             },
             {
