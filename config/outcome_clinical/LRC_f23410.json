@@ -257,31 +257,6 @@
                 ]
             },
             {
-                "name": "add_13",
-                "class_name": "Add",
-                "inputs": [
-                    "path_1_out",
-                    "path_3_out"
-                ]
-            },
-            {
-                "name": "add_23",
-                "class_name": "Add",
-                "inputs": [
-                    "path_2_out",
-                    "path_3_out"
-                ]
-            },
-            {
-                "name": "add_123",
-                "class_name": "Add",
-                "inputs": [
-                    "path_1_out",
-                    "path_2_out",
-                    "path_3_out"
-                ]
-            },
-            {
                 "name": "mul_12",
                 "class_name": "Multiply",
                 "inputs": [
