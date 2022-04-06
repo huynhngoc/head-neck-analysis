@@ -321,10 +321,6 @@
                     "path_1_out",
                     "path_2_out",
                     "path_3_out",
-                    "add_12",
-                    "add_13",
-                    "add_23",
-                    "add_123",
                     "mul_12",
                     "mul_13",
                     "mul_23",
@@ -340,14 +336,14 @@
             {
                 "class_name": "Dense",
                 "config": {
-                    "units": 10,
+                    "units": 16,
                     "activation": "swish"
                 }
             },
             {
                 "class_name": "Dropout",
                 "config": {
-                    "rate": 0.1
+                    "rate": 0.25
                 }
             },
             {
