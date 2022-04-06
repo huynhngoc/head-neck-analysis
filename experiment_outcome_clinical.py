@@ -127,6 +127,7 @@ if __name__ == '__main__':
         epochs=args.epochs,
         initial_epoch=40,
         save_val_inputs=False,
+        class_weight=class_weight,
     ).apply_post_processors(
         map_meta_data=meta,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
