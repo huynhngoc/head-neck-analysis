@@ -143,13 +143,7 @@
                 }
             },
             {
-                "class_name": "Dense",
-                "config": {
-                    "units": 16,
-                    "activation": "swish"
-                }
-            },
-            {
+                "name": "path_1_dropout_1",
                 "class_name": "Dropout",
                 "config": {
                     "rate": 0.4
@@ -164,10 +158,42 @@
                 }
             },
             {
+                "name": "path_1_dropout_2",
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.4
+                }
+            },
+            {
+                "name": "path_1_add_12",
                 "class_name": "Add",
                 "inputs": [
-                    "path_1_dense_1",
-                    "path_1_dense_2"
+                    "path_1_dropout_1",
+                    "path_1_dropout_2"
+                ]
+            },
+            {
+                "name": "path_1_dense_3",
+                "class_name": "Dense",
+                "config": {
+                    "units": 8,
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "path_1_dropout_3",
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.4
+                }
+            },
+            {
+                "name": "path_1_add_123",
+                "class_name": "Add",
+                "inputs": [
+                    "path_1_dropout_1",
+                    "path_1_dropout_2",
+                    "path_1_dropout_3"
                 ]
             },
             {
@@ -189,13 +215,7 @@
                 ]
             },
             {
-                "class_name": "Dense",
-                "config": {
-                    "units": 16,
-                    "activation": "swish"
-                }
-            },
-            {
+                "name": "path_2_dropout_1",
                 "class_name": "Dropout",
                 "config": {
                     "rate": 0.4
@@ -210,10 +230,42 @@
                 }
             },
             {
+                "name": "path_2_dropout_2",
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.4
+                }
+            },
+            {
+                "name": "path_2_add_12",
                 "class_name": "Add",
                 "inputs": [
-                    "path_2_dense_1",
-                    "path_2_dense_2"
+                    "path_2_dropout_1",
+                    "path_2_dropout_2"
+                ]
+            },
+            {
+                "name": "path_2_dense_3",
+                "class_name": "Dense",
+                "config": {
+                    "units": 8,
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "path_2_dropout_3",
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.4
+                }
+            },
+            {
+                "name": "path_2_add_123",
+                "class_name": "Add",
+                "inputs": [
+                    "path_2_dropout_1",
+                    "path_2_dropout_2",
+                    "path_2_dropout_3"
                 ]
             },
             {
@@ -235,13 +287,7 @@
                 ]
             },
             {
-                "class_name": "Dense",
-                "config": {
-                    "units": 16,
-                    "activation": "swish"
-                }
-            },
-            {
+                "name": "path_3_dropout_1",
                 "class_name": "Dropout",
                 "config": {
                     "rate": 0.4
@@ -256,10 +302,42 @@
                 }
             },
             {
+                "name": "path_3_dropout_2",
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.4
+                }
+            },
+            {
+                "name": "path_3_add_12",
                 "class_name": "Add",
                 "inputs": [
-                    "path_3_dense_1",
-                    "path_3_dense_2"
+                    "path_3_dropout_1",
+                    "path_3_dropout_2"
+                ]
+            },
+            {
+                "name": "path_3_dense_3",
+                "class_name": "Dense",
+                "config": {
+                    "units": 8,
+                    "activation": "swish"
+                }
+            },
+            {
+                "name": "path_3_dropout_3",
+                "class_name": "Dropout",
+                "config": {
+                    "rate": 0.4
+                }
+            },
+            {
+                "name": "path_3_add_123",
+                "class_name": "Add",
+                "inputs": [
+                    "path_3_dropout_1",
+                    "path_3_dropout_2",
+                    "path_3_dropout_3"
                 ]
             },
             {
@@ -268,14 +346,6 @@
                 "config": {
                     "rate": 0.3
                 }
-            },
-            {
-                "name": "add_12",
-                "class_name": "Add",
-                "inputs": [
-                    "path_1_out",
-                    "path_2_out"
-                ]
             },
             {
                 "name": "mul_12",
