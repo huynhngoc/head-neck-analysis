@@ -125,8 +125,8 @@ if __name__ == '__main__':
         config
     ).run_experiment(
         train_history_log=True,
-        model_checkpoint_period=20,
-        prediction_checkpoint_period=20,
+        model_checkpoint_period=40,
+        prediction_checkpoint_period=40,
         epochs=40,
         save_val_inputs=False,
         class_weight=class_weight,
