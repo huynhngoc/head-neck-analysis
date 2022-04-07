@@ -16,7 +16,7 @@ from deoxys.experiment import DefaultExperimentPipeline
 # from deoxys.utils import read_file
 import argparse
 # import os
-from deoxys.utils import read_csv
+from deoxys.utils import read_csv, load_json_config
 import numpy as np
 # from pathlib import Path
 # from comet_ml import Experiment as CometEx
@@ -108,11 +108,21 @@ if __name__ == '__main__':
     if 'LRC' in args.log_folder:
         class_weight = {0: 0.3, 1: 0.7}
 
+    config = load_json_config(args.config_file)
+    train_folds = config['dataset_params']['config']['train_folds']
+
+    for i in range(len(train_folds)):
+        if f'run{i+1}' in args.log_folder:
+            train_folds.append(train_folds[i])
+
+    print('training on folds',
+          config['dataset_params']['config']['train_folds'])
+
     exp = DefaultExperimentPipeline(
         log_base_path=args.log_folder,
         temp_base_path=args.temp_folder
     ).from_full_config(
-        args.config_file
+        config
     ).run_experiment(
         train_history_log=True,
         model_checkpoint_period=20,
