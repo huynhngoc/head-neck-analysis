@@ -1,0 +1,11 @@
+{
+    "config": {
+        "filename": "/home/work/ngochuyn/hn_delin/outcome_maastro.h5",
+        "test_folds": [
+            0,
+            1,
+            2,
+            3
+        ]
+    }
+}
