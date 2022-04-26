@@ -61,7 +61,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("dataset_file")
     parser.add_argument("log_folder")
-    parser.add_argument("--best_epoch", default=5, type=int)
+    parser.add_argument("--best_epoch", default=0, type=int)
     parser.add_argument("--temp_folder", default='', type=str)
     parser.add_argument("--analysis_folder",
                         default='', type=str)
@@ -104,6 +104,9 @@ if __name__ == '__main__':
     if not os.path.exists(log_folder):
         shutil.copytree(args.log_folder, log_folder)
 
+    if not os.path.exists(log_folder + '/model'):
+        shutil.copytree(args.log_folder + '/model', log_folder + '/model')
+
     ex = DefaultExperimentPipeline(
         log_base_path=log_folder,
         temp_base_path=args.temp_folder + '_' +
@@ -136,3 +139,5 @@ if __name__ == '__main__':
                            flip],
         metrics_kwargs=[{}, {}, {}, {}, {}, {}, {}, {'metric_name': 'f1_0'}]
     )
+
+    # shutil.rmtree(log_folder + '/model')
