@@ -2,12 +2,12 @@
 #SBATCH --ntasks=1               # 1 core(CPU)
 #SBATCH --nodes=1                # Use 1 node
 #SBATCH --job-name=head_neck   # sensible name for the job
-#SBATCH --mem=64G                 # Default memory per CPU is 3GB.
+#SBATCH --mem=200G                 # Default memory per CPU is 3GB.
 #SBATCH --partition=gpu # Use the verysmallmem-partition for jobs requiring < 10 GB RAM.
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=16
 #SBATCH --mail-user=ngochuyn@nmbu.no # Email me when job is done.
-#SBATCH --mail-type=ALL
+#SBATCH --mail-type=FAIL
 #SBATCH --output=outputs/eff-%A.out
 #SBATCH --error=outputs/eff-%A.out
 
@@ -53,7 +53,7 @@ nvidia-modprobe -u -c=0
 # export ITER_PER_EPOCH=200
 export NUM_CPUS=4
 export RAY_ROOT=$TMPDIR/ray
-singularity exec --nv deoxys-elasticdeform.sif python experiment_outcome.py $1 /net/fs-1/Ngoc/hnperf/$2 --temp_folder $SCRATCH/hnperf/$2 --analysis_folder $SCRATCH/analysis/$2 --epochs $3 ${@:4}
+singularity exec --nv deoxys-kbt.sif python experiment_outcome.py $1 $PROJECTS/ngoc/hnperf/$2 --temp_folder $SCRATCH_PROJECTS/ceheads/hnperf/$2 --analysis_folder $SCRATCH_PROJECTS/ceheads/hnperf_analysis/$2 --epochs $3 ${@:4}
 
 # echo "Finished training. Post-processing results"
 
