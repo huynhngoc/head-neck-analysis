@@ -17,7 +17,7 @@ from deoxys.experiment import DefaultExperimentPipeline
 import argparse
 # import os
 from deoxys.utils import read_csv
-# import numpy as np
+import numpy as np
 # from pathlib import Path
 # from comet_ml import Experiment as CometEx
 from sklearn import metrics
@@ -44,11 +44,12 @@ def metric_avg_score(res_df, postprocessor):
     # get f1 score in train data
     epochs = res_df['epochs']
     train_df = read_csv(
-        postprocessor.log_base_path + 'log.csv')
+        postprocessor.log_base_path + '/logs.csv')
     train_df['real_epoch'] = train_df['epoch'] + 1
-    train_f1 = train_df[train_df.real_epoch.isin(epochs)]['BinaryFbeta']
+    train_f1 = train_df[train_df.real_epoch.isin(epochs)]['BinaryFbeta'].values
+    train_f1 = 2 * np.sqrt(train_f1) / 3
 
-    res_df['avg_score'] = (auc + mcc + f1 + 0.75*f0 + 0.5*train_f1) / 4.25
+    res_df['avg_score'] = (auc + mcc + f1 + 0.75*f0 + 0.75*train_f1) / 4.5
 
     return res_df
 
@@ -102,6 +103,10 @@ if __name__ == '__main__':
 
     def flip(targets, predictions):
         return 1 - targets, 1 - (predictions > 0.5).astype(targets.dtype)
+    
+    class_weight = None
+    if 'LRC' in args.log_folder:
+        class_weight = {0: 0.7, 1: 1.9}
 
     exp = DefaultExperimentPipeline(
         log_base_path=args.log_folder,
@@ -114,6 +119,7 @@ if __name__ == '__main__':
         prediction_checkpoint_period=20,
         epochs=20,
         save_val_inputs=False,
+        class_weight=class_weight,
     ).run_experiment(
         train_history_log=True,
         model_checkpoint_period=args.model_checkpoint_period,
@@ -121,6 +127,7 @@ if __name__ == '__main__':
         epochs=args.epochs,
         initial_epoch=20,
         save_val_inputs=False,
+        class_weight=class_weight,
     ).apply_post_processors(
         map_meta_data=meta,
         metrics=['AUC', 'roc_auc', 'f1', 'BinaryCrossentropy',
