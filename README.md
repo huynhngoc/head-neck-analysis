@@ -36,6 +36,17 @@ or
 sbatch slurm_test.sh 3d_vnet_32 --best_epoch <BEST_EPOCH_NUMBER>
 ```
 
+External validation
+```
+sbatch slurm_external.sh ds_config.json path/to/log/folder
+```
+
+
+To transfer learning to new dataset
+```
+sbatch slurm_transfer.sh ds_config.json path/to/log/folder <epoch_num> --initial_epoch <init_epoch>
+```
+
 
 Alternatively, if your cluster does not have slurm installed, simply omit the `sbatch`
 part of the call above, thus running
