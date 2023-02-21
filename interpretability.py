@@ -100,8 +100,8 @@ if __name__ == '__main__':
     else:
         meta = args.meta.split(',')[0]
 
-    print('training from configuration', args.config_file,
-          'and saving log files to', args.log_folder)
+    print('external config from', args.dataset_file,
+          'and explaining on models in', args.log_folder)
     print('Unprocesssed prediction are saved to', args.temp_folder)
 
     def binarize(targets, predictions):
