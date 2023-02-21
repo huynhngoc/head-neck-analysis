@@ -66,9 +66,8 @@ if __name__ == '__main__':
         raise RuntimeError("GPU Unavailable")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("config_file")
-    parser.add_argument("log_folder")
     parser.add_argument("dataset_file")
+    parser.add_argument("log_folder")
     parser.add_argument("--temp_folder", default='', type=str)
     parser.add_argument("--model_checkpoint_period", default=1, type=int)
     parser.add_argument("--prediction_checkpoint_period", default=1, type=int)
@@ -117,8 +116,6 @@ if __name__ == '__main__':
     exp = DefaultExperimentPipeline(
         log_base_path=args.log_folder,
         temp_base_path=args.temp_folder
-        # ).from_full_config(
-        #     args.config_file
     ).load_best_model(
         monitor=args.monitor,
         use_raw_log=False,

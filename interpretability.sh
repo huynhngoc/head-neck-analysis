@@ -54,7 +54,7 @@ export NUM_CPUS=4
 export RAY_ROOT=$TMPDIR/ray
 export MAX_SAVE_STEP_GB=0
 rm -rf $TMPDIR/ray/*
-singularity exec --nv deoxys-2023-feb-fixed.sif python interpretability.py $1 $PROJECTS/ngoc/outcome_model/$2 $3 --temp_folder $SCRATCH_PROJECTS/ceheads/hnperf/$2 --analysis_folder $SCRATCH_PROJECTS/ceheads/hnperf_analysis/$2  ${@:4}
+singularity exec --nv deoxys-2023-feb-fixed.sif python interpretability.py $1 $PROJECTS/ngoc/outcome_model/$2 --temp_folder $SCRATCH_PROJECTS/ceheads/hnperf/$2 --analysis_folder $SCRATCH_PROJECTS/ceheads/hnperf_analysis/$2 ${@:3}
 
 # echo "Finished training. Post-processing results"
 
