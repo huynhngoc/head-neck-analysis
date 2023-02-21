@@ -159,7 +159,6 @@ if __name__ == '__main__':
                 tape.watch(x_noised)
                 pred = model(x_noised)
             grads = tape.gradient(pred, x_noised).numpy()
-            print(grads.shape)
             var_grad[..., trial] = grads
 
         final_var_grad = var_grad.std(axis=-1)
@@ -169,6 +168,9 @@ if __name__ == '__main__':
         i += 1
         if i == steps_per_epoch:
             break
+
+    print('Finish running data on OUS dataset')
+    print('Loading MAASTRO dataset')
 
     exp.load_new_dataset(args.dataset_file)
     model = exp.model.model
