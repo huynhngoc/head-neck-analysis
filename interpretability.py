@@ -117,8 +117,8 @@ if __name__ == '__main__':
     exp = DefaultExperimentPipeline(
         log_base_path=args.log_folder,
         temp_base_path=args.temp_folder
-    ).from_full_config(
-        args.config_file
+        # ).from_full_config(
+        #     args.config_file
     ).load_best_model(
         monitor=args.monitor,
         use_raw_log=False,
@@ -127,6 +127,7 @@ if __name__ == '__main__':
     )
 
     model = exp.model.model
+    print(model.summary())
     dr = exp.model.data_reader
 
     test_gen = dr.test_generator
@@ -134,36 +135,40 @@ if __name__ == '__main__':
     batch_size = test_gen.batch_size
     # pids
     pids = []
-    for fold in test_gen.folds:
-        pids.append(test_gen.hf[fold][meta][:])
+    with h5py.File(exp.post_processors.dataset_filename) as f:
+        for fold in test_gen.folds:
+            pids.append(f[fold][meta][:])
     pids = np.concatenate(pids)
+    print('Checking patients:', ', '.join([str(id) for id in pids]))
 
     with h5py.File(args.log_folder + '/ous_test.h5', 'w') as f:
         print('created file', args.log_folder + '/ous_test.h5')
 
+    tf_dtype = model.inputs[0].dtype
+    print('TF dtype', tf_dtype)
     data_gen = test_gen.generate()
     i = 0
-    for x, _ in next(data_gen):
-        print(f'Batch {i}/{steps_per_epoch}')
+    for x, _ in data_gen:
+        print(f'Batch {i+1}/{steps_per_epoch}')
         np_random_gen = np.random.default_rng(1123)
         new_shape = list(x.shape) + [20]
         var_grad = np.zeros(new_shape)
         for trial in range(20):
-            print(f'Trial {trial}')
+            print(f'Trial {trial+1}/20')
             x_noised = x + \
                 np_random_gen.normal(loc=0.0, scale=.2, size=x.shape)
-            x_noised = tf.Variable(x_noised)
+            x_noised = tf.Variable(x_noised, dtype=tf_dtype)
             with tf.GradientTape() as tape:
+                tape.watch(x_noised)
                 pred = model(x_noised)
-
-            grads = tape.gradient(pred, x).numpy()
+            grads = tape.gradient(pred, x_noised).numpy()
+            print(grads.shape)
             var_grad[..., trial] = grads
 
         final_var_grad = var_grad.std(axis=-1)
         with h5py.File(args.log_folder + '/ous_test.h5', 'a') as f:
             for sub_idx, pid in enumerate(pids[i*batch_size: (i+1)*batch_size]):
                 f.create_dataset(pid, data=final_var_grad[sub_idx])
-
         i += 1
         if i == steps_per_epoch:
             break
@@ -174,18 +179,19 @@ if __name__ == '__main__':
 
     test_gen = dr.test_generator
     steps_per_epoch = test_gen.total_batch
+    batch_size = test_gen.batch_size
     # pids
     pids = []
-    for fold in test_gen.folds:
-        pids.append(test_gen.hf[fold][meta][:])
+    with h5py.File(exp.post_processors.dataset_filename) as f:
+        for fold in test_gen.folds:
+            pids.append(f[fold][meta][:])
     pids = np.concatenate(pids)
-    batch_size = test_gen.batch_size
 
     with h5py.File(args.log_folder + '/maastro.h5', 'w') as f:
         print('created file', args.log_folder + '/maastro.h5')
     data_gen = test_gen.generate()
     i = 0
-    for x, _ in next(data_gen):
+    for x, _ in data_gen:
         print(f'Batch {i}/{steps_per_epoch}')
         np_random_gen = np.random.default_rng(1123)
         new_shape = list(x.shape) + [20]
@@ -196,13 +202,14 @@ if __name__ == '__main__':
                 np_random_gen.normal(loc=0.0, scale=.2, size=x.shape)
             x_noised = tf.Variable(x_noised)
             with tf.GradientTape() as tape:
+                tape.watch(x_noised)
                 pred = model(x_noised)
 
-            grads = tape.gradient(pred, x).numpy()
+            grads = tape.gradient(pred, x_noised).numpy()
             var_grad[..., trial] = grads
 
         final_var_grad = var_grad.std(axis=-1)
-        with h5py.File(args.log_folder + '/ous_test.h5', 'a') as f:
+        with h5py.File(args.log_folder + '/maastro.h5', 'a') as f:
             for sub_idx, pid in enumerate(pids[i*batch_size: (i+1)*batch_size]):
                 f.create_dataset(pid, data=final_var_grad[sub_idx])
 
