@@ -24,16 +24,28 @@ if [ $# -lt 2 ];
     exit 0
     fi
 
-if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/OUS" ]
+if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/OUS/raw" ]
     then
     echo "Didn't find OUS result folder. Creating folder..."
-    mkdir --parents $PROJECTS/ngoc/outcome_model/$2/OUS
+    mkdir --parents $PROJECTS/ngoc/outcome_model/$2/OUS/raw
     fi
 
-if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/MAASTRO" ]
+if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/OUS/smoothen" ]
+    then
+    echo "Didn't find OUS result folder. Creating folder..."
+    mkdir --parents $PROJECTS/ngoc/outcome_model/$2/OUS/smoothen
+    fi
+
+if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/MAASTRO/raw" ]
     then
     echo "Didn't find MAASTRO result folder. Creating folder..."
-    mkdir --parents $PROJECTS/ngoc/outcome_model/$2/MAASTRO
+    mkdir --parents $PROJECTS/ngoc/outcome_model/$2/MAASTRO/raw
+    fi
+
+if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/MAASTRO/smoothen" ]
+    then
+    echo "Didn't find MAASTRO result folder. Creating folder..."
+    mkdir --parents $PROJECTS/ngoc/outcome_model/$2/MAASTRO/smoothen
     fi
 
 echo "Finished seting up files."

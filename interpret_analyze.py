@@ -210,9 +210,11 @@ if __name__ == '__main__':
         data_normalized = ((data - thres) / (max_vargrad - thres)).clip([0, 1])
 
         info_raw = get_info(data_normalized, ct_img, pt_img, tumor, node)
-        raw_df = pd.DataFrame(info_raw)
+        raw_df = pd.DataFrame([info_raw])
         raw_df.insert(0, 'vargrad_threshold', thres)
         raw_df.insert(0, 'vargrad_max', max_vargrad)
+        raw_df.insert(0, 'test_fold', int(base_folder[-1]))
+        raw_df.insert(0, 'val_fold', int(base_folder[-2]))
         raw_df.insert(0, 'os', os)
         raw_df.insert(0, 'dfs', dfs)
         raw_df.insert(0, 'center', center)
@@ -220,7 +222,7 @@ if __name__ == '__main__':
 
         print('Saving raw resutls...')
         raw_df.to_csv(
-            base_folder + f'/{center}/raw_interpret_{pid}.csv', index=False)
+            base_folder + f'/{center}/raw/{pid}.csv', index=False)
 
         print('Smoothening interpret results...')
         smoothen_data = avg_filter(data)
@@ -231,9 +233,11 @@ if __name__ == '__main__':
         s_data_normalized = ((smoothen_data - s_thres) /
                              (s_max_vargrad - s_thres)).clip([0, 1])
         info_smooth = get_info(s_data_normalized, ct_img, pt_img, tumor, node)
-        smoothen_df = pd.DataFrame(info_smooth)
+        smoothen_df = pd.DataFrame([info_smooth])
         smoothen_df.insert(0, 'vargrad_threshold', s_thres)
         smoothen_df.insert(0, 'vargrad_max', s_max_vargrad)
+        smoothen_df.insert(0, 'test_fold', int(base_folder[-1]))
+        smoothen_df.insert(0, 'val_fold', int(base_folder[-2]))
         smoothen_df.insert(0, 'os', os)
         smoothen_df.insert(0, 'dfs', dfs)
         smoothen_df.insert(0, 'center', center)
@@ -241,7 +245,7 @@ if __name__ == '__main__':
 
         print('Saving smoothen results...')
         smoothen_df.to_csv(
-            base_folder + f'/{center}/raw_interpret_{pid}.csv', index=False)
+            base_folder + f'/{center}/smoothen/{pid}.csv', index=False)
 
     else:
         print('Index not found!! Exiting')
