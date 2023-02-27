@@ -169,7 +169,7 @@ if __name__ == '__main__':
             print('Getting MAASTRO dataset file')
             pids = []
             for key in f.keys():
-                pids.extends([
+                pids.extend([
                     pid for pid in f[key]['patient_idx'][:]
                 ])
                 if len(pids) > args.idx:

@@ -26,25 +26,25 @@ if [ $# -lt 2 ];
 
 if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/OUS/raw" ]
     then
-    echo "Didn't find OUS result folder. Creating folder..."
+    echo "Didn't find OUS raw result folder. Creating folder..."
     mkdir --parents $PROJECTS/ngoc/outcome_model/$2/OUS/raw
     fi
 
 if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/OUS/smoothen" ]
     then
-    echo "Didn't find OUS result folder. Creating folder..."
+    echo "Didn't find OUS smoothen result folder. Creating folder..."
     mkdir --parents $PROJECTS/ngoc/outcome_model/$2/OUS/smoothen
     fi
 
 if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/MAASTRO/raw" ]
     then
-    echo "Didn't find MAASTRO result folder. Creating folder..."
+    echo "Didn't find MAASTRO raw result folder. Creating folder..."
     mkdir --parents $PROJECTS/ngoc/outcome_model/$2/MAASTRO/raw
     fi
 
 if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/MAASTRO/smoothen" ]
     then
-    echo "Didn't find MAASTRO result folder. Creating folder..."
+    echo "Didn't find MAASTRO smoothen result folder. Creating folder..."
     mkdir --parents $PROJECTS/ngoc/outcome_model/$2/MAASTRO/smoothen
     fi
 
