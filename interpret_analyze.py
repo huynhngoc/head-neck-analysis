@@ -169,8 +169,7 @@ if __name__ == '__main__':
             pids = []
             for key in f.keys():
                 pids.extends([
-                    str(pid)
-                    for pid in f[key]['patient_idx'][:]
+                    pid for pid in f[key]['patient_idx'][:]
                 ])
                 if len(pids) > args.idx:
                     curr_fold = key
@@ -181,7 +180,7 @@ if __name__ == '__main__':
         print('Patients:', pid)
         print('Getting image data...')
         with h5py.File(src_data_file, 'r') as f:
-            img_idx = [str(pid)
+            img_idx = [pid
                        for pid in f[curr_fold]['patient_idx'][:]].index(pid)
             img = f[curr_fold]['image'][img_idx]
             dfs = f[curr_fold]['DFS'][img_idx]
