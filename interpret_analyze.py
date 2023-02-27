@@ -96,6 +96,7 @@ def get_histogram_info(data, areas, names):
             f'{name}_std': selected_data.std(),
             f'{name}_median': np.median(selected_data),
         })
+    return objs
 
 
 def get_info(data_normalized, ct_img, pt_img, tumor, node):

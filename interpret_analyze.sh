@@ -38,8 +38,6 @@ if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/MAASTRO" ]
 
 echo "Finished seting up files."
 
-# Hack to ensure that the GPUs work
-nvidia-modprobe -u -c=0
 
 # Run experiment
 # export ITER_PER_EPOCH=200
