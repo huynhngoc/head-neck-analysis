@@ -58,24 +58,46 @@ def get_overall_info(data):
 def get_area_info(data, area, name):
     print('Getting information based information of', name)
     selected_data = data[area > 0]
-    return {
-        f'ct_{name}_total': (selected_data[..., 0] > 0).sum(),
-        f'ct_{name}_sum': selected_data[..., 0].sum(),
-        f'ct_{name}_max': selected_data[..., 0].max(),
-        f'ct_{name}_mean': selected_data[..., 0].mean(),
-        f'ct_{name}_std': selected_data[..., 0].std(),
-        f'ct_{name}_q1': np.quantile(selected_data[..., 0], 0.25),
-        f'ct_{name}_q2': np.quantile(selected_data[..., 0], 0.5),
-        f'ct_{name}_q3': np.quantile(selected_data[..., 0], 0.75),
-        f'pt_{name}_total': (selected_data[..., 1] > 0).sum(),
-        f'pt_{name}_sum': selected_data[..., 1].sum(),
-        f'pt_{name}_max': selected_data[..., 1].max(),
-        f'pt_{name}_mean': selected_data[..., 1].mean(),
-        f'pt_{name}_std': selected_data[..., 1].std(),
-        f'pt_{name}_q1': np.quantile(selected_data[..., 1], 0.25),
-        f'pt_{name}_q2': np.quantile(selected_data[..., 1], 0.5),
-        f'pt_{name}_q3': np.quantile(selected_data[..., 1], 0.75),
-    }
+    try:
+        return {
+            f'ct_{name}_total': (selected_data[..., 0] > 0).sum(),
+            f'ct_{name}_sum': selected_data[..., 0].sum(),
+            f'ct_{name}_max': selected_data[..., 0].max(),
+            f'ct_{name}_mean': selected_data[..., 0].mean(),
+            f'ct_{name}_std': selected_data[..., 0].std(),
+            f'ct_{name}_q1': np.quantile(selected_data[..., 0], 0.25),
+            f'ct_{name}_q2': np.quantile(selected_data[..., 0], 0.5),
+            f'ct_{name}_q3': np.quantile(selected_data[..., 0], 0.75),
+            f'pt_{name}_total': (selected_data[..., 1] > 0).sum(),
+            f'pt_{name}_sum': selected_data[..., 1].sum(),
+            f'pt_{name}_max': selected_data[..., 1].max(),
+            f'pt_{name}_mean': selected_data[..., 1].mean(),
+            f'pt_{name}_std': selected_data[..., 1].std(),
+            f'pt_{name}_q1': np.quantile(selected_data[..., 1], 0.25),
+            f'pt_{name}_q2': np.quantile(selected_data[..., 1], 0.5),
+            f'pt_{name}_q3': np.quantile(selected_data[..., 1], 0.75),
+        }
+    except Exception as e:
+        print(e)
+        print(f'Area {name} is empty')
+        return {
+            f'ct_{name}_total': 0,
+            f'ct_{name}_sum': 0,
+            f'ct_{name}_max': 0,
+            f'ct_{name}_mean': 0,
+            f'ct_{name}_std': 0,
+            f'ct_{name}_q1': 0,
+            f'ct_{name}_q2': 0,
+            f'ct_{name}_q3': 0,
+            f'pt_{name}_total': 0,
+            f'pt_{name}_sum': 0,
+            f'pt_{name}_max': 0,
+            f'pt_{name}_mean': 0,
+            f'pt_{name}_std': 0,
+            f'pt_{name}_q1': 0,
+            f'pt_{name}_q2': 0,
+            f'pt_{name}_q3': 0,
+        }
 
 
 def get_histogram_info(data, areas, names):
@@ -83,13 +105,22 @@ def get_histogram_info(data, areas, names):
     objs = {}
     for (area, name) in zip(areas, names):
         selected_data = data[area > 0]
-        objs.update({
-            f'{name}_total': (selected_data > 0).sum(),
-            f'{name}_max': selected_data.max(),
-            f'{name}_mean': selected_data.mean(),
-            f'{name}_std': selected_data.std(),
-            f'{name}_median': np.median(selected_data),
-        })
+        if (area > 0).sum():
+            objs.update({
+                f'{name}_total': (selected_data > 0).sum(),
+                f'{name}_max': selected_data.max(),
+                f'{name}_mean': selected_data.mean(),
+                f'{name}_std': selected_data.std(),
+                f'{name}_median': np.median(selected_data),
+            })
+        else:
+            objs.update({
+                f'{name}_total': 0,
+                f'{name}_max': 0,
+                f'{name}_mean': 0,
+                f'{name}_std': 0,
+                f'{name}_median': 0,
+            })
     return objs
 
 
