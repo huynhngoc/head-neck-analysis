@@ -190,11 +190,11 @@ if __name__ == '__main__':
         print('Windowing CT images')
         # windowing
         ct_img = img[..., 0] - (1024 + 70)
-        ct_img = ((ct_img.clip(-100, 100) + 100) / 200).clip(0, 1)
+        ct_img = ((ct_img.clip(-100, 100) + 100) / 200.).clip(0, 1)
 
         print('Normalize PET images')
         # clipped SUV
-        pt_img = (img[..., 1] / 25).clip(0, 1)
+        pt_img = (img[..., 1] / 25.).clip(0, 1)
 
         tumor = img[..., 2]
         node = img[..., 3]

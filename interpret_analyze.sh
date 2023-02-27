@@ -57,7 +57,7 @@ export NUM_CPUS=4
 export RAY_ROOT=$TMPDIR/ray
 export MAX_SAVE_STEP_GB=0
 rm -rf $TMPDIR/ray/*
-singularity exec --nv deoxys-2023-feb-fixed.sif python interpret_analyze.py $1 $PROJECTS/ngoc/outcome_model/$2 --idx $SLURM_ARRAY_TASK_ID
+singularity exec --nv deoxys-2023-feb-fixed.sif python -u interpret_analyze.py $1 $PROJECTS/ngoc/outcome_model/$2 --idx $SLURM_ARRAY_TASK_ID
 
 # echo "Finished training. Post-processing results"
 
