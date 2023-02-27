@@ -47,17 +47,11 @@ def get_overall_info(data):
         'ct_max': data[..., 0].max(),
         'ct_mean': data[..., 0].mean(),
         'ct_std': data[..., 0].std(),
-        'ct_q1': np.quantile(data[..., 0], 0.25),
-        'ct_q2': np.quantile(data[..., 0], 0.5),
-        'ct_q3': np.quantile(data[..., 0], 0.75),
         'pt_total': (data[..., 1] > 0).sum(),
         'pt_sum': data[..., 1].sum(),
         'pt_max': data[..., 1].max(),
         'pt_mean': data[..., 1].mean(),
-        'pt_std': data[..., 1].std(),
-        'pt_q1': np.quantile(data[..., 1], 0.25),
-        'pt_q2': np.quantile(data[..., 1], 0.5),
-        'pt_q3': np.quantile(data[..., 1], 0.75),
+        'pt_std': data[..., 1].std()
     }
 
 
@@ -131,7 +125,9 @@ def get_info(data_normalized, ct_img, pt_img, tumor, node):
 
     all_info = {
         **overall_info,
+        'tumor_size': (tumor > 0).sum(),
         **tumor_info,
+        'node_size': (node > 0).sum(),
         **node_info,
         **normal_voxel_info,
         'hu_corr': hu_corr,
