@@ -207,7 +207,7 @@ if __name__ == '__main__':
         max_vargrad = data.max()
 
         print('Normalizing interpret results...')
-        data_normalized = ((data - thres) / (max_vargrad - thres)).clip([0, 1])
+        data_normalized = ((data - thres) / (max_vargrad - thres)).clip(0, 1)
 
         info_raw = get_info(data_normalized, ct_img, pt_img, tumor, node)
         raw_df = pd.DataFrame([info_raw])
@@ -231,7 +231,7 @@ if __name__ == '__main__':
 
         print('Normalizing smoothen interpret results...')
         s_data_normalized = ((smoothen_data - s_thres) /
-                             (s_max_vargrad - s_thres)).clip([0, 1])
+                             (s_max_vargrad - s_thres)).clip(0, 1)
         info_smooth = get_info(s_data_normalized, ct_img, pt_img, tumor, node)
         smoothen_df = pd.DataFrame([info_smooth])
         smoothen_df.insert(0, 'vargrad_threshold', s_thres)
