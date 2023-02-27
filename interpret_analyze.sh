@@ -4,11 +4,10 @@
 #SBATCH --job-name=interpret   # sensible name for the job
 #SBATCH --mem=12G                 # Default memory per CPU is 3GB.
 #SBATCH --partition=smallmem # Use the verysmallmem-partition for jobs requiring < 10 GB RAM.
-#SBATCH --constraint=avx2
 #SBATCH --mail-user=ngochuyn@nmbu.no # Email me when job is done.
 #SBATCH --mail-type=FAIL
-#SBATCH --output=outputs/interpret-analyze-%A.out
-#SBATCH --error=outputs/interpret-analyze-%A.out
+#SBATCH --output=outputs/interpret-analyze-%A-%a.out
+#SBATCH --error=outputs/interpret-analyze-%A-%a.out
 
 # If you would like to use more please adjust this.
 
@@ -25,23 +24,17 @@ if [ $# -lt 2 ];
     exit 0
     fi
 
-if [ ! -d "$TMPDIR/$USER/hn_delin" ]
+if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/OUS" ]
     then
-    echo "Didn't find dataset folder. Copying files..."
-    mkdir --parents $TMPDIR/$USER/hn_delin
+    echo "Didn't find OUS result folder. Creating folder..."
+    mkdir --parents $PROJECTS/ngoc/outcome_model/$2/OUS
     fi
 
-for f in $(ls $PROJECTS/ngoc/datasets/headneck/*)
-    do
-    FILENAME=`echo $f | awk -F/ '{print $NF}'`
-    echo $FILENAME
-    if [ ! -f "$TMPDIR/$USER/hn_delin/$FILENAME" ]
-        then
-        echo "copying $f"
-        cp -r $PROJECTS/ngoc/datasets/headneck/$FILENAME $TMPDIR/$USER/hn_delin/
-        fi
-    done
-
+if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/MAASTRO" ]
+    then
+    echo "Didn't find MAASTRO result folder. Creating folder..."
+    mkdir --parents $PROJECTS/ngoc/outcome_model/$2/MAASTRO
+    fi
 
 echo "Finished seting up files."
 

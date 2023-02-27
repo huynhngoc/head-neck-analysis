@@ -155,13 +155,15 @@ if __name__ == '__main__':
     print(f'Checking folder {base_folder}')
 
     if 'ous' in h5_file:
+        center = 'OUS'
         print('Getting OUS dataset file...')
-        src_data_file = '/home/work/ngochuyn/hn_delin/outcome_node_new.h5'
+        src_data_file = '/mnt/project/ngoc/datasets/headneck/outcome_node_new.h5'
         curr_fold = f'fold_{base_folder[-1]}'
         with h5py.File(src_data_file, 'r') as f:
-            pids = f[curr_fold][:]
+            pids = f[curr_fold]['patient_idx'][:]
     elif 'maastro' in h5_file:
-        src_data_file = '/home/work/ngochuyn/hn_delin/outcome_maastro_node.h5'
+        center = 'MAASTRO'
+        src_data_file = '/mnt/project/ngoc/datasets/headneck/outcome_maastro_node.h5'
         with h5py.File(src_data_file, 'r') as f:
             print('Getting MAASTRO dataset file')
             pids = []
@@ -213,11 +215,12 @@ if __name__ == '__main__':
         raw_df.insert(0, 'vargrad_max', max_vargrad)
         raw_df.insert(0, 'os', os)
         raw_df.insert(0, 'dfs', dfs)
-        raw_df.insert(0, 'center', 'ous' if 'ous' in h5_file else 'maastro')
+        raw_df.insert(0, 'center', center)
         raw_df.insert(0, 'pid', pid)
 
         print('Saving raw resutls...')
-        raw_df.to_csv(base_folder + '/raw_interpret.csv', index=False)
+        raw_df.to_csv(
+            base_folder + f'/{center}/raw_interpret_{pid}.csv', index=False)
 
         print('Smoothening interpret results...')
         smoothen_data = avg_filter(data)
@@ -233,11 +236,12 @@ if __name__ == '__main__':
         smoothen_df.insert(0, 'vargrad_max', s_max_vargrad)
         smoothen_df.insert(0, 'os', os)
         smoothen_df.insert(0, 'dfs', dfs)
+        smoothen_df.insert(0, 'center', center)
         smoothen_df.insert(0, 'pid', pid)
 
         print('Saving smoothen results...')
         smoothen_df.to_csv(
-            base_folder + '/smoothen_interpret.csv', index=False)
+            base_folder + f'/{center}/raw_interpret_{pid}.csv', index=False)
 
     except Exception:
         print('Index not found!! Exiting')
