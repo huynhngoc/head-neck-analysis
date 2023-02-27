@@ -175,7 +175,7 @@ if __name__ == '__main__':
                     curr_fold = key
                     break
     print('List of PIDS:', pids)
-    try:
+    if args.idx < len(pids):
         pid = pids[args.idx]
         print('Patients:', pid)
         print('Getting image data...')
@@ -200,7 +200,7 @@ if __name__ == '__main__':
 
         print('Getting interpret resutls...')
         with h5py.File(args.log_folder + '/' + h5_file, 'r') as f:
-            data = f[pid][:]
+            data = f[str(pid)][:]
 
         thres = np.quantile(data, 0.99)
         max_vargrad = data.max()
@@ -242,5 +242,5 @@ if __name__ == '__main__':
         smoothen_df.to_csv(
             base_folder + f'/{center}/raw_interpret_{pid}.csv', index=False)
 
-    except Exception:
+    else:
         print('Index not found!! Exiting')
