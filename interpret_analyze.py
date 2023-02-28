@@ -107,6 +107,7 @@ def get_histogram_info(data, areas, names):
         selected_data = data[area > 0]
         if (area > 0).sum():
             objs.update({
+                f'{name}_area': (area > 0).sum(),
                 f'{name}_total': (selected_data > 0).sum(),
                 f'{name}_max': selected_data.max(),
                 f'{name}_mean': selected_data.mean(),
@@ -115,6 +116,7 @@ def get_histogram_info(data, areas, names):
             })
         else:
             objs.update({
+                f'{name}_area': (area > 0).sum(),
                 f'{name}_total': 0,
                 f'{name}_max': 0,
                 f'{name}_mean': 0,
@@ -156,9 +158,7 @@ def get_info(data_normalized, ct_img, pt_img, tumor, node):
 
     all_info = {
         **overall_info,
-        'tumor_size': (tumor > 0).sum(),
         **tumor_info,
-        'node_size': (node > 0).sum(),
         **node_info,
         **normal_voxel_info,
         'hu_corr': hu_corr,
@@ -226,52 +226,105 @@ if __name__ == '__main__':
         tumor = img[..., 2]
         node = img[..., 3]
 
+        # histogram data
+        suv_0_2 = (pt_img <= 0.08).astype(int)
+        suv_2_4 = (pt_img <= 0.16).astype(int) - suv_0_2
+        suv_4_6 = (pt_img <= 0.24).astype(int) - suv_0_2 - suv_2_4
+        suv_6_8 = (pt_img <= 0.32).astype(int) - suv_0_2 - suv_2_4 - suv_4_6
+        suv_8_10 = (pt_img <= 0.4).astype(int) - \
+            suv_0_2 - suv_2_4 - suv_4_6 - suv_6_8
+        suv_10_over = (pt_img > 0.4).astype(int)
+
+        areas = [suv_0_2, suv_2_4, suv_4_6, suv_6_8, suv_8_10, suv_10_over]
+        area_names = ['all_suv_0_2', 'all_suv_2_4', 'all_suv_4_6',
+                      'all_suv_6_8', 'all_suv_8_10', 'all_suv_10_over']
+
         print('Getting interpret resutls...')
         with h5py.File(args.log_folder + '/' + h5_file, 'r') as f:
             data = f[str(pid)][:]
 
-        thres = np.quantile(data, 0.99)
-        max_vargrad = data.max()
+        basic_info = {
+            'pid': pid,
+            'center': center,
+            'dfs': dfs,
+            'os': os,
+            'val_fold': int(base_folder[-2]),
+            'test_fold': int(base_folder[-1]),
+            'vargrad_sum': data.sum(),
+            'vargrad_ct_sum': data[..., 0].sum(),
+            'vargrad_pt_sum': data[..., 0].sum(),
+            'hu_corr_all': np.corrcoef(data[..., 0], ct_img),
+            'suv_corr_all': np.corrcoef(data[..., 1], pt_img),
+            'tumor_size': (tumor > 0).sum(),
+            **get_area_info(data, tumor, 'tumor_all'),
+            'node_size': (node > 0).sum(),
+            **get_area_info(data, node, 'node_all'),
+            **get_area_info(data, 1 - tumor - node, 'outside_all'),
+            **get_histogram_info(data, areas, area_names)
+        }
 
-        print('Normalizing interpret results...')
-        data_normalized = ((data - thres) / (max_vargrad - thres)).clip(0, 1)
+        raw_info = []
+        for quantile in [.95, .96, .97, .98, .99]:
+            thres = np.quantile(data, quantile)
+            max_vargrad = data.max()
 
-        info_raw = get_info(data_normalized, ct_img, pt_img, tumor, node)
-        raw_df = pd.DataFrame([info_raw])
-        raw_df.insert(0, 'vargrad_threshold', thres)
-        raw_df.insert(0, 'vargrad_max', max_vargrad)
-        raw_df.insert(0, 'test_fold', int(base_folder[-1]))
-        raw_df.insert(0, 'val_fold', int(base_folder[-2]))
-        raw_df.insert(0, 'os', os)
-        raw_df.insert(0, 'dfs', dfs)
-        raw_df.insert(0, 'center', center)
-        raw_df.insert(0, 'pid', pid)
+            print('Normalizing interpret results...')
+            data_normalized = (
+                (data - thres) / (max_vargrad - thres)).clip(0, 1)
+            raw_info.append({
+                **basic_info,
+                'quantile': quantile,
+                'vargrad_max': max_vargrad,
+                'vargrad_threshold': thres,
+                'vargrad_sum_selected': data_normalized.sum(),
+                **get_info(data_normalized, ct_img, pt_img, tumor, node),
+            })
 
         print('Saving raw resutls...')
-        raw_df.to_csv(
+        pd.DataFrame(raw_info).to_csv(
             base_folder + f'/{center}/raw/{pid}.csv', index=False)
 
         print('Smoothening interpret results...')
         smoothen_data = avg_filter(data)
-        s_thres = np.quantile(smoothen_data, 0.99)
-        s_max_vargrad = smoothen_data.max()
+        s_basic_info = {
+            'pid': pid,
+            'center': center,
+            'dfs': dfs,
+            'os': os,
+            'val_fold': int(base_folder[-2]),
+            'test_fold': int(base_folder[-1]),
+            'vargrad_sum': smoothen_data.sum(),
+            'vargrad_ct_sum': smoothen_data[..., 0].sum(),
+            'vargrad_pt_sum': smoothen_data[..., 0].sum(),
+            'hu_corr_all': np.corrcoef(smoothen_data[..., 0], ct_img),
+            'suv_corr_all': np.corrcoef(smoothen_data[..., 1], pt_img),
+            'tumor_size': (tumor > 0).sum(),
+            **get_area_info(smoothen_data, tumor, 'tumor_all'),
+            'node_size': (node > 0).sum(),
+            **get_area_info(smoothen_data, node, 'node_all'),
+            **get_area_info(smoothen_data, 1 - tumor - node, 'outside_all'),
+            **get_histogram_info(smoothen_data, areas, area_names)
+        }
 
-        print('Normalizing smoothen interpret results...')
-        s_data_normalized = ((smoothen_data - s_thres) /
-                             (s_max_vargrad - s_thres)).clip(0, 1)
-        info_smooth = get_info(s_data_normalized, ct_img, pt_img, tumor, node)
-        smoothen_df = pd.DataFrame([info_smooth])
-        smoothen_df.insert(0, 'vargrad_threshold', s_thres)
-        smoothen_df.insert(0, 'vargrad_max', s_max_vargrad)
-        smoothen_df.insert(0, 'test_fold', int(base_folder[-1]))
-        smoothen_df.insert(0, 'val_fold', int(base_folder[-2]))
-        smoothen_df.insert(0, 'os', os)
-        smoothen_df.insert(0, 'dfs', dfs)
-        smoothen_df.insert(0, 'center', center)
-        smoothen_df.insert(0, 'pid', pid)
+        smooth_info = []
+        for quantile in [.95, .96, .97, .98, .99]:
+            s_thres = np.quantile(smoothen_data, quantile)
+            s_max_vargrad = smoothen_data.max()
+
+            print('Normalizing smoothen interpret results...')
+            s_data_normalized = ((smoothen_data - s_thres) /
+                                 (s_max_vargrad - s_thres)).clip(0, 1)
+            smooth_info.append({
+                **s_basic_info,
+                'quantile': quantile,
+                'vargrad_max': s_max_vargrad,
+                'vargrad_threshold': s_thres,
+                'vargrad_sum_selected': s_data_normalized.sum(),
+                **get_info(s_data_normalized, ct_img, pt_img, tumor, node),
+            })
 
         print('Saving smoothen results...')
-        smoothen_df.to_csv(
+        pd.DataFrame(smooth_info).to_csv(
             base_folder + f'/{center}/smoothen/{pid}.csv', index=False)
 
     else:
