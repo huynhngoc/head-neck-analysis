@@ -109,6 +109,7 @@ def get_histogram_info(data, areas, names):
             objs.update({
                 f'{name}_area': (area > 0).sum(),
                 f'{name}_total': (selected_data > 0).sum(),
+                f'{name}_sum': selected_data.sum(),
                 f'{name}_max': selected_data.max(),
                 f'{name}_mean': selected_data.mean(),
                 f'{name}_std': selected_data.std(),
@@ -118,6 +119,7 @@ def get_histogram_info(data, areas, names):
             objs.update({
                 f'{name}_area': (area > 0).sum(),
                 f'{name}_total': 0,
+                f'{name}_sum': 0,
                 f'{name}_max': 0,
                 f'{name}_mean': 0,
                 f'{name}_std': 0,
@@ -143,7 +145,8 @@ def get_info(data_normalized, ct_img, pt_img, tumor, node):
         ct_img.flatten(), data_normalized[..., 0].flatten())[0, 1]
 
     # histogram data
-    suv_0_2 = (pt_img <= 0.08).astype(int)
+    suv_zero = (pt_img == 0.08).astype(int)
+    suv_0_2 = (pt_img <= 0.08).astype(int) - suv_zero
     suv_2_4 = (pt_img <= 0.16).astype(int) - suv_0_2
     suv_4_6 = (pt_img <= 0.24).astype(int) - suv_0_2 - suv_2_4
     suv_6_8 = (pt_img <= 0.32).astype(int) - suv_0_2 - suv_2_4 - suv_4_6
@@ -151,10 +154,11 @@ def get_info(data_normalized, ct_img, pt_img, tumor, node):
         suv_0_2 - suv_2_4 - suv_4_6 - suv_6_8
     suv_10_over = (pt_img > 0.4).astype(int)
 
-    areas = [suv_0_2, suv_2_4, suv_4_6, suv_6_8, suv_8_10, suv_10_over]
-    area_names = ['suv_0_2', 'suv_2_4', 'suv_4_6',
+    areas = [suv_zero, suv_0_2, suv_2_4,
+             suv_4_6, suv_6_8, suv_8_10, suv_10_over]
+    area_names = ['suv_zeros', 'suv_0_2', 'suv_2_4', 'suv_4_6',
                   'suv_6_8', 'suv_8_10', 'suv_10_over']
-    suv_info = get_histogram_info(data_normalized, areas, area_names)
+    suv_info = get_histogram_info(data_normalized[..., 1], areas, area_names)
 
     all_info = {
         **overall_info,
@@ -227,7 +231,8 @@ if __name__ == '__main__':
         node = img[..., 3]
 
         # histogram data
-        suv_0_2 = (pt_img <= 0.08).astype(int)
+        suv_zero = (pt_img == 0.08).astype(int)
+        suv_0_2 = (pt_img <= 0.08).astype(int) - suv_zero
         suv_2_4 = (pt_img <= 0.16).astype(int) - suv_0_2
         suv_4_6 = (pt_img <= 0.24).astype(int) - suv_0_2 - suv_2_4
         suv_6_8 = (pt_img <= 0.32).astype(int) - suv_0_2 - suv_2_4 - suv_4_6
@@ -235,8 +240,9 @@ if __name__ == '__main__':
             suv_0_2 - suv_2_4 - suv_4_6 - suv_6_8
         suv_10_over = (pt_img > 0.4).astype(int)
 
-        areas = [suv_0_2, suv_2_4, suv_4_6, suv_6_8, suv_8_10, suv_10_over]
-        area_names = ['all_suv_0_2', 'all_suv_2_4', 'all_suv_4_6',
+        areas = suv_zero, [suv_0_2, suv_2_4, suv_4_6,
+                           suv_6_8, suv_8_10, suv_10_over]
+        area_names = ['all_suv_zeros', 'all_suv_0_2', 'all_suv_2_4', 'all_suv_4_6',
                       'all_suv_6_8', 'all_suv_8_10', 'all_suv_10_over']
 
         print('Getting interpret resutls...')
@@ -268,7 +274,7 @@ if __name__ == '__main__':
             'node_size': (node > 0).sum(),
             **get_area_info(d_norm, node, 'node_all'),
             **get_area_info(d_norm, 1 - tumor - node, 'outside_all'),
-            **get_histogram_info(d_norm, areas, area_names)
+            **get_histogram_info(d_norm[..., 1], areas, area_names)
         }
 
         raw_info = []
@@ -320,7 +326,7 @@ if __name__ == '__main__':
             'node_size': (node > 0).sum(),
             **get_area_info(s_d_norm, node, 'node_all'),
             **get_area_info(s_d_norm, 1 - tumor - node, 'outside_all'),
-            **get_histogram_info(s_d_norm, areas, area_names)
+            **get_histogram_info(s_d_norm[..., 1], areas, area_names)
         }
 
         smooth_info = []
