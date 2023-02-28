@@ -145,7 +145,7 @@ def get_info(data_normalized, ct_img, pt_img, tumor, node):
         ct_img.flatten(), data_normalized[..., 0].flatten())[0, 1]
 
     # histogram data
-    suv_zero = (pt_img == 0.08).astype(int)
+    suv_zero = (pt_img == 0).astype(int)
     suv_0_2 = (pt_img <= 0.08).astype(int) - suv_zero
     suv_2_4 = (pt_img <= 0.16).astype(int) - suv_0_2
     suv_4_6 = (pt_img <= 0.24).astype(int) - suv_0_2 - suv_2_4
@@ -231,7 +231,7 @@ if __name__ == '__main__':
         node = img[..., 3]
 
         # histogram data
-        suv_zero = (pt_img == 0.08).astype(int)
+        suv_zero = (pt_img == 0).astype(int)
         suv_0_2 = (pt_img <= 0.08).astype(int) - suv_zero
         suv_2_4 = (pt_img <= 0.16).astype(int) - suv_0_2
         suv_4_6 = (pt_img <= 0.24).astype(int) - suv_0_2 - suv_2_4
