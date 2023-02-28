@@ -243,6 +243,12 @@ if __name__ == '__main__':
         with h5py.File(args.log_folder + '/' + h5_file, 'r') as f:
             data = f[str(pid)][:]
 
+        # normalize original data
+        d_min = data.min()
+        d_max = data.max()
+
+        d_norm = ((data - d_min) / (d_max - d_min)).clip(0, 1)
+
         basic_info = {
             'pid': pid,
             'center': center,
@@ -250,17 +256,19 @@ if __name__ == '__main__':
             'os': os,
             'val_fold': int(base_folder[-2]),
             'test_fold': int(base_folder[-1]),
-            'vargrad_sum': data.sum(),
-            'vargrad_ct_sum': data[..., 0].sum(),
-            'vargrad_pt_sum': data[..., 0].sum(),
-            'hu_corr_all': np.corrcoef(data[..., 0].flatten(), ct_img.flatten())[0, 1],
-            'suv_corr_all': np.corrcoef(data[..., 1].flatten(), pt_img.flatten())[0, 1],
+            'vargrad_sum': d_norm.sum(),
+            'vargrad_ct_sum': d_norm[..., 0].sum(),
+            'vargrad_pt_sum': d_norm[..., 0].sum(),
+            'hu_corr_all': np.corrcoef(d_norm[..., 0].flatten(),
+                                       ct_img.flatten())[0, 1],
+            'suv_corr_all': np.corrcoef(d_norm[..., 1].flatten(),
+                                        pt_img.flatten())[0, 1],
             'tumor_size': (tumor > 0).sum(),
-            **get_area_info(data, tumor, 'tumor_all'),
+            **get_area_info(d_norm, tumor, 'tumor_all'),
             'node_size': (node > 0).sum(),
-            **get_area_info(data, node, 'node_all'),
-            **get_area_info(data, 1 - tumor - node, 'outside_all'),
-            **get_histogram_info(data, areas, area_names)
+            **get_area_info(d_norm, node, 'node_all'),
+            **get_area_info(d_norm, 1 - tumor - node, 'outside_all'),
+            **get_histogram_info(d_norm, areas, area_names)
         }
 
         raw_info = []
@@ -286,6 +294,13 @@ if __name__ == '__main__':
 
         print('Smoothening interpret results...')
         smoothen_data = avg_filter(data)
+
+        # normalize original data
+        s_d_min = smoothen_data.min()
+        s_d_max = smoothen_data.max()
+
+        s_d_norm = ((data - s_d_min) / (s_d_max - s_d_min)).clip(0, 1)
+
         s_basic_info = {
             'pid': pid,
             'center': center,
@@ -293,17 +308,19 @@ if __name__ == '__main__':
             'os': os,
             'val_fold': int(base_folder[-2]),
             'test_fold': int(base_folder[-1]),
-            'vargrad_sum': smoothen_data.sum(),
-            'vargrad_ct_sum': smoothen_data[..., 0].sum(),
-            'vargrad_pt_sum': smoothen_data[..., 0].sum(),
-            'hu_corr_all': np.corrcoef(smoothen_data[..., 0].flatten(), ct_img.flatten()),
-            'suv_corr_all': np.corrcoef(smoothen_data[..., 1].flatten(), pt_img.flatten()),
+            'vargrad_sum': s_d_norm.sum(),
+            'vargrad_ct_sum': s_d_norm[..., 0].sum(),
+            'vargrad_pt_sum': s_d_norm[..., 0].sum(),
+            'hu_corr_all': np.corrcoef(s_d_norm[..., 0].flatten(),
+                                       ct_img.flatten())[0, 1],
+            'suv_corr_all': np.corrcoef(s_d_norm[..., 1].flatten(),
+                                        pt_img.flatten())[0, 1],
             'tumor_size': (tumor > 0).sum(),
-            **get_area_info(smoothen_data, tumor, 'tumor_all'),
+            **get_area_info(s_d_norm, tumor, 'tumor_all'),
             'node_size': (node > 0).sum(),
-            **get_area_info(smoothen_data, node, 'node_all'),
-            **get_area_info(smoothen_data, 1 - tumor - node, 'outside_all'),
-            **get_histogram_info(smoothen_data, areas, area_names)
+            **get_area_info(s_d_norm, node, 'node_all'),
+            **get_area_info(s_d_norm, 1 - tumor - node, 'outside_all'),
+            **get_histogram_info(s_d_norm, areas, area_names)
         }
 
         smooth_info = []
