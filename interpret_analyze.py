@@ -263,11 +263,15 @@ if __name__ == '__main__':
             'test_fold': int(base_folder[-1]),
             'vargrad_sum': d_norm.sum(),
             'vargrad_ct_sum': d_norm[..., 0].sum(),
-            'vargrad_pt_sum': d_norm[..., 0].sum(),
+            'vargrad_pt_sum': d_norm[..., 1].sum(),
             'hu_corr_all': np.corrcoef(d_norm[..., 0].flatten(),
                                        ct_img.flatten())[0, 1],
             'suv_corr_all': np.corrcoef(d_norm[..., 1].flatten(),
                                         pt_img.flatten())[0, 1],
+            'hu_corr_raw': np.corrcoef(d_norm[..., 0].flatten(),
+                                       img[..., 0].flatten())[0, 1],
+            'suv_corr_raw': np.corrcoef(d_norm[..., 1].flatten(),
+                                        img[..., 1].flatten())[0, 1],
             'tumor_size': (tumor > 0).sum(),
             **get_area_info(d_norm, tumor, 'tumor_all'),
             'node_size': (node > 0).sum(),
@@ -315,11 +319,15 @@ if __name__ == '__main__':
             'test_fold': int(base_folder[-1]),
             'vargrad_sum': s_d_norm.sum(),
             'vargrad_ct_sum': s_d_norm[..., 0].sum(),
-            'vargrad_pt_sum': s_d_norm[..., 0].sum(),
+            'vargrad_pt_sum': s_d_norm[..., 1].sum(),
             'hu_corr_all': np.corrcoef(s_d_norm[..., 0].flatten(),
                                        ct_img.flatten())[0, 1],
             'suv_corr_all': np.corrcoef(s_d_norm[..., 1].flatten(),
                                         pt_img.flatten())[0, 1],
+            'hu_corr_raw': np.corrcoef(s_d_norm[..., 0].flatten(),
+                                       img[..., 0].flatten())[0, 1],
+            'suv_corr_raw': np.corrcoef(s_d_norm[..., 1].flatten(),
+                                        img[..., 1].flatten())[0, 1],
             'tumor_size': (tumor > 0).sum(),
             **get_area_info(s_d_norm, tumor, 'tumor_all'),
             'node_size': (node > 0).sum(),
@@ -348,6 +356,62 @@ if __name__ == '__main__':
         print('Saving smoothen results...')
         pd.DataFrame(smooth_info).to_csv(
             base_folder + f'/{center}/smoothen/{pid}.csv', index=False)
+
+        print('Smoothening interpret results one more time...')
+        smoothen_data = avg_filter(smoothen_data)
+
+        # normalize original data
+        s_d_min = smoothen_data.min()
+        s_d_max = smoothen_data.max()
+
+        s_d_norm = ((smoothen_data - s_d_min) / (s_d_max - s_d_min)).clip(0, 1)
+
+        s_basic_info = {
+            'pid': pid,
+            'center': center,
+            'dfs': dfs,
+            'os': os,
+            'val_fold': int(base_folder[-2]),
+            'test_fold': int(base_folder[-1]),
+            'vargrad_sum': s_d_norm.sum(),
+            'vargrad_ct_sum': s_d_norm[..., 0].sum(),
+            'vargrad_pt_sum': s_d_norm[..., 1].sum(),
+            'hu_corr_all': np.corrcoef(s_d_norm[..., 0].flatten(),
+                                       ct_img.flatten())[0, 1],
+            'suv_corr_all': np.corrcoef(s_d_norm[..., 1].flatten(),
+                                        pt_img.flatten())[0, 1],
+            'hu_corr_raw': np.corrcoef(s_d_norm[..., 0].flatten(),
+                                       img[..., 0].flatten())[0, 1],
+            'suv_corr_raw': np.corrcoef(s_d_norm[..., 1].flatten(),
+                                        img[..., 1].flatten())[0, 1],
+            'tumor_size': (tumor > 0).sum(),
+            **get_area_info(s_d_norm, tumor, 'tumor_all'),
+            'node_size': (node > 0).sum(),
+            **get_area_info(s_d_norm, node, 'node_all'),
+            **get_area_info(s_d_norm, 1 - tumor - node, 'outside_all'),
+            **get_histogram_info(s_d_norm[..., 1], areas, area_names)
+        }
+
+        smooth_info = []
+        for quantile in [.95, .96, .97, .98, .99]:
+            s_thres = np.quantile(smoothen_data, quantile)
+            s_max_vargrad = smoothen_data.max()
+
+            print('Normalizing smoothen interpret results...')
+            s_data_normalized = ((smoothen_data - s_thres) /
+                                 (s_max_vargrad - s_thres)).clip(0, 1)
+            smooth_info.append({
+                **s_basic_info,
+                'quantile': quantile,
+                'vargrad_max': s_max_vargrad,
+                'vargrad_threshold': s_thres,
+                'vargrad_sum_selected': s_data_normalized.sum(),
+                **get_info(s_data_normalized, ct_img, pt_img, tumor, node),
+            })
+
+        print('Saving smoothen results...')
+        pd.DataFrame(smooth_info).to_csv(
+            base_folder + f'/{center}/smoothen_v2/{pid}.csv', index=False)
 
     else:
         print('Index not found!! Exiting')

@@ -35,6 +35,11 @@ if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/OUS/smoothen" ]
     echo "Didn't find OUS smoothen result folder. Creating folder..."
     mkdir --parents $PROJECTS/ngoc/outcome_model/$2/OUS/smoothen
     fi
+if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/OUS/smoothen_v2" ]
+    then
+    echo "Didn't find OUS smoothen result folder. Creating folder..."
+    mkdir --parents $PROJECTS/ngoc/outcome_model/$2/OUS/smoothen_v2
+    fi
 
 if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/MAASTRO/raw" ]
     then
@@ -46,6 +51,12 @@ if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/MAASTRO/smoothen" ]
     then
     echo "Didn't find MAASTRO smoothen result folder. Creating folder..."
     mkdir --parents $PROJECTS/ngoc/outcome_model/$2/MAASTRO/smoothen
+    fi
+
+if [ ! -d "$PROJECTS/ngoc/outcome_model/$2/MAASTRO/smoothen_v2" ]
+    then
+    echo "Didn't find MAASTRO smoothen result folder. Creating folder..."
+    mkdir --parents $PROJECTS/ngoc/outcome_model/$2/MAASTRO/smoothen_v2
     fi
 
 echo "Finished seting up files."
