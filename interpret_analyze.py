@@ -51,7 +51,12 @@ def get_overall_info(data):
         'pt_sum': data[..., 1].sum(),
         'pt_max': data[..., 1].max(),
         'pt_mean': data[..., 1].mean(),
-        'pt_std': data[..., 1].std()
+        'pt_std': data[..., 1].std(),
+        'T_total': (data[..., 2] > 0).sum(),
+        'T_sum': data[..., 2].sum(),
+        'T_max': data[..., 2].max(),
+        'T_mean': data[..., 2].mean(),
+        'T_std': data[..., 2].std()
     }
 
 
@@ -76,6 +81,14 @@ def get_area_info(data, area, name):
             f'pt_{name}_q1': np.quantile(selected_data[..., 1], 0.25),
             f'pt_{name}_q2': np.quantile(selected_data[..., 1], 0.5),
             f'pt_{name}_q3': np.quantile(selected_data[..., 1], 0.75),
+            f'T_{name}_total': (selected_data[..., 2] > 0).sum(),
+            f'T_{name}_sum': selected_data[..., 2].sum(),
+            f'T_{name}_max': selected_data[..., 2].max(),
+            f'T_{name}_mean': selected_data[..., 2].mean(),
+            f'T_{name}_std': selected_data[..., 2].std(),
+            f'T_{name}_q1': np.quantile(selected_data[..., 2], 0.25),
+            f'T_{name}_q2': np.quantile(selected_data[..., 2], 0.5),
+            f'T_{name}_q3': np.quantile(selected_data[..., 2], 0.75),
         }
     except Exception as e:
         print(e)
@@ -97,6 +110,14 @@ def get_area_info(data, area, name):
             f'pt_{name}_q1': 0,
             f'pt_{name}_q2': 0,
             f'pt_{name}_q3': 0,
+            f'T_{name}_total': 0,
+            f'T_{name}_sum': 0,
+            f'T_{name}_max': 0,
+            f'T_{name}_mean': 0,
+            f'T_{name}_std': 0,
+            f'T_{name}_q1': 0,
+            f'T_{name}_q2': 0,
+            f'T_{name}_q3': 0,
         }
 
 
@@ -264,6 +285,7 @@ if __name__ == '__main__':
             'vargrad_sum': d_norm.sum(),
             'vargrad_ct_sum': d_norm[..., 0].sum(),
             'vargrad_pt_sum': d_norm[..., 1].sum(),
+            'vargrad_T_sum': d_norm[..., 2].sum(),
             'hu_corr_all': np.corrcoef(d_norm[..., 0].flatten(),
                                        ct_img.flatten())[0, 1],
             'suv_corr_all': np.corrcoef(d_norm[..., 1].flatten(),
@@ -320,6 +342,7 @@ if __name__ == '__main__':
             'vargrad_sum': s_d_norm.sum(),
             'vargrad_ct_sum': s_d_norm[..., 0].sum(),
             'vargrad_pt_sum': s_d_norm[..., 1].sum(),
+            'vargrad_T_sum': s_d_norm[..., 2].sum(),
             'hu_corr_all': np.corrcoef(s_d_norm[..., 0].flatten(),
                                        ct_img.flatten())[0, 1],
             'suv_corr_all': np.corrcoef(s_d_norm[..., 1].flatten(),
@@ -376,6 +399,7 @@ if __name__ == '__main__':
             'vargrad_sum': s_d_norm.sum(),
             'vargrad_ct_sum': s_d_norm[..., 0].sum(),
             'vargrad_pt_sum': s_d_norm[..., 1].sum(),
+            'vargrad_T_sum': s_d_norm[..., 2].sum(),
             'hu_corr_all': np.corrcoef(s_d_norm[..., 0].flatten(),
                                        ct_img.flatten())[0, 1],
             'suv_corr_all': np.corrcoef(s_d_norm[..., 1].flatten(),
