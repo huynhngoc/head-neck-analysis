@@ -32,14 +32,14 @@ if [ ! -d "$TMPDIR/$USER/hn_delin" ]
     mkdir --parents $TMPDIR/$USER/hn_delin
     fi
 
-for f in $(ls $HOME/datasets/headneck/*)
+for f in $(ls $PROJECTS/ngoc/datasets/headneck/*)
     do
     FILENAME=`echo $f | awk -F/ '{print $NF}'`
     echo $FILENAME
     if [ ! -f "$TMPDIR/$USER/hn_delin/$FILENAME" ]
         then
         echo "copying $f"
-        cp -r $HOME/datasets/headneck/$FILENAME $TMPDIR/$USER/hn_delin/
+        cp -r $PROJECTS/ngoc/datasets/headneck/$FILENAME $TMPDIR/$USER/hn_delin/
         fi
     done
 
@@ -56,16 +56,16 @@ export RAY_ROOT=$TMPDIR/ray
 fold_list = $3
 for folds in ${fold_list//,/ }
 do
-    singularity exec --nv deoxys-2023-feb-fixed.sif python experiment_outcome_clinical.py $1_$fold.json /net/fs-1/Ngoc/hnperf/$2_$fold --temp_folder $SCRATCH/hnperf/$2_$fold --analysis_folder $SCRATCH/analysis/$2_$fold --epochs $4 ${@:5}
+    singularity exec --nv deoxys-2023-feb-fixed.sif python experiment_outcome_clinical.py $1_$fold.json $PROJECTS/ngoc/hnperf/$2_$fold --temp_folder $SCRATCH_PROJECTS/ceheads/hnperf/$2_$fold --analysis_folder $SCRATCH_PROJECTS/ceheads/analysis/$2_$fold --epochs $4 ${@:5}
 done
 
 test_fold_idx=${fold: -1}
 
-singularity exec --nv deoxys-2023-feb-fixed.sif python -u ensemble_outcome.py /net/fs-1/Ngoc/hnperf/$1_ $3 --merge_name test_fold$test_fold_idx
+singularity exec --nv deoxys-2023-feb-fixed.sif python -u ensemble_outcome.py $PROJECTS/ngoc/hnperf/$1_ $3 --merge_name test_fold$test_fold_idx
 
 for fold in ${fold_list//,/ }
 do
-    singularity exec --nv deoxys-2023-feb-fixed.sif python outcome_external_clinical.py external_config/outcome_maastro_tabular.json /net/fs-1/Ngoc/hnperf/$2_$fold --temp_folder $SCRATCH/hnperf/$2_$fold --analysis_folder $SCRATCH/analysis/$2_$fold ${@:5}
+    singularity exec --nv deoxys-2023-feb-fixed.sif python outcome_external_clinical.py external_config/outcome_maastro_tabular.json $PROJECTS/ngoc/hnperf/$2_$fold --temp_folder $SCRATCH_PROJECTS/ceheads/hnperf/$2_$fold --analysis_folder $SCRATCH_PROJECTS/ceheads/analysis/$2_$fold ${@:5}
 done
 
 fold_maastro=""
@@ -78,4 +78,4 @@ done
 fold_maastro=${fold_maastro:1}
 echo $fold_maastro
 
-singularity exec --nv deoxys-2023-feb-fixed.sif python -u ensemble_outcome.py /net/fs-1/Ngoc/hnperf/$1_ $fold_maastro --merge_name maastro_fold$test_fold_idx
+singularity exec --nv deoxys-2023-feb-fixed.sif python -u ensemble_outcome.py $PROJECTS/ngoc/hnperf/$1_ $fold_maastro --merge_name maastro_fold$test_fold_idx
