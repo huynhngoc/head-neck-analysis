@@ -1,0 +1,11 @@
+{
+    "config": {
+        "filename": "../../outcome_all_maastro.h5",
+        "test_folds": [
+            0,
+            1,
+            2,
+            3
+        ]
+    }
+}
