@@ -5,7 +5,7 @@
 #SBATCH --mem=16G                 # Default memory per CPU is 3GB.
 #SBATCH --partition=gpu # Use the verysmallmem-partition for jobs requiring < 10 GB RAM.
 #SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=1
 #SBATCH --mail-user=ngochuyn@nmbu.no # Email me when job is done.
 #SBATCH --mail-type=FAIL
 #SBATCH --output=outputs/fcn-%A.out
@@ -51,7 +51,7 @@ nvidia-modprobe -u -c=0
 
 # Run experiment
 # export ITER_PER_EPOCH=200
-export NUM_CPUS=4
+# export NUM_CPUS=4
 export RAY_ROOT=$TMPDIR/ray
 
 fold_list=$3
