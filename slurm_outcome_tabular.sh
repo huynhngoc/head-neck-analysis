@@ -55,7 +55,7 @@ export NUM_CPUS=4
 export RAY_ROOT=$TMPDIR/ray
 
 fold_list=$3
-for folds in ${fold_list//,/ }
+for fold in ${fold_list//,/ }
 do
     singularity exec --nv deoxys-2023-feb-fixed.sif python experiment_outcome_clinical.py $1_$fold.json $PROJECTS/ngoc/hnperf/$2_$fold --temp_folder $SCRATCH_PROJECTS/ceheads/hnperf/$2_$fold --analysis_folder $SCRATCH_PROJECTS/ceheads/analysis/$2_$fold --epochs $4 ${@:5}
 done
