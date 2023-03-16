@@ -62,7 +62,7 @@ done
 
 test_fold_idx=${fold: -1}
 
-singularity exec --nv deoxys-2023-feb-fixed.sif python -u ensemble_outcome.py $PROJECTS/ngoc/hnperf/$1_ $3 --merge_name test_fold$test_fold_idx
+singularity exec --nv deoxys-2023-feb-fixed.sif python -u ensemble_outcome.py $PROJECTS/ngoc/hnperf/$2_ $3 --merge_name test_fold$test_fold_idx
 
 for fold in ${fold_list//,/ }
 do
@@ -79,4 +79,4 @@ done
 fold_maastro=${fold_maastro:1}
 echo $fold_maastro
 
-singularity exec --nv deoxys-2023-feb-fixed.sif python -u ensemble_outcome.py $PROJECTS/ngoc/hnperf/$1_ $fold_maastro --merge_name maastro_fold$test_fold_idx
+singularity exec --nv deoxys-2023-feb-fixed.sif python -u ensemble_outcome.py $PROJECTS/ngoc/hnperf/$2_ $fold_maastro --merge_name maastro_fold$test_fold_idx
