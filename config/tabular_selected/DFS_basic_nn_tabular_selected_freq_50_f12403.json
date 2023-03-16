@@ -836,20 +836,6 @@
                     "config": {
                         "channel": [
                             7,
-                            21,
-                            142,
-                            215,
-                            316,
-                            11,
-                            205
-                        ]
-                    }
-                },
-                {
-                    "class_name": "ChannelSelector",
-                    "config": {
-                        "channel": [
-                            7,
                             10,
                             12,
                             21,
