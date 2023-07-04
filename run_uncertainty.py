@@ -27,7 +27,6 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("name")
-    parser.add_argument("save_path")
     parser.add_argument("source")
     parser.add_argument("--iter", default=1, type=int)
     parser.add_argument("--dropout_rate", default=10, type=int)
@@ -48,17 +47,17 @@ if __name__ == '__main__':
             # Virtual devices must be set before GPUs have been initialized
             print(e)
 
-    base_path = args.save_path + '/' + args.name + '_' + str(args.dropout_rate)
+    base_path = args.source + '/' + args.name + '_' + str(args.dropout_rate)
     iter = args.iter
 
     if not os.path.exists(base_path):
         os.makedirs(base_path)
 
-    ous_h5 = args.source + '/ous_test.h5'
-    ous_csv = args.source + '/ous_test.csv'
-    maastro_h5 = args.source + '/maastro_full.h5'
-    maastro_csv = args.source + '/maastro_full.csv'
-    model_file = args.source + '/model.h5'
+    ous_h5 = args.source + '/' + args.name + '/ous_test.h5'
+    ous_csv = args.source + '/' + args.name + '/ous_test.csv'
+    maastro_h5 = args.source + '/' + args.name + '/maastro_full.h5'
+    maastro_csv = args.source + '/' + args.name + '/maastro_full.csv'
+    model_file = args.source + '/' + args.name + '/model.h5'
 
     # NOTE: exclude patient 5 from MAASTRO set
     # data = data[data.patient_idx != 5]
