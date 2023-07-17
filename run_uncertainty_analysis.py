@@ -81,8 +81,8 @@ if __name__ == '__main__':
     if not os.path.exists(base_path):
         os.makedirs(base_path)
 
-    ous_h5 = args.source + '/' + args.name + '/ous_original_results.h5'
-    ous_csv = args.source + '/' + args.name + '/ous_test.csv'
+    ous_h5 = args.source + '/' + args.name + '/ous_test.h5'
+    ous_csv = args.source + '/' + args.name + '/ous_original_results.csv'
     maastro_h5 = args.source + '/' + args.name + '/maastro_full.h5'
     maastro_csv = args.source + '/' + args.name + '/maastro_original_results.csv'
     # model_file = args.source + '/' + args.name + '/model.h5'
