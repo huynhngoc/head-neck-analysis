@@ -113,6 +113,7 @@ if __name__ == '__main__':
         intersection = None
         union = None
         for i in range(1, num_mc + 1):
+            print('mc_idx:', i)
             with open(base_path + f'/OUS/{pid}/{i:02d}.npy', 'rb') as f:
                 prob = np.load(f)
             # entropy map
@@ -135,6 +136,7 @@ if __name__ == '__main__':
             for j in range(i + 1, num_mc + 1):
                 if i == j:
                     continue
+                print('mc_idx cross:', j)
                 with open(base_path + f'/OUS/{pid}/{j:02d}.npy', 'rb') as f:
                     prob_2 = np.load(f)
 
@@ -158,7 +160,7 @@ if __name__ == '__main__':
 
         y_pred = np.stack(y_pred, axis=0).mean(axis=0)
         uncertainty_map = - y_pred * np.log(y_pred)
-        with open(base_path + f'/OUS_uncertainty_map/{num_mc:02d}/' + str(pid) + f'/{iter:02d}.npy', 'wb') as f:
+        with open(base_path + f'/OUS_uncertainty_map/{num_mc:02d}/{pid}.npy', 'wb') as f:
             np.save(f, uncertainty_map)
 
     pd.DataFrame(iou_info).to_csv(
@@ -191,6 +193,7 @@ if __name__ == '__main__':
         intersection = None
         union = None
         for i in range(1, num_mc + 1):
+            print('mc_idx:', i)
             with open(base_path + f'/MAASTRO/{pid}/{i:02d}.npy', 'rb') as f:
                 prob = np.load(f)
             # entropy map
@@ -213,6 +216,7 @@ if __name__ == '__main__':
             for j in range(i + 1, num_mc + 1):
                 if i == j:
                     continue
+                print('mc_idx cross:', j)
                 with open(base_path + f'/MAASTRO/{pid}/{j:02d}.npy', 'rb') as f:
                     prob_2 = np.load(f)
 
@@ -236,7 +240,7 @@ if __name__ == '__main__':
 
         y_pred = np.stack(y_pred, axis=0).mean(axis=0)
         uncertainty_map = - y_pred * np.log(y_pred)
-        with open(base_path + f'/MAASTRO_uncertainty_map/{num_mc:02d}/' + str(pid) + f'/{iter:02d}.npy', 'wb') as f:
+        with open(base_path + f'/MAASTRO_uncertainty_map/{num_mc:02d}/{pid}.npy', 'wb') as f:
             np.save(f, uncertainty_map)
 
     pd.DataFrame(iou_info).to_csv(
